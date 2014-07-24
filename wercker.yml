@@ -1,0 +1,12 @@
+box: wercker/golang
+build:
+    steps:
+      - script:
+          name: go get
+          code: |
+            go version
+            go get -d -t ./...            
+      - script:
+          name: go test
+          code: |
+            go test ./...
