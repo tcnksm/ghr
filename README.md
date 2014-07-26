@@ -1,6 +1,8 @@
 ghr [![wercker status](https://app.wercker.com/status/d03e68731c944d8202914a8aaa93d3f0/s "wercker status")](https://app.wercker.com/project/bykey/d03e68731c944d8202914a8aaa93d3f0)
 ====
 
+Not released
+
 Easy to release your project to Github Release page.
 
 ## Synopsis
