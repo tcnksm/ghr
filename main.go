@@ -6,9 +6,27 @@ import (
 	"os"
 )
 
+type Info struct {
+	Token           string
+	TagName         string
+	RepoName        string
+	OwnerName       string
+	TargetCommitish string
+	Draft           bool
+	Prerelease      bool
+}
+
 func debug(v ...interface{}) {
 	if os.Getenv("DEBUG") != "" {
 		log.Println(v...)
+	}
+}
+
+func NewInfo() Info {
+	return Info{
+		TargetCommitish: "master",
+		Draft:           false,
+		Prerelease:      false,
 	}
 }
 
@@ -27,30 +45,49 @@ func ghrMain() int {
 	}
 
 	if len(os.Args) != 3 {
-		fmt.Fprintf(os.Stderr, "Usage: ghr <version> <artifact>\n")
+		fmt.Fprintf(os.Stderr, "Usage: ghr <tag> <artifact>\n")
 		return 1
 	}
 
-	version := os.Args[1]
-	debug(version)
+	tag := os.Args[1]
+	debug(tag)
 
 	artifacts := os.Args[2]
 	debug(artifacts)
 
-	owner, _ := GitOwner()
+	// git config --global user.name
+	// tcnksm
+	owner, err := GitOwner()
+	if err != nil || owner == "" {
+		fmt.Fprintf(os.Stderr, "Please set `git config --global user.name`\n")
+		return 1
+	}
 	debug(owner)
 
-	remoteURL, _ := GitRemote()
+	// git config --local remote.origin.url
+	// https://github.com/tcnksm/ghr.git
+	remoteURL, err := GitRemote()
+	if err != nil || remoteURL == "" {
+		fmt.Fprintf(os.Stderr, "Please set remote host of your project\n")
+		return 1
+	}
 	debug(remoteURL)
 
 	repo := GitRepoName(remoteURL)
 	debug(repo)
 
-	// git config --local remote.origin.url
-	// https://github.com/tcnksm/ghr.git
+	info := NewInfo()
+	info.Token = os.Getenv("GITHUB_TOKEN")
+	info.TagName = tag
+	info.OwnerName = owner
+	info.RepoName = repo
+	debug(info)
 
-	// git config --global user.name
-	// tcnksm
+	err = CreateNewRelease(info)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, err.Error())
+		return 0
+	}
 
 	fmt.Fprintf(os.Stderr, "Success\n")
 	return 0
