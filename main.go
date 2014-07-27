@@ -83,12 +83,29 @@ func ghrMain() int {
 	info.RepoName = repo
 	debug(info)
 
-	err = CreateNewRelease(info)
+	id, err := GetReleaseID(info)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
-		return 0
+		return 1
+	}
+	debug(id)
+
+	if id == -1 {
+		err = CreateNewRelease(info)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			return 1
+		}
+
+		id, err = GetReleaseID(info)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			return 1
+		}
 	}
 
-	fmt.Fprintf(os.Stderr, "Success\n")
+	debug(id)
+	//
+
 	return 0
 }

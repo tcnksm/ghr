@@ -13,10 +13,15 @@ import (
 
 const (
 	RELEASE_URL = "https://api.github.com/repos/%s/%s/releases"
-	UPLOAD_URL  = "https://uploads.github.com/repos/%s/%s/releases/%s/assets?name=%s"
+	UPLOAD_URL  = "https://uploads.github.com/repos/%s/%s/releases/%s/assets"
 )
 
-type ReleaseBody struct {
+type Releases struct {
+	ID      int    `json:"id"`
+	TagName string `json:"tag_name"`
+}
+
+type ReleaseRequest struct {
 	TagName         string `json:"tag_name"`
 	TargetCommitish string `json:"target_commitish"`
 	Draft           bool   `json:"draft"`
@@ -30,12 +35,51 @@ func debugResponseBody(body io.ReadCloser) {
 	}
 }
 
+func GetReleaseID(info Info) (int, error) {
+
+	url := fmt.Sprintf(RELEASE_URL, info.OwnerName, info.RepoName)
+	debug(url)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return -1, err
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return -1, err
+	}
+	defer res.Body.Close()
+
+	debug(res.Status)
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return -1, err
+	}
+	debug(string(body))
+
+	var releases []Releases
+	err = json.Unmarshal(body, &releases)
+	if err != nil {
+		return -1, err
+	}
+
+	for _, release := range releases {
+		if release.TagName == info.TagName {
+			return release.ID, nil
+		}
+	}
+
+	return -1, nil
+}
+
 func CreateNewRelease(info Info) error {
 
 	url := fmt.Sprintf(RELEASE_URL, info.OwnerName, info.RepoName)
 	debug(url)
 
-	params := ReleaseBody{
+	params := ReleaseRequest{
 		TagName:         info.TagName,
 		TargetCommitish: info.TargetCommitish,
 		Draft:           info.Draft,
