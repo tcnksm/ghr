@@ -58,25 +58,18 @@ func ghrMain() int {
 	path := os.Args[2]
 	debug(path)
 
-	// git config --global user.name
-	// tcnksm
-	owner, err := GitOwner()
-	if err != nil || owner == "" {
-		fmt.Fprintf(os.Stderr, "Please set `git config --global user.name`\n")
+	owner, err := GetOwnerName()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, err.Error())
 		return 1
 	}
 	debug(owner)
 
-	// git config --local remote.origin.url
-	// https://github.com/tcnksm/ghr.git
-	remoteURL, err := GitRemote()
-	if err != nil || remoteURL == "" {
-		fmt.Fprintf(os.Stderr, "Please set remote host of your project\n")
+	repo, err := GetRepoName()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, err.Error())
 		return 1
 	}
-	debug(remoteURL)
-
-	repo := GitRepoName(remoteURL)
 	debug(repo)
 
 	info := NewInfo()

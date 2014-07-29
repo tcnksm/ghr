@@ -29,12 +29,16 @@ func TestGitConfig(t *testing.T) {
 	url, err := gitConfig("remote.origin.url")
 	Expect(err).NotTo(HaveOccurred())
 	Expect(url).To(Equal("https://github.com/tcnksm/test.git"))
+
+	blank, err := gitConfig("nothing.nothing")
+	Expect(err).To(HaveOccurred())
+	Expect(blank).To(Equal(""))
 }
 
-func TestGitRepoName(t *testing.T) {
+func TestRetrieveRepoName(t *testing.T) {
 	RegisterTestingT(t)
 
-	repo := GitRepoName("https://github.com/tcnksm/ghr.git")
+	repo := retrieveRepoName("https://github.com/tcnksm/ghr.git")
 	Expect(repo).To(Equal("ghr"))
 }
 
