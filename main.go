@@ -127,7 +127,8 @@ func ghrMain() int {
 		go func(p string) {
 			defer wg.Done()
 			fmt.Printf("--> Uploading: %15s\n", p)
-			if err := uploadAsset(info, p); err != nil {
+			// TODO check IsDir
+			if err := UploadAsset(info, p); err != nil {
 				errorLock.Lock()
 				defer errorLock.Unlock()
 				errors = append(errors,
