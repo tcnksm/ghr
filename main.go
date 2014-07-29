@@ -6,12 +6,22 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+
+	flag "github.com/dotcloud/docker/pkg/mflag"
 )
 
 func debug(v ...interface{}) {
 	if os.Getenv("DEBUG") != "" {
 		log.Println(v...)
 	}
+}
+
+func showVersion() {
+	fmt.Fprintf(os.Stderr, "ghr %s\n", Version)
+}
+
+func showHelp() {
+	fmt.Fprintf(os.Stderr, helpText)
 }
 
 func artifacts(path string) ([]string, error) {
@@ -47,13 +57,35 @@ func ghrMain() int {
 		return 1
 	}
 
-	if len(os.Args) != 3 {
-		fmt.Fprintf(os.Stderr, "Usage: ghr <tag> <artifact>\n")
+	var (
+		flVersion = flag.Bool([]string{"v", "-version"}, false, "Print version information and quit")
+		flHelp    = flag.Bool([]string{"h", "-help"}, false, "Print this message and quit")
+		flDebug   = flag.Bool([]string{"-debug"}, false, "Run as DEBUG mode")
+	)
+	flag.Parse()
+
+	if *flHelp {
+		showHelp()
+		return 0
+	}
+
+	if *flVersion {
+		showVersion()
+		return 0
+	}
+
+	if *flDebug {
+		os.Setenv("DEBUG", "1")
+		debug("Run as DEBUG mode")
+	}
+
+	if len(flag.Args()) != 2 {
+		showHelp()
 		return 1
 	}
 
-	tag := os.Args[1]
-	inputPath := os.Args[2]
+	tag := flag.Arg(0)
+	inputPath := flag.Arg(1)
 
 	owner, err := GetOwnerName()
 	if err != nil {
@@ -137,3 +169,18 @@ func ghrMain() int {
 
 	return 0
 }
+
+const helpText = `Usage: ghr [option] <tag> <artifacts>
+
+ghr - easy to release to Github in parallel
+
+Options:
+
+  -h, --help       Print this message and quit
+  -v, --version    Print version information and quit
+  --debug=false    Run as DEBUG mode
+
+Example:
+  $ ghr v1.0.0 pkg/dist/
+  $ ghr v1.0.2 pkg/dist/tool.zip
+`
