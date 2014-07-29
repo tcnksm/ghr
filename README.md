@@ -1,35 +1,58 @@
 ghr [![wercker status](https://app.wercker.com/status/d03e68731c944d8202914a8aaa93d3f0/s "wercker status")](https://app.wercker.com/project/bykey/d03e68731c944d8202914a8aaa93d3f0)
 ====
 
-Not released
-
 Easy to release your project to Github Release page.
 
-## Synopsis
+## Description
 
-`ghr` enable you to create release on Github and upload your artifacts to it. 
+`ghr` enable you to create release on Github and upload your artifacts to it. `ghr` will parallelize upload multiple artifacts.
 
 ## Demo
 
+## VS.
+
+- [aktau/github-release](https://github.com/aktau/github-release) - `github-release` can also create and edit releases and upload artifacts. It has many options. `ghr` is a simple alternative. And `ghr` will parallelize upload artifacts.
+
+
 ## Usage
 
-To upload all package in `pkg` directory:
+You need to execute command in your github project directory:
 
 ```bash
-$ ghr v1.0 pkg
+$ ghr [option] <tag> <artifacts>
+```
+
+You need to set `GITHUB_TOKEN` environmental variable:
+
+```bash
+$ export GITHUB_TOKEN="....."
+```
+
+## Example
+
+To upload all package in `pkg` directory with tag `v0.1.0`
+
+```bash
+$ ghr v0.1.0 pkg/
+--> Uploading: pkg/0.1.0_SHASUMS
+--> Uploading: pkg/ghr_0.1.0_darwin_386.zip
+--> Uploading: pkg/ghr_0.1.0_darwin_amd64.zip
+--> Uploading: pkg/ghr_0.1.0_linux_386.zip
+--> Uploading: pkg/ghr_0.1.0_linux_amd64.zip
+--> Uploading: pkg/ghr_0.1.0_windows_386.zip
+--> Uploading: pkg/ghr_0.1.0_windows_amd64.zip
 ```
 
 ## Install
 
-To install, use `go get`:
+If you are OSX user, you can use [Homebrew](http://brew.sh/):
 
 ```bash
-$ go get -d github.com/tcnksm/ghr
+$ brew tap tcnksm/ghr
+$ brew install ghr
 ```
 
-## VS.
-
-- [aktau/github-release](https://github.com/aktau/github-release) - `github-release` can also create and edit releases and upload artifacts. It has many options. `ghr` is a super slim alternative.
+If you are in another platform, please install binary from [relase page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory. 
 
 ## Contribution
 
@@ -37,9 +60,17 @@ $ go get -d github.com/tcnksm/ghr
 1. Create a feature branch
 1. Commit your changes
 1. Rebase your local changes against the master branch
-1. Run test suite with the `go test ./...` command and confirm that it passes
+1. Run test suite with the `make test` command and confirm that it passes
 1. Run `gofmt -s`
 1. Create new Pull Request
+
+You can get source with `go get`:
+
+```bash
+$ go get -d github.com/tcnksm/ghr
+$ cd $GOPATH/src/github.com/tcnksm/cli-init
+$ make install
+```
 
 ## Licence
 
