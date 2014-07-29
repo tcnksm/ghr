@@ -1,13 +1,17 @@
 ghr [![wercker status](https://app.wercker.com/status/d03e68731c944d8202914a8aaa93d3f0/s "wercker status")](https://app.wercker.com/project/bykey/d03e68731c944d8202914a8aaa93d3f0)
 ====
 
-Easy to release your project to Github Release page.
+Easy to release your packages to Github Release page.
 
 ## Description
 
-`ghr` enable you to create release on Github and upload your artifacts to it. `ghr` will parallelize upload multiple artifacts.
+`ghr` enable you to create Github release page and upload your artifacts to it. `ghr` will parallelize upload multiple artifacts.
 
 ## Demo
+
+![](http://deeeet.com/writing/images/post/ghr.gif)
+
+Result is [here](https://github.com/tcnksm/ghr/releases/tag/v0.1.0).
 
 ## VS.
 
@@ -16,7 +20,7 @@ Easy to release your project to Github Release page.
 
 ## Usage
 
-You need to execute command in your github project directory:
+Run it in your project directory:
 
 ```bash
 $ ghr [option] <tag> <artifacts>
@@ -52,7 +56,7 @@ $ brew tap tcnksm/ghr
 $ brew install ghr
 ```
 
-If you are in another platform, please install binary from [relase page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory. 
+If you are in another platform, download binary from [relase page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory. 
 
 ## Contribution
 
