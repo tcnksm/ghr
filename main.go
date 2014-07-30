@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	flag "github.com/dotcloud/docker/pkg/mflag"
+	"runtime"
 )
 
 func debug(v ...interface{}) {
@@ -61,6 +62,7 @@ func ghrMain() int {
 		flVersion = flag.Bool([]string{"v", "-version"}, false, "Print version information and quit")
 		flHelp    = flag.Bool([]string{"h", "-help"}, false, "Print this message and quit")
 		flDebug   = flag.Bool([]string{"-debug"}, false, "Run as DEBUG mode")
+		parallel  = flag.Int([]string{"p", "--parallel"}, -1, "Parallelization factor")
 	)
 	flag.Parse()
 
@@ -77,6 +79,12 @@ func ghrMain() int {
 	if *flDebug {
 		os.Setenv("DEBUG", "1")
 		debug("Run as DEBUG mode")
+	}
+
+	// Limit amount of parallelism
+	// by number of logic CPU
+	if *parallel <= 0 {
+		*parallel = runtime.NumCPU()
 	}
 
 	if len(flag.Args()) != 2 {
@@ -133,10 +141,14 @@ func ghrMain() int {
 		return 1
 	}
 
+	// Use CPU efficiently
+	cpu := runtime.NumCPU()
+	runtime.GOMAXPROCS(cpu)
+
 	var errorLock sync.Mutex
 	var wg sync.WaitGroup
 	errors := make([]string, 0)
-
+	semaphore := make(chan int, *parallel)
 	for _, path := range files {
 		wg.Add(1)
 		go func(path string) {
@@ -148,6 +160,7 @@ func ghrMain() int {
 				return
 			}
 
+			semaphore <- 1
 			fmt.Printf("--> Uploading: %15s\n", path)
 			if err := UploadAsset(info, path); err != nil {
 				errorLock.Lock()
@@ -155,6 +168,7 @@ func ghrMain() int {
 				errors = append(errors,
 					fmt.Sprintf("%s error: %s", path, err))
 			}
+			<-semaphore
 		}(path)
 	}
 	wg.Wait()
@@ -176,9 +190,10 @@ ghr - easy to release to Github in parallel
 
 Options:
 
-  -h, --help       Print this message and quit
-  -v, --version    Print version information and quit
-  --debug=false    Run as DEBUG mode
+  -p, --parallel=-1  Amount of parallelism, defaults to number of CPUs
+  -h, --help         Print this message and quit
+  -v, --version      Print version information and quit
+  --debug=false      Run as DEBUG mode
 
 Example:
   $ ghr v1.0.0 pkg/dist/
