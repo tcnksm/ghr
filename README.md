@@ -13,10 +13,6 @@ Easy to release your packages to Github Release page.
 
 Result is [here](https://github.com/tcnksm/ghr/releases/tag/v0.1.0).
 
-## VS.
-
-- [aktau/github-release](https://github.com/aktau/github-release) - `github-release` can also create and edit releases and upload artifacts. It has many options. `ghr` is a simple alternative. And `ghr` will parallelize upload artifacts.
-
 
 ## Usage
 
@@ -56,7 +52,17 @@ $ brew tap tcnksm/ghr
 $ brew install ghr
 ```
 
-If you are in another platform, download binary from [relase page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory. 
+If you are in another platform, you can install it with `curl`:
+
+```bash
+$ L=/usr/local/bin/ghr && curl -sL -A "`uname -sp`"  http://ghr.herokuapp.com/ghr.zip | zcat >$L && chmod +x $L
+```
+
+You can also download binary from [relase page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory. 
+
+## VS.
+
+- [aktau/github-release](https://github.com/aktau/github-release) - `github-release` can also create and edit releases and upload artifacts. It has many options. `ghr` is a simple alternative. And `ghr` will parallelize upload artifacts.
 
 ## Contribution
 
