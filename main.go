@@ -62,6 +62,7 @@ func ghrMain() int {
 		flVersion = flag.Bool([]string{"v", "-version"}, false, "Print version information and quit")
 		flHelp    = flag.Bool([]string{"h", "-help"}, false, "Print this message and quit")
 		flDebug   = flag.Bool([]string{"-debug"}, false, "Run as DEBUG mode")
+		flOwner   = flag.String([]string{"u", "-username"}, "", "GitHub username")
 		parallel  = flag.Int([]string{"p", "--parallel"}, -1, "Parallelization factor")
 	)
 	flag.Parse()
@@ -99,6 +100,9 @@ func ghrMain() int {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		return 1
+	}
+	if len(*flOwner) > 0 {
+		owner = *flOwner
 	}
 
 	repo, err := GetRepoName()
@@ -193,6 +197,7 @@ Options:
   -p, --parallel=-1  Amount of parallelism, defaults to number of CPUs
   -h, --help         Print this message and quit
   -v, --version      Print version information and quit
+  -u, --username     Github username
   --debug=false      Run as DEBUG mode
 
 Example:
