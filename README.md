@@ -1,4 +1,4 @@
-ghr [![Build Status](https://drone.io/github.com/tcnksm/ghr/status.png)](https://drone.io/github.com/tcnksm/ghr/latest) [![Coverage Status](https://coveralls.io/repos/tcnksm/ghr/badge.png?branch=master)](https://coveralls.io/r/tcnksm/ghr?branch=master)
+ghr [![Build Status](https://drone.io/github.com/tcnksm/ghr/status.png)](https://drone.io/github.com/tcnksm/ghr/latest) [![Coverage Status](https://coveralls.io/repos/tcnksm/ghr/badge.png?branch=master)](https://coveralls.io/r/tcnksm/ghr?branch=master) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/tcnksm/ghr/blob/master/LICENCE)
 ====
 
 Easy to release your packages to Github Release page.
@@ -81,10 +81,6 @@ $ go get -d github.com/tcnksm/ghr
 $ cd $GOPATH/src/github.com/tcnksm/cli-init
 $ make install
 ```
-
-## Licence
-
-[MIT](https://github.com/tcnksm/ghr/blob/master/LICENCE)
 
 ## Author
 
