@@ -1,4 +1,4 @@
-ghr [![wercker status](https://app.wercker.com/status/d03e68731c944d8202914a8aaa93d3f0/s "wercker status")](https://app.wercker.com/project/bykey/d03e68731c944d8202914a8aaa93d3f0)
+ghr [![Build Status](https://drone.io/github.com/tcnksm/ghr/status.png)](https://drone.io/github.com/tcnksm/ghr/latest) [![Coverage Status](https://coveralls.io/repos/tcnksm/ghr/badge.png?branch=master)](https://coveralls.io/r/tcnksm/ghr?branch=master)
 ====
 
 Easy to release your packages to Github Release page.
