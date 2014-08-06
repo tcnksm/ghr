@@ -7,14 +7,7 @@ type Info struct {
 	RepoName        string
 	OwnerName       string
 	TargetCommitish string
+	Body            string
 	Draft           bool
 	Prerelease      bool
-}
-
-func NewInfo() Info {
-	return Info{
-		TargetCommitish: "master",
-		Draft:           false,
-		Prerelease:      false,
-	}
 }

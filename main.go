@@ -11,6 +11,18 @@ import (
 	"runtime"
 )
 
+var (
+	owner        = flag.String([]string{"u", "-username"}, "", "GitHub username")
+	repo         = flag.String([]string{"r", "-repository"}, "", "Repository name")
+	token        = flag.String([]string{"t", "-token"}, "", "Github API Token")
+	parallel     = flag.Int([]string{"p", "--parallel"}, -1, "Parallelization factor")
+	flDraft      = flag.Bool([]string{"-draft"}, false, "Create unpublised release")
+	flPrerelease = flag.Bool([]string{"-prerelease"}, false, "Create prerelease")
+	flVersion    = flag.Bool([]string{"v", "-version"}, false, "Print version information and quit")
+	flHelp       = flag.Bool([]string{"h", "-help"}, false, "Print this message and quit")
+	flDebug      = flag.Bool([]string{"-debug"}, false, "Run as DEBUG mode")
+)
+
 func debug(v ...interface{}) {
 	if os.Getenv("DEBUG") != "" {
 		log.Println(v...)
@@ -53,18 +65,6 @@ func main() {
 
 func ghrMain() int {
 
-	if os.Getenv("GITHUB_TOKEN") == "" {
-		fmt.Fprintf(os.Stderr, "Please set your Github API Token in the GITHUB_TOKEN env var\n")
-		return 1
-	}
-
-	var (
-		flVersion = flag.Bool([]string{"v", "-version"}, false, "Print version information and quit")
-		flHelp    = flag.Bool([]string{"h", "-help"}, false, "Print this message and quit")
-		flDebug   = flag.Bool([]string{"-debug"}, false, "Run as DEBUG mode")
-		flOwner   = flag.String([]string{"u", "-username"}, "", "GitHub username")
-		parallel  = flag.Int([]string{"p", "--parallel"}, -1, "Parallelization factor")
-	)
 	flag.Parse()
 
 	if *flHelp {
@@ -82,12 +82,6 @@ func ghrMain() int {
 		debug("Run as DEBUG mode")
 	}
 
-	// Limit amount of parallelism
-	// by number of logic CPU
-	if *parallel <= 0 {
-		*parallel = runtime.NumCPU()
-	}
-
 	if len(flag.Args()) != 2 {
 		showHelp()
 		return 1
@@ -96,26 +90,47 @@ func ghrMain() int {
 	tag := flag.Arg(0)
 	inputPath := flag.Arg(1)
 
-	owner, err := GetOwnerName()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
-		return 1
-	}
-	if len(*flOwner) > 0 {
-		owner = *flOwner
+	var err error
+
+	if *owner == "" {
+		*owner, err = GetOwnerName()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			return 1
+		}
 	}
 
-	repo, err := GetRepoName()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
-		return 1
+	if *repo == "" {
+		*repo, err = GetRepoName()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			return 1
+		}
 	}
 
-	info := NewInfo()
-	info.Token = os.Getenv("GITHUB_TOKEN")
-	info.TagName = tag
-	info.OwnerName = owner
-	info.RepoName = repo
+	if *token == "" {
+		*token = os.Getenv("GITHUB_TOKEN")
+		if *token == "" {
+			fmt.Fprintf(os.Stderr, "Please set your Github API Token in the GITHUB_TOKEN env var\n")
+			return 1
+		}
+	}
+
+	// Limit amount of parallelism
+	// by number of logic CPU
+	if *parallel <= 0 {
+		*parallel = runtime.NumCPU()
+	}
+
+	info := Info{
+		TagName:         tag,
+		Token:           *token,
+		OwnerName:       *owner,
+		RepoName:        *repo,
+		TargetCommitish: "master",
+		Draft:           *flDraft,
+		Prerelease:      *flPrerelease,
+	}
 	debug(info)
 
 	id, err := GetReleaseID(info)
@@ -194,10 +209,14 @@ ghr - easy to release to Github in parallel
 
 Options:
 
+  -u, --username     Github username
+  -t, --token        Github API Token
+  -r, --repository   Github repository name
   -p, --parallel=-1  Amount of parallelism, defaults to number of CPUs
+  --draft            Create unpublised release
+  --prerelease       Create prerelease	
   -h, --help         Print this message and quit
   -v, --version      Print version information and quit
-  -u, --username     Github username
   --debug=false      Run as DEBUG mode
 
 Example:
