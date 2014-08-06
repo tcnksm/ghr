@@ -1,11 +1,11 @@
 ghr [![Build Status](https://drone.io/github.com/tcnksm/ghr/status.png)](https://drone.io/github.com/tcnksm/ghr/latest) [![Coverage Status](https://coveralls.io/repos/tcnksm/ghr/badge.png?branch=master)](https://coveralls.io/r/tcnksm/ghr?branch=master) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/tcnksm/ghr/blob/master/LICENCE)
 ====
 
-Easy to release your packages to Github Release page.
+Easy to ship your project on Github to your user 
 
 ## Description
 
-`ghr` enable you to create Github release page and upload your artifacts to it. `ghr` will parallelize upload multiple artifacts.
+`ghr` enable you to create Release on Github and upload your artifacts to it. `ghr` will parallelize upload multiple artifacts.
 
 ## Demo
 
@@ -41,6 +41,21 @@ $ ghr v0.1.0 pkg/
 --> Uploading: pkg/ghr_0.1.0_linux_amd64.zip
 --> Uploading: pkg/ghr_0.1.0_windows_386.zip
 --> Uploading: pkg/ghr_0.1.0_windows_amd64.zip
+```
+
+## Options
+
+You can set some options:
+
+```bash
+$ ghr \
+    -t <token> \       # Set Github API Token
+    -u <username> \    # Set Github username
+    -r <repository> \  # Set repository name
+    -p <num> \         # Set amount of parallelism (Default is number of CPU)
+    --draft \          # Release as draft (Unpublish)
+    --prerelease \     # Crate prerelease
+    <tag> <artifacts>
 ```
 
 ## Install
