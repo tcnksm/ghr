@@ -9,14 +9,13 @@ import (
 	"strings"
 )
 
-var RepoNameRegexp = regexp.MustCompile(`.+/([^/]+)\.git$`)
+var RepoNameRegexp = regexp.MustCompile(`.+/([^/]+)(\.git)?$`)
 
 func GetRepoName() (string, error) {
 	url, err := gitRemote()
 	if err != nil || url == "" {
 		return "", fmt.Errorf("Cound not retrieve remote repository url\n")
 	}
-
 	repo := retrieveRepoName(url)
 	if repo == "" {
 		return "", fmt.Errorf("Cound not retrieve repository name\n")
