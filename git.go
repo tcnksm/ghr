@@ -33,7 +33,7 @@ func GetOwnerName() (string, error) {
 
 func retrieveRepoName(url string) string {
 	matched := RepoNameRegexp.FindStringSubmatch(url)
-	return matched[1]
+	return strings.TrimRight(matched[1], ".git")
 }
 
 // git config --local remote.origin.url

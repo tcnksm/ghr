@@ -40,6 +40,9 @@ func TestRetrieveRepoName(t *testing.T) {
 
 	repo := retrieveRepoName("https://github.com/tcnksm/ghr.git")
 	Expect(repo).To(Equal("ghr"))
+
+	repo = retrieveRepoName("https://github.com/tcnksm/ghr")
+	Expect(repo).To(Equal("ghr"))
 }
 
 func withGitConfigFile(content string) func() {
