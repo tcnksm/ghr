@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>ghr(1) - Easy to ship your project on Github to your user</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#OPTIONS">OPTIONS</a>
+    <a href="#EXAMPLES">EXAMPLES</a>
+    <a href="#COPYRIGHT">COPYRIGHT</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>ghr(1)</li>
+    <li class='tc'></li>
+    <li class='tr'>ghr(1)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>ghr</code> - <span class="man-whatis">Easy to ship your project on Github to your user</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p><code>ghr</code> <a href="#OPTIONS" title="OPTIONS" data-bare-link="true">options</a> <var>version</var> <var>artifact</var></p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p><strong>ghr</strong> enable you to create Release on Github and upload your artifacts to it. ghr will parallelize upload multiple artifacts. You just need to set release version and artifact path, ghr automatically extract your github user name and upload url.</p>
+
+<h2 id="OPTIONS">OPTIONS</h2>
+
+<dl>
+<dt><code>-u</code>, <code>--username</code></dt><dd><p>  Set Github username, defaults to use ~/.gitconfig file setting.</p></dd>
+<dt><code>-t</code>, <code>--token</code></dt><dd><p>  Set Github API token, defaults to use GITHUB_TOKEN env variable.</p></dd>
+<dt><code>-r</code>, <code>--repository</code></dt><dd><p>  Set Github repository name, defaults to use .git/config file setting in your project directory.</p></dd>
+<dt class="flush"><code>--draft</code></dt><dd><p>  Create unpublised release, defaults to set false.</p></dd>
+<dt><code>--prerelease</code></dt><dd><p>  Create prerelease, defaults to set false.</p></dd>
+<dt><code>-p</code>, <code>--parallel</code></dt><dd><p>  Set amount of parallelism, defaults to use number of CPUs.</p></dd>
+<dt class="flush"><code>--debug</code></dt><dd><p>  Run as DEBUG mode. Prompt concreate outputs.</p></dd>
+<dt><code>-h</code>, <code>--help</code></dt><dd><p>  Show simple usage message and exit.</p></dd>
+<dt><code>-v</code>, <code>--version</code></dt><dd><p>  Show cli-init version and exit.</p></dd>
+</dl>
+
+
+<h2 id="EXAMPLES">EXAMPLES</h2>
+
+<p>Release all artifalts in pkg directory with v1.0.0 version:</p>
+
+<pre><code>$ ghr v1.0.0 pkg/
+</code></pre>
+
+<p>Release tool.zip with v1.0.0 version:</p>
+
+<pre><code>$ ghr v1.0.0 pkg/tool.zip
+</code></pre>
+
+<h2 id="COPYRIGHT">COPYRIGHT</h2>
+
+<p>ghr is Copyright (C) 2014 Taichi Nakashima <a href="https://github.com/tcnksm" data-bare-link="true">https://github.com/tcnksm</a></p>
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>August 2014</li>
+    <li class='tr'>ghr(1)</li>
+  </ol>
+
+  </div>
+</body>
+</html>

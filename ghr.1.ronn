@@ -1,0 +1,53 @@
+ghr(1) -- Easy to ship your project on Github to your user
+====
+
+## SYNOPSIS
+
+`ghr` [options] <version> <artifact>
+
+## DESCRIPTION
+
+**ghr** enable you to create Release on Github and upload your artifacts to it. ghr will parallelize upload multiple artifacts. You just need to set release version and artifact path, ghr automatically extract your github user name and upload url.
+
+## OPTIONS
+
+  * `-u`, `--username`:
+      Set Github username, defaults to use ~/.gitconfig file setting.
+
+  * `-t`, `--token`:
+      Set Github API token, defaults to use GITHUB_TOKEN env variable.
+
+  * `-r`, `--repository`:
+      Set Github repository name, defaults to use .git/config file setting in your project directory.
+
+  * `--draft`:
+      Create unpublised release, defaults to set false.
+
+  * `--prerelease`:
+      Create prerelease, defaults to set false. 
+
+  * `-p`, `--parallel`:
+      Set amount of parallelism, defaults to use number of CPUs.
+      
+  * `--debug`:
+      Run as DEBUG mode. Prompt concreate outputs.
+
+  * `-h`, `--help`:
+      Show simple usage message and exit.
+      
+  * `-v`, `--version`:
+      Show cli-init version and exit.
+      
+## EXAMPLES
+
+Release all artifalts in pkg directory with v1.0.0 version:
+
+    $ ghr v1.0.0 pkg/
+
+Release tool.zip with v1.0.0 version:
+
+    $ ghr v1.0.0 pkg/tool.zip
+
+## COPYRIGHT
+
+ghr is Copyright (C) 2014 Taichi Nakashima <https://github.com/tcnksm>

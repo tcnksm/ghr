@@ -1,0 +1,80 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "GHR" "1" "August 2014" "" ""
+.
+.SH "NAME"
+\fBghr\fR \- Easy to ship your project on Github to your user
+.
+.SH "SYNOPSIS"
+\fBghr\fR \fIoptions\fR \fIversion\fR \fIartifact\fR
+.
+.SH "DESCRIPTION"
+\fBghr\fR enable you to create Release on Github and upload your artifacts to it\. ghr will parallelize upload multiple artifacts\. You just need to set release version and artifact path, ghr automatically extract your github user name and upload url\.
+.
+.SH "OPTIONS"
+.
+.TP
+\fB\-u\fR, \fB\-\-username\fR
+Set Github username, defaults to use ~/\.gitconfig file setting\.
+.
+.TP
+\fB\-t\fR, \fB\-\-token\fR
+Set Github API token, defaults to use GITHUB_TOKEN env variable\.
+.
+.TP
+\fB\-r\fR, \fB\-\-repository\fR
+Set Github repository name, defaults to use \.git/config file setting in your project directory\.
+.
+.TP
+\fB\-\-draft\fR
+Create unpublised release, defaults to set false\.
+.
+.TP
+\fB\-\-prerelease\fR
+Create prerelease, defaults to set false\.
+.
+.TP
+\fB\-p\fR, \fB\-\-parallel\fR
+Set amount of parallelism, defaults to use number of CPUs\.
+.
+.TP
+\fB\-\-debug\fR
+Run as DEBUG mode\. Prompt concreate outputs\.
+.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Show simple usage message and exit\.
+.
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+Show cli\-init version and exit\.
+.
+.SH "EXAMPLES"
+Release all artifalts in pkg directory with v1\.0\.0 version:
+.
+.IP "" 4
+.
+.nf
+
+$ ghr v1\.0\.0 pkg/
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Release tool\.zip with v1\.0\.0 version:
+.
+.IP "" 4
+.
+.nf
+
+$ ghr v1\.0\.0 pkg/tool\.zip
+.
+.fi
+.
+.IP "" 0
+.
+.SH "COPYRIGHT"
+ghr is Copyright (C) 2014 Taichi Nakashima \fIhttps://github\.com/tcnksm\fR
