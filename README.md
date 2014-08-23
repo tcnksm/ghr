@@ -1,7 +1,7 @@
 ghr [![Build Status](https://drone.io/github.com/tcnksm/ghr/status.png)](https://drone.io/github.com/tcnksm/ghr/latest) [![Coverage Status](https://coveralls.io/repos/tcnksm/ghr/badge.png?branch=master)](https://coveralls.io/r/tcnksm/ghr?branch=master) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/tcnksm/ghr/blob/master/LICENCE)
 ====
 
-Easy to ship your project on Github to your user 
+Easily ship your project to your user using Github Releases
 
 ## Description
 
