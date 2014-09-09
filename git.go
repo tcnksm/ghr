@@ -1,18 +1,23 @@
 package main
 
 import (
-	"bytes"
+	"github.com/tcnksm/go-gitconfig"
+
 	"fmt"
-	"io/ioutil"
-	"os/exec"
 	"regexp"
 	"strings"
 )
 
-var RepoNameRegexp = regexp.MustCompile(`.+/([^/]+)(\.git)?$`)
+func GetOwnerName() (string, error) {
+	owner, err := gitconfig.Username()
+	if err != nil || owner == "" {
+		return "", fmt.Errorf("Cound not retrieve git user name\n")
+	}
+	return owner, err
+}
 
 func GetRepoName() (string, error) {
-	url, err := gitRemote()
+	url, err := gitconfig.OriginURL()
 	if err != nil || url == "" {
 		return "", fmt.Errorf("Cound not retrieve remote repository url\n")
 	}
@@ -23,39 +28,9 @@ func GetRepoName() (string, error) {
 	return repo, nil
 }
 
-func GetOwnerName() (string, error) {
-	owner, err := gitOwner()
-	if err != nil || owner == "" {
-		return "", fmt.Errorf("Cound not retrieve git user name\n")
-	}
-	return owner, err
-}
+var RepoNameRegexp = regexp.MustCompile(`.+/([^/]+)(\.git)?$`)
 
 func retrieveRepoName(url string) string {
 	matched := RepoNameRegexp.FindStringSubmatch(url)
 	return strings.TrimRight(matched[1], ".git")
-}
-
-// git config --local remote.origin.url
-func gitRemote() (string, error) {
-	return gitConfig("--local", "remote.origin.url")
-}
-
-// git config --global user.name
-func gitOwner() (string, error) {
-	return gitConfig("--global", "user.name")
-}
-
-func gitConfig(args ...string) (string, error) {
-	gitArgs := append([]string{"config", "--get", "--null"}, args...)
-	var stdout bytes.Buffer
-	cmd := exec.Command("git", gitArgs...)
-	cmd.Stdout = &stdout
-	cmd.Stderr = ioutil.Discard
-
-	if err := cmd.Run(); err != nil {
-		return "", err
-	}
-
-	return strings.TrimRight(stdout.String(), "\000"), nil
 }
