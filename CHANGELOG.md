@@ -1,3 +1,21 @@
+## 0.1.2 (Not released)
+
+### Added
+
+- [tcnksm/go-gitconfig](https://github.com/tcnksm/go-gitconfig) for extracting git config values
+
+### Deprecated
+
+- Nothing
+
+### Removed
+
+- Nothing
+
+### Fixed
+
+- Nothing
+
 ## 0.1.1 (2014-08-06)
 
 ### Added
