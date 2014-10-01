@@ -5,10 +5,11 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 
 	flag "github.com/dotcloud/docker/pkg/mflag"
-	"runtime"
+	"github.com/tcnksm/go-gitconfig"
 )
 
 var (
@@ -90,28 +91,28 @@ func ghrMain() int {
 	tag := flag.Arg(0)
 	inputPath := flag.Arg(1)
 
+	if *token == "" {
+		*token = os.Getenv("GITHUB_TOKEN")
+		if *token == "" {
+			fmt.Fprintf(os.Stderr, "Please set your Github API Token in the GITHUB_TOKEN env var\n")
+			return 1
+		}
+	}
+
 	var err error
 
 	if *owner == "" {
-		*owner, err = GetOwnerName()
+		*owner, err = gitconfig.Username()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
+			fmt.Fprintf(os.Stderr, "Cound not retrieve git user name\n")
 			return 1
 		}
 	}
 
 	if *repo == "" {
-		*repo, err = GetRepoName()
+		*repo, err = gitconfig.Repository()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
-			return 1
-		}
-	}
-
-	if *token == "" {
-		*token = os.Getenv("GITHUB_TOKEN")
-		if *token == "" {
-			fmt.Fprintf(os.Stderr, "Please set your Github API Token in the GITHUB_TOKEN env var\n")
+			fmt.Fprintf(os.Stderr, "Cound not retrieve repository name\n")
 			return 1
 		}
 	}
