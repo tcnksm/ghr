@@ -1,7 +1,9 @@
-## 0.1.2 (Not released)
+## 0.1.2 (2014-10-09)
 
 ### Added
 
+- `--replace` option to replace artifact if it exist
+- `--delete` option to delete release in advance if it exist
 - [tcnksm/go-gitconfig](https://github.com/tcnksm/go-gitconfig) for extracting git config values
 
 ### Deprecated
