@@ -140,15 +140,21 @@ func ghrMain() int {
 		fmt.Fprintf(os.Stderr, err.Error())
 		return 1
 	}
+	info.ID = id
 
-	// Relase is exist but delete
-	if id != -1 && *flDelete {
-		fmt.Fprintf(os.Stderr, "Delete before upload\n")
-		return 1
+	// Delete release if it exists
+	if info.ID != -1 && *flDelete {
+		fmt.Fprintf(os.Stderr, "Delete Release %d associated with Tag %s \n", info.ID, info.TagName)
+		err = DeleteRelease(info)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			return 1
+		}
+		info.ID = -1
 	}
 
 	// Relase is not exists
-	if id == -1 {
+	if info.ID == -1 {
 		id, err = CreateNewRelease(info)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
@@ -158,10 +164,8 @@ func ghrMain() int {
 		if id == -1 {
 			fmt.Fprintf(os.Stderr, "Counld not retrieve release ID\n")
 		}
+		info.ID = id
 	}
-
-	info.ID = id
-	debug(id)
 
 	files, err := artifacts(inputPath)
 	if err != nil {
@@ -189,7 +193,7 @@ func ghrMain() int {
 			}
 
 			semaphore <- 1
-			fmt.Printf("--> Uploading: %15s\n", path)
+			fmt.Fprintf(os.Stderr, "--> Uploading: %15s\n", path)
 			if err := UploadAsset(info, path); err != nil {
 				errorLock.Lock()
 				defer errorLock.Unlock()
