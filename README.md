@@ -43,6 +43,12 @@ $ ghr v0.1.0 pkg/
 --> Uploading: pkg/ghr_0.1.0_windows_amd64.zip
 ```
 
+Or if you want to replace artifact which is already uploaded:
+
+```bash
+$ ghr --replace v0.1.0 pkg/
+```
+
 ## Options
 
 You can set some options:
@@ -53,6 +59,7 @@ $ ghr \
     -u <username> \    # Set Github username
     -r <repository> \  # Set repository name
     -p <num> \         # Set amount of parallelism (Default is number of CPU)
+    --replace \        # Replace asset if target is already exists
     --delete \         # Delete release in advance if it exists
     --draft \          # Release as draft (Unpublish)
     --prerelease \     # Crate prerelease
