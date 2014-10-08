@@ -49,8 +49,57 @@ func GetReleaseID(info *Info) (int, error) {
 	return SearchIDByTag(res.Body, info.TagName)
 }
 
+func GetDeleteTargets(info *Info, uploads []string) ([]DeleteTarget, error) {
+	requestURL := listAssetsURL(info)
+	debug(requestURL)
+
+	req, err := http.NewRequest("GET", requestURL, nil)
+	if err != nil {
+		return []DeleteTarget{}, err
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return []DeleteTarget{}, err
+	}
+	debug(res.Status)
+
+	err = checkStatusOK(res.StatusCode, res.Status)
+	if err != nil {
+		return []DeleteTarget{}, err
+	}
+
+	defer res.Body.Close()
+	return SearchDeleteTargets(res.Body, uploads)
+}
+
 func DeleteRelease(info *Info) error {
 	requestURL := deleteReleaseURL(info)
+	debug(requestURL)
+
+	req, err := http.NewRequest("DELETE", requestURL, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/vnd.github.v3+json")
+	req.Header.Add("Authorization", fmt.Sprintf("token %s", info.Token))
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	debug(res.Status)
+
+	if res.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("Github returned %s\n", res.Status)
+	}
+	return nil
+}
+
+func DeleteAsset(info *Info, assetId int) error {
+	requestURL := deleteAssetURL(info, assetId)
 	debug(requestURL)
 
 	req, err := http.NewRequest("DELETE", requestURL, nil)

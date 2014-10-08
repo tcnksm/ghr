@@ -17,6 +17,7 @@ var (
 	repo         = flag.String([]string{"r", "-repository"}, "", "Repository name")
 	token        = flag.String([]string{"t", "-token"}, "", "Github API Token")
 	parallel     = flag.Int([]string{"p", "--parallel"}, -1, "Parallelization factor")
+	flReplace    = flag.Bool([]string{"-replace"}, false, "Replace asset if target is already uploaded")
 	flDelete     = flag.Bool([]string{"-delete"}, false, "Delete release if it exists")
 	flDraft      = flag.Bool([]string{"-draft"}, false, "Create unpublised release")
 	flPrerelease = flag.Bool([]string{"-prerelease"}, false, "Create prerelease")
@@ -58,6 +59,16 @@ func artifacts(path string) ([]string, error) {
 	return files, nil
 }
 
+func artifactNames(artifacts []string) []string {
+	names := []string{}
+	for _, artifact := range artifacts {
+		if f, err := os.Stat(artifact); err == nil {
+			names = append(names, f.Name())
+		}
+	}
+	return names
+}
+
 func main() {
 	// call ghrMain in a separate function
 	// so that it can use defer and have them
@@ -91,12 +102,6 @@ func ghrMain() int {
 
 	tag := flag.Arg(0)
 	inputPath := flag.Arg(1)
-
-	// Limit amount of parallelism
-	// by number of logic CPU
-	if *parallel <= 0 {
-		*parallel = runtime.NumCPU()
-	}
 
 	if *token == "" {
 		*token = os.Getenv("GITHUB_TOKEN")
@@ -173,6 +178,12 @@ func ghrMain() int {
 		return 1
 	}
 
+	// Limit amount of parallelism
+	// by number of logic CPU
+	if *parallel <= 0 {
+		*parallel = runtime.NumCPU()
+	}
+
 	// Use CPU efficiently
 	cpu := runtime.NumCPU()
 	runtime.GOMAXPROCS(cpu)
@@ -181,6 +192,30 @@ func ghrMain() int {
 	var wg sync.WaitGroup
 	errors := make([]string, 0)
 	semaphore := make(chan int, *parallel)
+
+	if *flReplace {
+		deleteTargets, err := GetDeleteTargets(info, artifactNames(files))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+		}
+		for _, target := range deleteTargets {
+			wg.Add(1)
+			go func(target DeleteTarget) {
+				defer wg.Done()
+				semaphore <- 1
+				fmt.Fprintf(os.Stderr, "--> %15s is already exists, delete it\n", target.Name)
+				if err := DeleteAsset(info, target.AssetId); err != nil {
+					errorLock.Lock()
+					defer errorLock.Unlock()
+					errors = append(errors,
+						fmt.Sprintf("deleting %s error: %s", target.Name, err))
+				}
+				<-semaphore
+			}(target)
+		}
+	}
+	wg.Wait()
+
 	for _, path := range files {
 		wg.Add(1)
 		go func(path string) {
@@ -198,7 +233,7 @@ func ghrMain() int {
 				errorLock.Lock()
 				defer errorLock.Unlock()
 				errors = append(errors,
-					fmt.Sprintf("%s error: %s", path, err))
+					fmt.Sprintf("upload %s error: %s", path, err))
 			}
 			<-semaphore
 		}(path)
@@ -226,6 +261,7 @@ Options:
   -t, --token        Github API Token
   -r, --repository   Github repository name
   -p, --parallel=-1  Amount of parallelism, defaults to number of CPUs
+　--replace          Replace asset if target already exists
 　--delete           Delete release if same version exists
   --draft            Create unpublised release
   --prerelease       Create prerelease	
@@ -235,6 +271,6 @@ Options:
 
 Example:
   $ ghr v1.0.0 dist/
-  $ ghr --delete v1.0.0 dist/
+  $ ghr --replace v1.0.0 dist/
   $ ghr v1.0.2 dist/tool.zip
 `
