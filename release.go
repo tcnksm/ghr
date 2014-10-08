@@ -27,12 +27,12 @@ const (
 	RELEASE_URL = "https://api.github.com/repos/%s/%s/releases"
 )
 
-func releaseURL(info Info) string {
+func releaseURL(info *Info) string {
 	return fmt.Sprintf(RELEASE_URL, info.OwnerName, info.RepoName)
 }
 
-func releaseRequest(info Info) ([]byte, error) {
-	params := ReleaseRequest{
+func releaseRequest(info *Info) ([]byte, error) {
+	params := &ReleaseRequest{
 		TagName:         info.TagName,
 		TargetCommitish: info.TargetCommitish,
 		Draft:           info.Draft,

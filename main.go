@@ -17,6 +17,7 @@ var (
 	repo         = flag.String([]string{"r", "-repository"}, "", "Repository name")
 	token        = flag.String([]string{"t", "-token"}, "", "Github API Token")
 	parallel     = flag.Int([]string{"p", "--parallel"}, -1, "Parallelization factor")
+	flDelete     = flag.Bool([]string{"-delete"}, false, "Delete release if it exists")
 	flDraft      = flag.Bool([]string{"-draft"}, false, "Create unpublised release")
 	flPrerelease = flag.Bool([]string{"-prerelease"}, false, "Create prerelease")
 	flVersion    = flag.Bool([]string{"v", "-version"}, false, "Print version information and quit")
@@ -31,7 +32,7 @@ func debug(v ...interface{}) {
 }
 
 func showVersion() {
-	fmt.Fprintf(os.Stderr, "ghr %s\n", Version)
+	fmt.Fprintf(os.Stderr, "ghr version %s, build %s \n", Version, GitCommit)
 }
 
 func showHelp() {
@@ -68,6 +69,11 @@ func ghrMain() int {
 
 	flag.Parse()
 
+	if *flDebug {
+		os.Setenv("DEBUG", "1")
+		debug("Run as DEBUG mode")
+	}
+
 	if *flHelp {
 		showHelp()
 		return 0
@@ -78,11 +84,6 @@ func ghrMain() int {
 		return 0
 	}
 
-	if *flDebug {
-		os.Setenv("DEBUG", "1")
-		debug("Run as DEBUG mode")
-	}
-
 	if len(flag.Args()) != 2 {
 		showHelp()
 		return 1
@@ -90,6 +91,12 @@ func ghrMain() int {
 
 	tag := flag.Arg(0)
 	inputPath := flag.Arg(1)
+
+	// Limit amount of parallelism
+	// by number of logic CPU
+	if *parallel <= 0 {
+		*parallel = runtime.NumCPU()
+	}
 
 	if *token == "" {
 		*token = os.Getenv("GITHUB_TOKEN")
@@ -117,13 +124,7 @@ func ghrMain() int {
 		}
 	}
 
-	// Limit amount of parallelism
-	// by number of logic CPU
-	if *parallel <= 0 {
-		*parallel = runtime.NumCPU()
-	}
-
-	info := Info{
+	info := &Info{
 		TagName:         tag,
 		Token:           *token,
 		OwnerName:       *owner,
@@ -140,6 +141,13 @@ func ghrMain() int {
 		return 1
 	}
 
+	// Relase is exist but delete
+	if id != -1 && *flDelete {
+		fmt.Fprintf(os.Stderr, "Delete before upload\n")
+		return 1
+	}
+
+	// Relase is not exists
 	if id == -1 {
 		id, err = CreateNewRelease(info)
 		if err != nil {
@@ -214,6 +222,7 @@ Options:
   -t, --token        Github API Token
   -r, --repository   Github repository name
   -p, --parallel=-1  Amount of parallelism, defaults to number of CPUs
+　--delete           Delete release if same version exists
   --draft            Create unpublised release
   --prerelease       Create prerelease	
   -h, --help         Print this message and quit
@@ -221,6 +230,7 @@ Options:
   --debug=false      Run as DEBUG mode
 
 Example:
-  $ ghr v1.0.0 pkg/dist/
-  $ ghr v1.0.2 pkg/dist/tool.zip
+  $ ghr v1.0.0 dist/
+  $ ghr --delete v1.0.0 dist/
+  $ ghr v1.0.2 dist/tool.zip
 `

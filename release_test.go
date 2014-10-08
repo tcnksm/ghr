@@ -9,7 +9,7 @@ import (
 func TestReleaseURL(t *testing.T) {
 	RegisterTestingT(t)
 
-	info := Info{
+	info := &Info{
 		OwnerName: "tc",
 		RepoName:  "tool",
 	}
@@ -85,7 +85,7 @@ func TestSearchIDByTag(t *testing.T) {
 func TestReleaseRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	info := Info{
+	info := &Info{
 		TagName:         "v1.0.0",
 		TargetCommitish: "master",
 		Draft:           false,

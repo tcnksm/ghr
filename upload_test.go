@@ -8,7 +8,7 @@ import (
 func TestUploadURL(t *testing.T) {
 	RegisterTestingT(t)
 
-	info := Info{
+	info := &Info{
 		ID:        123,
 		OwnerName: "tc",
 		RepoName:  "tool",

@@ -25,7 +25,7 @@ func checkStatusCreated(code int, msg string) error {
 	return nil
 }
 
-func GetReleaseID(info Info) (int, error) {
+func GetReleaseID(info *Info) (int, error) {
 	requestURL := releaseURL(info)
 	debug(requestURL)
 
@@ -49,7 +49,7 @@ func GetReleaseID(info Info) (int, error) {
 	return SearchIDByTag(res.Body, info.TagName)
 }
 
-func CreateNewRelease(info Info) (int, error) {
+func CreateNewRelease(info *Info) (int, error) {
 
 	requestURL := releaseURL(info)
 	debug(requestURL)
@@ -79,7 +79,7 @@ func CreateNewRelease(info Info) (int, error) {
 	return CreatedID(res.Body)
 }
 
-func UploadAsset(info Info, path string) error {
+func UploadAsset(info *Info, path string) error {
 
 	file, err := os.Stat(path)
 	requestURL := uploadURL(info, file.Name())
