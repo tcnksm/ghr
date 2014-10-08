@@ -53,6 +53,7 @@ $ ghr \
     -u <username> \    # Set Github username
     -r <repository> \  # Set repository name
     -p <num> \         # Set amount of parallelism (Default is number of CPU)
+    --delete \         # Delete release in advance if it exists
     --draft \          # Release as draft (Unpublish)
     --prerelease \     # Crate prerelease
     <tag> <artifacts>
@@ -67,13 +68,7 @@ $ brew tap tcnksm/ghr
 $ brew install ghr
 ```
 
-If you are in another platform, you can install it with `curl`:
-
-```bash
-$ L=/usr/local/bin/ghr && curl -sL -A "`uname -sp`"  http://ghr.herokuapp.com/ghr.zip | zcat >$L && chmod +x $L
-```
-
-You can also download binary from [relase page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory. 
+If you are in another platform, you can download binary from [relase page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory. 
 
 ## VS.
 
