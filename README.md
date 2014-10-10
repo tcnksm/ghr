@@ -1,4 +1,4 @@
-ghr [![Build Status](https://drone.io/github.com/tcnksm/ghr/status.png)](https://drone.io/github.com/tcnksm/ghr/latest) [![Coverage Status](https://coveralls.io/repos/tcnksm/ghr/badge.png?branch=master)](https://coveralls.io/r/tcnksm/ghr?branch=master) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/tcnksm/ghr/blob/master/LICENCE)
+ghr [![wercker status](https://app.wercker.com/status/a181c474f1e25e1870d0ba387723046b/s "wercker status")](https://app.wercker.com/project/bykey/a181c474f1e25e1870d0ba387723046b) [![Coverage Status](https://coveralls.io/repos/tcnksm/ghr/badge.png?branch=master)](https://coveralls.io/r/tcnksm/ghr?branch=master) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/tcnksm/ghr/blob/master/LICENCE)
 ====
 
 Easily ship your project to your user using Github Releases
