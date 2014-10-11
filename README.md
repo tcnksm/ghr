@@ -1,6 +1,5 @@
 ghr [![wercker status](https://app.wercker.com/status/a181c474f1e25e1870d0ba387723046b/s "wercker status")](https://app.wercker.com/project/bykey/a181c474f1e25e1870d0ba387723046b) [![Coverage Status](https://coveralls.io/repos/tcnksm/ghr/badge.png?branch=master)](https://coveralls.io/r/tcnksm/ghr?branch=master) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/tcnksm/ghr/blob/master/LICENCE)
 ====
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/tcnksm/ghr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Easily ship your project to your user using Github Releases
 
@@ -76,7 +75,7 @@ $ brew tap tcnksm/ghr
 $ brew install ghr
 ```
 
-If you are in another platform, you can download binary from [relase page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory. 
+If you are in another platform, you can download binary from [relase page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory.
 
 ## VS.
 
@@ -99,6 +98,13 @@ $ go get -d github.com/tcnksm/ghr
 $ cd $GOPATH/src/github.com/tcnksm/cli-init
 $ make install
 ```
+
+## Support
+
+If you have something to ask me or request for new features, feel free to join gitter room.
+
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/tcnksm/ghr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 ## Author
 
