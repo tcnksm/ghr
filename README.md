@@ -77,6 +77,12 @@ $ brew install ghr
 
 If you are in another platform, you can download binary from [relase page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory.
 
+## Integration with CI-as-a-Service
+
+You can integrate ghr with CI-as-a-Service to release your artifacts after test passed. It's very easy to provide latest build to your user continuously.
+
+See [Integrate ghr with CI as a Service](https://github.com/tcnksm/ghr/wiki/Integrate-ghr-with-CI-as-a-Service) page.
+
 ## VS.
 
 - [aktau/github-release](https://github.com/aktau/github-release) - `github-release` can also create and edit releases and upload artifacts. It has many options. `ghr` is a simple alternative. And `ghr` will parallelize upload artifacts.
