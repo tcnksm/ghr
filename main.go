@@ -106,8 +106,11 @@ func ghrMain() int {
 	if *token == "" {
 		*token = os.Getenv("GITHUB_TOKEN")
 		if *token == "" {
-			fmt.Fprintf(os.Stderr, "Please set your Github API Token in the GITHUB_TOKEN env var\n")
-			return 1
+			*token, _ = gitconfig.GithubToken()
+			if *token == "" {
+				fmt.Fprintf(os.Stderr, "Please set your Github API Token in the GITHUB_TOKEN env var\n")
+				return 1
+			}
 		}
 	}
 
@@ -264,7 +267,7 @@ Options:
 　--replace          Replace asset if target already exists
 　--delete           Delete release if same version exists
   --draft            Create unpublised release
-  --prerelease       Create prerelease	
+  --prerelease       Create prerelease
   -h, --help         Print this message and quit
   -v, --version      Print version information and quit
   --debug=false      Run as DEBUG mode
