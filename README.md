@@ -22,11 +22,18 @@ Run it in your project directory:
 $ ghr [option] <tag> <artifacts>
 ```
 
-You need to set `GITHUB_TOKEN` environmental variable:
+You need to set `GITHUB_TOKEN` environmental variable or `github.token` in gitconfig:
+Enviromental variable takes priority over gitconfig value.
 
 ```bash
 $ export GITHUB_TOKEN="....."
 ```
+
+```
+[github]
+  token = "....."
+```
+
 
 ## Example
 
