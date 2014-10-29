@@ -34,6 +34,8 @@ func GetReleaseID(info *Info) (int, error) {
 		return -1, err
 	}
 
+	req.Close = true
+
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return -1, err
@@ -58,6 +60,8 @@ func GetDeleteTargets(info *Info, uploads []string) ([]DeleteTarget, error) {
 		return []DeleteTarget{}, err
 	}
 
+	req.Close = true
+
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return []DeleteTarget{}, err
@@ -81,6 +85,8 @@ func DeleteRelease(info *Info) error {
 	if err != nil {
 		return err
 	}
+
+	req.Close = true
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/vnd.github.v3+json")
@@ -107,6 +113,8 @@ func DeleteTag(info *Info) error {
 		return err
 	}
 
+	req.Close = true
+
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/vnd.github.v3+json")
 	req.Header.Add("Authorization", fmt.Sprintf("token %s", info.Token))
@@ -131,6 +139,8 @@ func DeleteAsset(info *Info, assetId int) error {
 	if err != nil {
 		return err
 	}
+
+	req.Close = true
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/vnd.github.v3+json")
@@ -158,6 +168,8 @@ func CreateNewRelease(info *Info) (int, error) {
 	if err != nil {
 		return -1, err
 	}
+
+	req.Close = true
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/vnd.github.v3+json")
@@ -192,6 +204,8 @@ func UploadAsset(info *Info, path string) error {
 	if err != nil {
 		return err
 	}
+
+	req.Close = true
 
 	req.ContentLength = file.Size()
 	req.Header.Set("Content-Type", "application/octet-stream")
