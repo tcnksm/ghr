@@ -1,3 +1,24 @@
+## 0.1.3 (Not released)
+
+You can try this version from [pre-release](https://github.com/tcnksm/ghr/releases/tag/pre-release)
+
+### Added
+
+- Read `GITHUB_TOKEN` from `gitconfig` file ([**@sona-tar**](https://github.com/sona-tar), [#8](https://github.com/tcnksm/ghr/pull/8))
+
+### Deprecated
+
+- Nothing
+
+### Removed
+
+- Nothing
+
+### Fixed
+
+- Nothing
+
+
 ## 0.1.2 (2014-10-09)
 
 ### Added
