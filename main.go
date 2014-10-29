@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sync"
+	"time"
 
 	flag "github.com/dotcloud/docker/pkg/mflag"
 	"github.com/tcnksm/go-gitconfig"
@@ -77,6 +78,10 @@ func main() {
 }
 
 func ghrMain() int {
+
+	// Use CPU efficiently
+	cpu := runtime.NumCPU()
+	runtime.GOMAXPROCS(cpu)
 
 	flag.Parse()
 
@@ -160,11 +165,17 @@ func ghrMain() int {
 			return 1
 		}
 
+		fmt.Fprintf(os.Stderr, "Delete Tag %s \n", info.TagName)
 		err = DeleteTag(info)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
 			return 1
 		}
+
+		// executing delete tag has time lag
+		// So we need to wait for a while
+		// This is stupid implementation...
+		time.Sleep(3 * time.Second)
 		info.ID = -1
 	}
 
@@ -193,10 +204,6 @@ func ghrMain() int {
 	if *parallel <= 0 {
 		*parallel = runtime.NumCPU()
 	}
-
-	// Use CPU efficiently
-	cpu := runtime.NumCPU()
-	runtime.GOMAXPROCS(cpu)
 
 	var errorLock sync.Mutex
 	var wg sync.WaitGroup
