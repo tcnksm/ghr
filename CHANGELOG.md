@@ -5,6 +5,7 @@ You can try this version from [pre-release](https://github.com/tcnksm/ghr/releas
 ### Added
 
 - Read `GITHUB_TOKEN` from `gitconfig` file ([**@sona-tar**](https://github.com/sona-tar), [#8](https://github.com/tcnksm/ghr/pull/8))
+- When using `--delete` option, delete its git tag 
 
 ### Deprecated
 
