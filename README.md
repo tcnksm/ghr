@@ -67,7 +67,7 @@ $ ghr \
     -r <repository> \  # Set repository name
     -p <num> \         # Set amount of parallelism (Default is number of CPU)
     --replace \        # Replace asset if target is already exists
-    --delete \         # Delete release in advance if it exists
+    --delete \         # Delete release and its git tag in advance if it exists
     --draft \          # Release as draft (Unpublish)
     --prerelease \     # Crate prerelease
     <tag> <artifacts>
