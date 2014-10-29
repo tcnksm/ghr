@@ -151,9 +151,16 @@ func ghrMain() int {
 	info.ID = id
 
 	// Delete release if it exists
+	// This will also delete its tag
 	if info.ID != -1 && *flDelete {
 		fmt.Fprintf(os.Stderr, "Delete Release %d associated with Tag %s \n", info.ID, info.TagName)
 		err = DeleteRelease(info)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			return 1
+		}
+
+		err = DeleteTag(info)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
 			return 1
@@ -265,7 +272,7 @@ Options:
   -r, --repository   Github repository name
   -p, --parallel=-1  Amount of parallelism, defaults to number of CPUs
 　--replace          Replace asset if target already exists
-　--delete           Delete release if same version exists
+　--delete           Delete release and its git tag if same version exists
   --draft            Create unpublised release
   --prerelease       Create prerelease
   -h, --help         Print this message and quit

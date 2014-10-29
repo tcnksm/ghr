@@ -98,6 +98,31 @@ func DeleteRelease(info *Info) error {
 	return nil
 }
 
+func DeleteTag(info *Info) error {
+	requestURL := deleteTagURL(info)
+	debug(requestURL)
+
+	req, err := http.NewRequest("DELETE", requestURL, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/vnd.github.v3+json")
+	req.Header.Add("Authorization", fmt.Sprintf("token %s", info.Token))
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	debug(res.Status)
+
+	if res.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("Github returned %s\n", res.Status)
+	}
+	return nil
+}
+
 func DeleteAsset(info *Info, assetId int) error {
 	requestURL := deleteAssetURL(info, assetId)
 	debug(requestURL)

@@ -29,3 +29,16 @@ func TestDeleteAssetURL(t *testing.T) {
 	url := deleteAssetURL(info, 12345)
 	Expect(url).To(Equal("https://api.github.com/repos/taichi/tool/releases/assets/12345"))
 }
+
+func TestDeleteTagURL(t *testing.T) {
+	RegisterTestingT(t)
+
+	info := &Info{
+		TagName:   "v0.1.2",
+		OwnerName: "taichi",
+		RepoName:  "tool",
+	}
+
+	url := deleteTagURL(info)
+	Expect(url).To(Equal("https://api.github.com/repos/taichi/tool/git/refs/tags/v0.1.2"))
+}
