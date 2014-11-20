@@ -36,6 +36,10 @@ func GetReleaseID(info *Info) (int, error) {
 
 	req.Close = true
 
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/vnd.github.v3+json")
+	req.Header.Add("Authorization", fmt.Sprintf("token %s", info.Token))
+
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return -1, err
@@ -61,6 +65,10 @@ func GetDeleteTargets(info *Info, uploads []string) ([]DeleteTarget, error) {
 	}
 
 	req.Close = true
+
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/vnd.github.v3+json")
+	req.Header.Add("Authorization", fmt.Sprintf("token %s", info.Token))
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
