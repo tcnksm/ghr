@@ -7,10 +7,8 @@ import (
 	"path/filepath"
 	"runtime"
 	"sync"
-	"time"
 
 	flag "github.com/dotcloud/docker/pkg/mflag"
-	"github.com/tcnksm/go-gitconfig"
 )
 
 var (
@@ -27,49 +25,6 @@ var (
 	flDebug      = flag.Bool([]string{"-debug"}, false, "Run as DEBUG mode")
 )
 
-func debug(v ...interface{}) {
-	if os.Getenv("DEBUG") != "" {
-		log.Println(v...)
-	}
-}
-
-func showVersion() {
-	fmt.Fprintf(os.Stderr, "ghr version %s, build %s \n", Version, GitCommit)
-}
-
-func showHelp() {
-	fmt.Fprintf(os.Stderr, helpText)
-}
-
-func artifacts(path string) ([]string, error) {
-	var files []string
-	file, err := os.Stat(path)
-	if err != nil {
-		return nil, err
-	}
-
-	if file.IsDir() {
-		files, err = filepath.Glob(path + "/*")
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		files = append(files, path)
-	}
-
-	return files, nil
-}
-
-func artifactNames(artifacts []string) []string {
-	names := []string{}
-	for _, artifact := range artifacts {
-		if f, err := os.Stat(artifact); err == nil {
-			names = append(names, f.Name())
-		}
-	}
-	return names
-}
-
 func main() {
 	// call ghrMain in a separate function
 	// so that it can use defer and have them
@@ -78,6 +33,10 @@ func main() {
 }
 
 func ghrMain() int {
+
+	var (
+		err error
+	)
 
 	// Use CPU efficiently
 	cpu := runtime.NumCPU()
@@ -105,95 +64,23 @@ func ghrMain() int {
 		return 1
 	}
 
+	// Extract from arguments
 	tag := flag.Arg(0)
 	inputPath := flag.Arg(1)
 
-	if *token == "" {
-		*token = os.Getenv("GITHUB_TOKEN")
-		if *token == "" {
-			*token, _ = gitconfig.GithubToken()
-			if *token == "" {
-				fmt.Fprintf(os.Stderr, "Please set your Github API Token in the GITHUB_TOKEN env var\n")
-				return 1
-			}
-		}
-	}
-
-	var err error
-
-	if *owner == "" {
-		*owner, err = gitconfig.Username()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Cound not retrieve git user name\n")
-			return 1
-		}
-	}
-
-	if *repo == "" {
-		*repo, err = gitconfig.Repository()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Cound not retrieve repository name\n")
-			return 1
-		}
-	}
-
-	info := &Info{
-		TagName:         tag,
-		Token:           *token,
-		OwnerName:       *owner,
-		RepoName:        *repo,
-		TargetCommitish: "master",
-		Draft:           *flDraft,
-		Prerelease:      *flPrerelease,
-	}
-	debug(info)
-
-	id, err := GetReleaseID(info)
+	files, err := artifacts(inputPath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		return 1
 	}
-	info.ID = id
 
-	// Delete release if it exists
-	// This will also delete its tag
-	if info.ID != -1 && *flDelete {
-		fmt.Fprintf(os.Stderr, "Delete Release %d associated with Tag %s \n", info.ID, info.TagName)
-		err = DeleteRelease(info)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
-			return 1
-		}
-
-		fmt.Fprintf(os.Stderr, "Delete Tag %s \n", info.TagName)
-		err = DeleteTag(info)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
-			return 1
-		}
-
-		// executing delete tag has time lag
-		// So we need to wait for a while
-		// This is stupid implementation...
-		time.Sleep(3 * time.Second)
-		info.ID = -1
+	info, err := NewInfo(tag)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, err.Error())
+		return 1
 	}
 
-	// Relase is not exists
-	if info.ID == -1 {
-		id, err = CreateNewRelease(info)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
-			return 1
-		}
-
-		if id == -1 {
-			fmt.Fprintf(os.Stderr, "Counld not retrieve release ID\n")
-		}
-		info.ID = id
-	}
-
-	files, err := artifacts(inputPath)
+	err = SetRelease(info, *flDelete)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		return 1
@@ -207,6 +94,7 @@ func ghrMain() int {
 
 	var errorLock sync.Mutex
 	var wg sync.WaitGroup
+
 	errors := make([]string, 0)
 	semaphore := make(chan int, *parallel)
 
@@ -266,6 +154,49 @@ func ghrMain() int {
 	}
 
 	return 0
+}
+
+func debug(v ...interface{}) {
+	if os.Getenv("DEBUG") != "" {
+		log.Println(v...)
+	}
+}
+
+func showVersion() {
+	fmt.Fprintf(os.Stderr, "ghr version %s, build %s \n", Version, GitCommit)
+}
+
+func showHelp() {
+	fmt.Fprintf(os.Stderr, helpText)
+}
+
+func artifacts(path string) ([]string, error) {
+	var files []string
+	file, err := os.Stat(path)
+	if err != nil {
+		return nil, err
+	}
+
+	if file.IsDir() {
+		files, err = filepath.Glob(path + "/*")
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		files = append(files, path)
+	}
+
+	return files, nil
+}
+
+func artifactNames(artifacts []string) []string {
+	names := []string{}
+	for _, artifact := range artifacts {
+		if f, err := os.Stat(artifact); err == nil {
+			names = append(names, f.Name())
+		}
+	}
+	return names
 }
 
 const helpText = `Usage: ghr [option] <tag> <artifacts>
