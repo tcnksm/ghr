@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"runtime"
 	"sync"
 
 	flag "github.com/dotcloud/docker/pkg/mflag"
+	"path/filepath"
 )
 
 var (
@@ -64,17 +64,16 @@ func ghrMain() int {
 		return 1
 	}
 
-	// Extract from arguments
 	tag := flag.Arg(0)
 	inputPath := flag.Arg(1)
 
-	files, err := artifacts(inputPath)
+	info, err := NewInfo(tag)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		return 1
 	}
 
-	info, err := NewInfo(tag)
+	files, err := Artifacts(inputPath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		return 1
@@ -84,6 +83,14 @@ func ghrMain() int {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		return 1
+	}
+
+	var deleteTargets []DeleteTarget
+	if *flReplace {
+		deleteTargets, err = GetDeleteTargets(info, ArtifactNames(files))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+		}
 	}
 
 	// Limit amount of parallelism
@@ -98,29 +105,6 @@ func ghrMain() int {
 	errors := make([]string, 0)
 	semaphore := make(chan int, *parallel)
 
-	if *flReplace {
-		deleteTargets, err := GetDeleteTargets(info, artifactNames(files))
-		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
-		}
-		for _, target := range deleteTargets {
-			wg.Add(1)
-			go func(target DeleteTarget) {
-				defer wg.Done()
-				semaphore <- 1
-				fmt.Fprintf(os.Stderr, "--> %15s is already exists, delete it\n", target.Name)
-				if err := DeleteAsset(info, target.AssetId); err != nil {
-					errorLock.Lock()
-					defer errorLock.Unlock()
-					errors = append(errors,
-						fmt.Sprintf("deleting %s error: %s", target.Name, err))
-				}
-				<-semaphore
-			}(target)
-		}
-	}
-	wg.Wait()
-
 	for _, path := range files {
 		wg.Add(1)
 		go func(path string) {
@@ -133,6 +117,17 @@ func ghrMain() int {
 			}
 
 			semaphore <- 1
+
+			if id := DeleteTargetID(deleteTargets, path); id != ID_NOT_FOUND {
+				fmt.Fprintf(os.Stderr, "--> Deleting: %15s\n", filepath.Base(path))
+				if err := DeleteAsset(info, id); err != nil {
+					errorLock.Lock()
+					defer errorLock.Unlock()
+					errors = append(errors,
+						fmt.Sprintf("deleting %s error: %s", filepath.Base(path), err))
+				}
+			}
+
 			fmt.Fprintf(os.Stderr, "--> Uploading: %15s\n", path)
 			if err := UploadAsset(info, path); err != nil {
 				errorLock.Lock()
@@ -168,35 +163,6 @@ func showVersion() {
 
 func showHelp() {
 	fmt.Fprintf(os.Stderr, helpText)
-}
-
-func artifacts(path string) ([]string, error) {
-	var files []string
-	file, err := os.Stat(path)
-	if err != nil {
-		return nil, err
-	}
-
-	if file.IsDir() {
-		files, err = filepath.Glob(path + "/*")
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		files = append(files, path)
-	}
-
-	return files, nil
-}
-
-func artifactNames(artifacts []string) []string {
-	names := []string{}
-	for _, artifact := range artifacts {
-		if f, err := os.Stat(artifact); err == nil {
-			names = append(names, f.Name())
-		}
-	}
-	return names
 }
 
 const helpText = `Usage: ghr [option] <tag> <artifacts>
