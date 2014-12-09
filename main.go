@@ -33,21 +33,16 @@ func main() {
 }
 
 func ghrMain() int {
-
-	var (
-		err error
-	)
-
-	// Use CPU efficiently
-	cpu := runtime.NumCPU()
-	runtime.GOMAXPROCS(cpu)
+	var err error
 
 	flag.Parse()
 
 	if *flDebug {
 		os.Setenv("DEBUG", "1")
-		debug("Run as DEBUG mode")
 	}
+	debug("Run as DEBUG mode")
+	debug("Version:", Version)
+	debug("Execution:", os.Args)
 
 	if *flHelp {
 		showHelp()
@@ -67,6 +62,8 @@ func ghrMain() int {
 	tag := flag.Arg(0)
 	inputPath := flag.Arg(1)
 
+	// Info stores all configuration values
+	// for using GitHub API.
 	info, err := NewInfo(tag)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
@@ -79,12 +76,18 @@ func ghrMain() int {
 		return 1
 	}
 
+	// Create release on GitHub if not exsits.
+	// If exists, just set its releaseID to *Info
+	// If `--delete`, deleting it if exists.
 	err = SetRelease(info, *flDelete)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		return 1
 	}
 
+	// If `--replace`, deleting artifacts if exists (Not here)
+	// Here just extracting all artifacts which are already on
+	// GitHub and related to releaseID.
 	var deleteTargets []DeleteTarget
 	if *flReplace {
 		deleteTargets, err = GetDeleteTargets(info, ArtifactNames(files))
@@ -93,11 +96,14 @@ func ghrMain() int {
 		}
 	}
 
-	// Limit amount of parallelism
-	// by number of logic CPU
+	// Limit amount of parallelism by number of logic CPU
 	if *parallel <= 0 {
 		*parallel = runtime.NumCPU()
 	}
+
+	// Use CPU efficiently
+	cpu := runtime.NumCPU()
+	runtime.GOMAXPROCS(cpu)
 
 	var errorLock sync.Mutex
 	var wg sync.WaitGroup
@@ -118,6 +124,8 @@ func ghrMain() int {
 
 			semaphore <- 1
 
+			// Only when `--replace`,
+			// Deleting artifact on GitHub if exists in advance
 			if id := DeleteTargetID(deleteTargets, path); id != ID_NOT_FOUND {
 				fmt.Fprintf(os.Stderr, "--> Deleting: %15s\n", filepath.Base(path))
 				if err := DeleteAsset(info, id); err != nil {
@@ -128,6 +136,7 @@ func ghrMain() int {
 				}
 			}
 
+			// Upload artifacts
 			fmt.Fprintf(os.Stderr, "--> Uploading: %15s\n", path)
 			if err := UploadAsset(info, path); err != nil {
 				errorLock.Lock()
@@ -135,11 +144,13 @@ func ghrMain() int {
 				errors = append(errors,
 					fmt.Sprintf("upload %s error: %s", path, err))
 			}
+
 			<-semaphore
 		}(path)
 	}
 	wg.Wait()
 
+	// List all errors in uploading or deleting
 	if len(errors) > 0 {
 		fmt.Fprintf(os.Stderr, "%d errors occurred:\n", len(errors))
 		for _, err := range errors {
