@@ -1,6 +1,6 @@
 package main
 
-const Version string = "v0.1.3-pre"
+const Version string = "v0.2.0"
 
 // Describe latest commit hash.
 // This is automatically extracted by git describe --always.
