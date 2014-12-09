@@ -1,11 +1,11 @@
-## 0.1.3 (Not released)
-
-You can try this version from [pre-release](https://github.com/tcnksm/ghr/releases/tag/pre-release)
+## 0.2.0 (2014-12-09)
 
 ### Added
 
 - Read `GITHUB_TOKEN` from `gitconfig` file ([**@sona-tar**](https://github.com/sona-tar), [#8](https://github.com/tcnksm/ghr/pull/8))
-- When using `--delete` option, delete its git tag 
+- When using `--delete` option, delete its git tag
+- Support private repository ([**@virifi**](https://github.com/virifi), [#10](https://github.com/tcnksm/ghr/pull/10))
+- Many refactoring
 
 ### Deprecated
 
@@ -17,7 +17,7 @@ You can try this version from [pre-release](https://github.com/tcnksm/ghr/releas
 
 ### Fixed
 
-- Nothing
+
 
 
 ## 0.1.2 (2014-10-09)
