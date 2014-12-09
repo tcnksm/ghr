@@ -3,16 +3,17 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 )
 
 const (
-	ID_NOT_SET = -1
+	ID_NOT_FOUND = -1
 )
 
 func deleteRelease(info *Info) (err error) {
 
-	if info.ID == ID_NOT_SET {
+	if info.ID == ID_NOT_FOUND {
 		return nil
 	}
 
@@ -32,7 +33,7 @@ func deleteRelease(info *Info) (err error) {
 	// So we need to wait for a while
 	// This is stupid implementation...
 	time.Sleep(3 * time.Second)
-	info.ID = ID_NOT_SET
+	info.ID = ID_NOT_FOUND
 
 	return nil
 }
@@ -50,7 +51,7 @@ func SetRelease(info *Info, replace bool) (err error) {
 		}
 	}
 
-	if info.ID != ID_NOT_SET {
+	if info.ID != ID_NOT_FOUND {
 		return nil
 	}
 
@@ -59,9 +60,20 @@ func SetRelease(info *Info, replace bool) (err error) {
 		return err
 	}
 
-	if info.ID == ID_NOT_SET {
+	if info.ID == ID_NOT_FOUND {
 		return fmt.Errorf("Counld not retrieve release ID\n")
 	}
 
 	return nil
+}
+
+// Extract delete target ID
+func DeleteTargetID(targets []DeleteTarget, path string) int {
+	for _, t := range targets {
+		if t.Name == filepath.Base(path) {
+			return t.AssetId
+		}
+	}
+
+	return ID_NOT_FOUND
 }
