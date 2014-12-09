@@ -1,7 +1,7 @@
-ghr [![wercker status](https://app.wercker.com/status/a181c474f1e25e1870d0ba387723046b/s "wercker status")](https://app.wercker.com/project/bykey/a181c474f1e25e1870d0ba387723046b) [![Coverage Status](https://coveralls.io/repos/tcnksm/ghr/badge.png?branch=master)](https://coveralls.io/r/tcnksm/ghr?branch=master) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/tcnksm/ghr/blob/master/LICENCE)
+ghr [![wercker status](https://app.wercker.com/status/a181c474f1e25e1870d0ba387723046b/s "wercker status")](https://app.wercker.com/project/bykey/a181c474f1e25e1870d0ba387723046b) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/tcnksm/ghr/blob/master/LICENCE)
 ====
 
-Easily ship your project to your user using Github Releases
+Easily ship your project to your user using Github Releases.
 
 ## Description
 
@@ -22,18 +22,19 @@ Run it in your project directory:
 $ ghr [option] <tag> <artifacts>
 ```
 
-You need to set `GITHUB_TOKEN` environmental variable or `github.token` in gitconfig:
-Enviromental variable takes priority over gitconfig value.
+You need to set `GITHUB_TOKEN` environmental variable:
 
 ```bash
 $ export GITHUB_TOKEN="....."
 ```
 
-```
-[github]
-  token = "....."
+Or you can set it in `github.token` in gitconfig:
+
+```bash
+$ git config --global github.token "....."
 ```
 
+Enviromental variable takes priority over gitconfig value.
 
 ## Example
 
