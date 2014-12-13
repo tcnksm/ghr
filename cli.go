@@ -46,20 +46,9 @@ type CLI struct {
 
 // Run invokes the CLI with the given arguments.
 func (cli *CLI) Run(args []string) int {
-	var (
-		// GitHub API related.
-		githubAPIOpts GitHubAPIOpts
-
-		// ghr related.
-		ghrOpts GhrOpts
-
-		// general
-		version bool
-		help    bool
-		debug   bool
-
-		err error
-	)
+	var githubAPIOpts GitHubAPIOpts
+	var ghrOpts GhrOpts
+	var err error
 
 	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
 	flags.SetOutput(cli.errStream)
@@ -85,11 +74,11 @@ func (cli *CLI) Run(args []string) int {
 		"Delete release if it exists")
 
 	// Receive general options.
-	flags.BoolVar(&version, []string{"v", "-version"}, false,
+	version := flags.Bool([]string{"v", "-version"}, false,
 		"Print version information and quit")
-	flags.BoolVar(&help, []string{"h", "-help"}, false,
+	help := flags.Bool([]string{"h", "-help"}, false,
 		"Print this message and quit")
-	flags.BoolVar(&debug, []string{"-debug"}, false,
+	debug := flags.Bool([]string{"-debug"}, false,
 		"Run as DEBUG mode")
 
 	// Parse all the flags
@@ -98,19 +87,19 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	// Version
-	if version {
+	if *version {
 		fmt.Fprintf(cli.errStream, "ghr version %s, build %s \n", Version, GitCommit)
 		return ExitCodeOK
 	}
 
 	// Help
-	if help {
+	if *help {
 		fmt.Fprintf(cli.errStream, helpText)
 		return ExitCodeOK
 	}
 
 	// Run as DEBUG mode
-	if debug {
+	if *debug {
 		os.Setenv("DEBUG", "1")
 	}
 
