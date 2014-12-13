@@ -1,83 +1,147 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"io/ioutil"
+	"github.com/google/go-github/github"
 )
-
-type ReleaseRequest struct {
-	TagName         string `json:"tag_name"`
-	TargetCommitish string `json:"target_commitish"`
-	Draft           bool   `json:"draft"`
-	Prerelease      bool   `json:"prerelease"`
-}
-
-type Released struct {
-	ID      int    `json:"id"`
-	TagName string `json:"tag_name"`
-}
-
-type Created struct {
-	ID int `json:"id"`
-}
 
 const (
-	RELEASE_URL = "https://api.github.com/repos/%s/%s/releases"
+	ReleaseIDNotFound int = 0
 )
 
-func releaseURL(info *Info) string {
-	return fmt.Sprintf(RELEASE_URL, info.OwnerName, info.RepoName)
-}
+// CreateRelease creates release on GitHub.
+// If release already exists, it just set `GitHubAPIOpts.ID`.
+// If release already exists and `--delete` option is provided,
+// delete it and re-create release.
+func CreateRelease(ghrOpts *GhrOpts, apiOpts *GitHubAPIOpts) (err error) {
 
-func releaseRequest(info *Info) ([]byte, error) {
-	params := &ReleaseRequest{
-		TagName:         info.TagName,
-		TargetCommitish: info.TargetCommitish,
-		Draft:           info.Draft,
-		Prerelease:      info.Prerelease,
-	}
-
-	payload, err := json.Marshal(params)
+	// Get release ID
+	err = GetReleaseID(apiOpts)
 	if err != nil {
-		return nil, nil
+		return err
 	}
 
-	return payload, nil
-}
-
-func CreatedID(r io.Reader) (int, error) {
-	body, err := ioutil.ReadAll(r)
-	if err != nil {
-		return -1, err
-	}
-
-	var created Created
-	err = json.Unmarshal(body, &created)
-	if err != nil {
-		return -1, err
-	}
-	return created.ID, nil
-}
-
-func SearchIDByTag(r io.Reader, tag string) (int, error) {
-	body, err := ioutil.ReadAll(r)
-	if err != nil {
-		return -1, err
-	}
-
-	var releases []Released
-	err = json.Unmarshal(body, &releases)
-	if err != nil {
-		return -1, err
-	}
-
-	for _, release := range releases {
-		if release.TagName == tag {
-			return release.ID, nil
+	// Delte release if `--delete` is set
+	if ghrOpts.Delete {
+		err = DeleteRelease(apiOpts)
+		if err != nil {
+			return err
 		}
 	}
 
-	return -1, nil
+	// If release is exist, do nothing
+	if apiOpts.ID != ReleaseIDNotFound {
+		return nil
+	}
+
+	// Create client
+	client := NewOAuthedClient(apiOpts.Token)
+
+	// Create Release
+	request := CreateReleaseRequest(apiOpts)
+	rel, res, err := client.Repositories.CreateRelease(apiOpts.OwnerName, apiOpts.RepoName, request)
+	if err != nil {
+		return err
+	}
+
+	err = CheckStatusCreated(res)
+	if err != nil {
+		return err
+	}
+
+	// Set ReleaseID and UploadURL
+	apiOpts.ID = *rel.ID
+	apiOpts.UploadURL = *rel.UploadURL
+
+	return nil
+}
+
+// GetRleaseID gets release ID
+// If it's not exist, it sets ReleaseIDNotFound(=0) to `GithubAPIOpts.ID`
+func GetReleaseID(apiOpts *GitHubAPIOpts) (err error) {
+	// Create client
+	client := NewOAuthedClient(apiOpts.Token)
+
+	// Fetch all releases on GitHub
+	releases, res, err := client.Repositories.ListReleases(apiOpts.OwnerName, apiOpts.RepoName, nil)
+	if err != nil {
+		return err
+	}
+
+	// Check request is succeeded.
+	err = CheckStatusOK(res)
+	if err != nil {
+		return err
+	}
+
+	// Check relase already exists or not
+	for _, r := range releases {
+		if *r.TagName == apiOpts.TagName {
+
+			// Set ID if relase is already exist
+			apiOpts.ID = *r.ID
+			apiOpts.UploadURL = *r.UploadURL
+
+			return nil
+		}
+	}
+
+	// Set const value to tell other func there is no release
+	apiOpts.ID = ReleaseIDNotFound
+	apiOpts.UploadURL = ""
+
+	return nil
+}
+
+// DeleteRelease delete release which is related to release ID
+// It also deletes its tag
+func DeleteRelease(apiOpts *GitHubAPIOpts) (err error) {
+
+	// Check Release is already exist or not
+	if apiOpts.ID == ReleaseIDNotFound {
+		return nil
+	}
+
+	// Create client
+	client := NewOAuthedClient(apiOpts.Token)
+
+	// Delete release.
+	res, err := client.Repositories.DeleteRelease(apiOpts.OwnerName, apiOpts.RepoName, apiOpts.ID)
+	if err != nil {
+		return err
+	}
+
+	// Check deleting release is succeeded.
+	err = CheckStatusNoContent(res)
+	if err != nil {
+		return err
+	}
+
+	// Delete tag related to its release
+	ref := "tags/" + apiOpts.TagName
+	res, err = client.Git.DeleteRef(apiOpts.OwnerName, apiOpts.RepoName, ref)
+	if err != nil {
+		return err
+	}
+
+	// Check deleting release is succeeded.
+	err = CheckStatusNoContent(res)
+	if err != nil {
+		return err
+	}
+
+	// Set const value to tell other func there is no release
+	apiOpts.ID = ReleaseIDNotFound
+	apiOpts.UploadURL = ""
+
+	return nil
+}
+
+// CreateReleaseRequest creates request for CreateRelease
+func CreateReleaseRequest(apiOpts *GitHubAPIOpts) *github.RepositoryRelease {
+	return &github.RepositoryRelease{
+		TagName:         &apiOpts.TagName,
+		Draft:           &apiOpts.Draft,
+		Prerelease:      &apiOpts.Prerelease,
+		TargetCommitish: &apiOpts.TargetCommitish,
+	}
 }

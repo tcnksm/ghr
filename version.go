@@ -1,5 +1,6 @@
 package main
 
+const Name = "ghr"
 const Version string = "v0.2.0"
 
 // Describe latest commit hash.
