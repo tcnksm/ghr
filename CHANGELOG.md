@@ -1,3 +1,21 @@
+## 0.3.0 (Not Released)
+
+### Added
+
+- [goole/go-github](https://github.com/google/go-github) for GitHub API client
+
+### Deprecated
+
+- Nothing
+
+### Removed
+
+- Old GitHub API client
+
+### Fixed
+
+- Nothing
+
 ## 0.2.0 (2014-12-09)
 
 ### Added
@@ -17,8 +35,7 @@
 
 ### Fixed
 
-
-
+- Nothing
 
 ## 0.1.2 (2014-10-09)
 
