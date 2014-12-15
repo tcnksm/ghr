@@ -2,7 +2,7 @@ ghr
 ====
 
 [![GitHub release](http://img.shields.io/github/release/tcnksm/ghr.svg?style=flat-square)][release]
-[![Wercker](http://img.shields.io/wercker/ci/54330318b4ce963d50020750.svg?style=flat-square)][wercker]
+[![Wercker](http://img.shields.io/wercker/ci/54393fe184570fc622001411.svg?style=flat-square)][wercker]
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)][license]
 [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godocs]
 
