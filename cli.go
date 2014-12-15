@@ -223,7 +223,7 @@ func setOwner(githubOpts *GitHubAPIOpts) (err error) {
 
 	// Confirm value is not blank.
 	if githubOpts.OwnerName == "" {
-		return fmt.Errorf("Cound not retrieve git user name\n")
+		return fmt.Errorf("Could not retrieve git user name. Please set one via -u or git config\n")
 	}
 
 	return nil
