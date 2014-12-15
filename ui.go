@@ -21,3 +21,9 @@ func Colorize(msg string, color string) (out string) {
 func ColoredError(msg string) string {
 	return Colorize(msg, "red")
 }
+
+// Hot returned red colored msg.
+// This is used display most downloaded release in `-stat`
+func Hot(msg string) string {
+	return Colorize(msg, "red")
+}

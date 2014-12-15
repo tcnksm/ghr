@@ -280,6 +280,7 @@ Options:
   -t, --token        Github API Token
   -r, --repository   Github repository name
   -p, --parallel=-1  Amount of parallelism, defaults to number of CPUs
+  --stat             Show how many tool donwloaded
 　--replace          Replace asset if target already exists
 　--delete           Delete release and its git tag if same version exists
   --draft            Create unpublised release
@@ -290,6 +291,6 @@ Options:
 
 Example:
   $ ghr v1.0.0 dist/
-  $ ghr --replace v1.0.0 dist/
   $ ghr v1.0.2 dist/tool.zip
+  $ ghr --stat
 `
