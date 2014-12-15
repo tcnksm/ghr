@@ -1,8 +1,11 @@
-## 0.3.0 (Not Released)
+## 0.3.0 (2014-12-15)
 
 ### Added
 
 - [goole/go-github](https://github.com/google/go-github) for GitHub API client
+- `--stat` option to show how many tool downloaded
+- Color output
+- Many refactorings
 
 ### Deprecated
 
