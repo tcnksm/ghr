@@ -7,5 +7,8 @@ deps:
 test: deps
 	go test -v ./...
 
+build: deps
+	go build -ldflags "-X main.GitCommit \"$(COMMIT)\"" -o ghr
+
 install: deps
 	go install -ldflags "-X main.GitCommit \"$(COMMIT)\""
