@@ -118,21 +118,31 @@ func (cli *CLI) Run(args []string) int {
 	// Set Token
 	err = setToken(&githubAPIOpts)
 	if err != nil {
-		fmt.Fprintf(cli.errStream, err.Error())
+		errMsg := fmt.Sprintf("Could not retrieve GitHub API Token\n")
+		errMsg += "Please set your Github API Token in the GITHUB_TOKEN env var.\n"
+		errMsg += "Or set one via `-t` option.\n"
+		errMsg += "See about GitHub API Token on https://github.com/blog/1509-personal-api-tokens\n"
+		fmt.Fprintf(cli.errStream, errMsg)
 		return ExitCodeTokenNotFound
 	}
 
 	// Set repository owner name.
 	err = setOwner(&githubAPIOpts)
 	if err != nil {
-		fmt.Fprintf(cli.errStream, err.Error())
+		errMsg := fmt.Sprintf("Could not retrieve repository user name: %s\n", err)
+		errMsg += "ghr try to retrieve git user name from `~/.gitcofig` file.\n"
+		errMsg += "Please set one via -u option or `~/.gitconfig` file.\n"
+		fmt.Fprintf(cli.errStream, errMsg)
 		return ExitCodeOwnerNotFound
 	}
 
 	// Set repository owner name.
 	err = setRepo(&githubAPIOpts)
 	if err != nil {
-		fmt.Fprintf(cli.errStream, err.Error())
+		errMsg := fmt.Sprintf("Could not retrieve repository name: %s\n", err)
+		errMsg += "ghr try to retrieve github repository name from `.git/cofig` file.\n"
+		errMsg += "Please be sure you're in github repository. Or set one via `-r` options.\n"
+		fmt.Fprintf(cli.errStream, errMsg)
 		return ExitCodeRepoNotFound
 	}
 
@@ -195,14 +205,11 @@ func setToken(githubOpts *GitHubAPIOpts) (err error) {
 	}
 
 	// Use .gitconfig value.
-	githubOpts.Token, err = gitconfig.GithubToken()
-	if err != nil {
-		return err
-	}
+	githubOpts.Token, _ = gitconfig.GithubToken()
 
 	// Confirm value is not blank.
 	if githubOpts.Token == "" {
-		return fmt.Errorf("Please set your Github API Token in the GITHUB_TOKEN env var\n")
+		return fmt.Errorf("GitHub API token is not found.")
 	}
 
 	return nil
@@ -223,7 +230,7 @@ func setOwner(githubOpts *GitHubAPIOpts) (err error) {
 
 	// Confirm value is not blank.
 	if githubOpts.OwnerName == "" {
-		return fmt.Errorf("Could not retrieve git user name. Please set one via -u or git config\n")
+		return fmt.Errorf("key `user.name` is not found in `~/.gitconfig`")
 	}
 
 	return nil
@@ -244,7 +251,7 @@ func setRepo(githubOpts *GitHubAPIOpts) (err error) {
 
 	// Confirm value is not blank.
 	if githubOpts.RepoName == "" {
-		return fmt.Errorf("cound not retrieve repository name\n")
+		return fmt.Errorf("key `remote.origin.url` is not found in `.git/config`")
 	}
 
 	return nil
