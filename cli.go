@@ -48,6 +48,7 @@ type CLI struct {
 func (cli *CLI) Run(args []string) int {
 	var githubAPIOpts GitHubAPIOpts
 	var ghrOpts GhrOpts
+	var stat bool
 	var err error
 
 	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
@@ -72,6 +73,8 @@ func (cli *CLI) Run(args []string) int {
 		"Replace asset if target is already uploaded")
 	flags.BoolVar(&ghrOpts.Delete, []string{"-delete"}, false,
 		"Delete release if it exists")
+	flags.BoolVar(&stat, []string{"-stat"}, false,
+		"Show statical infomation")
 
 	// Receive general options.
 	version := flags.Bool([]string{"v", "-version"}, false,
@@ -103,26 +106,14 @@ func (cli *CLI) Run(args []string) int {
 		os.Setenv("DEBUG", "1")
 	}
 
-	// Get the parsed arguments
-	parsedArgs := flags.Args()
-	if len(parsedArgs) != 2 {
-		fmt.Fprintf(cli.errStream, "must specify two arguments - tag, path\n")
-		fmt.Fprintf(cli.errStream, helpText)
-		return ExitCodeBadArgs
-	}
-
-	// Get the tag of release and path
-	tag, path := parsedArgs[0], parsedArgs[1]
-	githubAPIOpts.TagName = tag
-
 	// Set Token
 	err = setToken(&githubAPIOpts)
 	if err != nil {
-		errMsg := fmt.Sprintf("Could not retrieve GitHub API Token\n")
+		errMsg := fmt.Sprintf("Could not retrieve GitHub API Token.\n")
 		errMsg += "Please set your Github API Token in the GITHUB_TOKEN env var.\n"
 		errMsg += "Or set one via `-t` option.\n"
 		errMsg += "See about GitHub API Token on https://github.com/blog/1509-personal-api-tokens\n"
-		fmt.Fprintf(cli.errStream, errMsg)
+		fmt.Fprint(cli.errStream, ColoredError(errMsg))
 		return ExitCodeTokenNotFound
 	}
 
@@ -132,7 +123,7 @@ func (cli *CLI) Run(args []string) int {
 		errMsg := fmt.Sprintf("Could not retrieve repository user name: %s\n", err)
 		errMsg += "ghr try to retrieve git user name from `~/.gitcofig` file.\n"
 		errMsg += "Please set one via -u option or `~/.gitconfig` file.\n"
-		fmt.Fprintf(cli.errStream, errMsg)
+		fmt.Fprintf(cli.errStream, ColoredError(errMsg))
 		return ExitCodeOwnerNotFound
 	}
 
@@ -142,21 +133,42 @@ func (cli *CLI) Run(args []string) int {
 		errMsg := fmt.Sprintf("Could not retrieve repository name: %s\n", err)
 		errMsg += "ghr try to retrieve github repository name from `.git/cofig` file.\n"
 		errMsg += "Please be sure you're in github repository. Or set one via `-r` options.\n"
-		fmt.Fprintf(cli.errStream, errMsg)
+		fmt.Fprintf(cli.errStream, ColoredError(errMsg))
 		return ExitCodeRepoNotFound
 	}
+
+	if stat {
+		err = ShowStat(cli.outStream, &githubAPIOpts)
+		if err != nil {
+			fmt.Fprintf(cli.errStream, ColoredError(err.Error()))
+			return ExitCodeError
+		}
+		return ExitCodeOK
+	}
+
+	// Get the parsed arguments
+	parsedArgs := flags.Args()
+	if len(parsedArgs) != 2 {
+		fmt.Fprintf(cli.errStream, ColoredError("Argument error: must specify two arguments - tag, path\n\n"))
+		fmt.Fprintf(cli.errStream, helpText)
+		return ExitCodeBadArgs
+	}
+
+	// Get the tag of release and path
+	tag, path := parsedArgs[0], parsedArgs[1]
+	githubAPIOpts.TagName = tag
 
 	// Get the asset to upload.
 	assets, err := GetLocalAssets(path)
 	if err != nil {
-		fmt.Fprintf(cli.errStream, err.Error())
+		fmt.Fprintf(cli.errStream, ColoredError(err.Error()))
 		return ExitCodeError
 	}
 
 	// Create release.
 	err = CreateRelease(&ghrOpts, &githubAPIOpts)
 	if err != nil {
-		fmt.Fprintf(cli.errStream, err.Error())
+		fmt.Fprintf(cli.errStream, ColoredError(err.Error()))
 		return ExitCodeError
 	}
 
@@ -164,7 +176,7 @@ func (cli *CLI) Run(args []string) int {
 	if ghrOpts.Replace {
 		err = FetchAssetID(assets, &githubAPIOpts)
 		if err != nil {
-			fmt.Fprintf(cli.errStream, err.Error())
+			fmt.Fprintf(cli.errStream, ColoredError(err.Error()))
 			return ExitCodeError
 		}
 	}
@@ -181,9 +193,10 @@ func (cli *CLI) Run(args []string) int {
 	// Start releasing
 	errors := UploadAssets(assets, &ghrOpts, &githubAPIOpts)
 	if len(errors) > 0 {
-		fmt.Fprintf(cli.errStream, "%d errors occurred:\n", len(errors))
+		errMsg := fmt.Sprintf("%d errors occurred:\n", len(errors))
+		fmt.Fprintf(cli.errStream, ColoredError(errMsg))
 		for _, err := range errors {
-			fmt.Fprintf(cli.errStream, "--> %s\n", err)
+			fmt.Fprintf(cli.errStream, ColoredError(fmt.Sprintf("--> %s\n", err)))
 		}
 		return ExitCodeRleaseError
 	}
