@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestRun__versionFlag(t *testing.T) {
+func TestRun_versionFlag(t *testing.T) {
 	outStream, errStream := new(bytes.Buffer), new(bytes.Buffer)
 	cli := &CLI{outStream: outStream, errStream: errStream}
 	args := strings.Split("ghr --version", " ")
