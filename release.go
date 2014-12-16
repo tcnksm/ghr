@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/google/go-github/github"
+	"time"
 )
 
 const (
@@ -120,6 +121,12 @@ func DeleteRelease(apiOpts *GitHubAPIOpts) (err error) {
 	if err != nil {
 		return err
 	}
+
+	// We need to wait a little because deleting release takes time.
+	// This is because sometimes process of deleting tag on GitHub is more fast
+	// than deleting release and it breaks release.
+	// I know this is stupid implementation.
+	time.Sleep(3 * time.Second)
 
 	// Delete tag related to its release
 	ref := "tags/" + apiOpts.TagName
