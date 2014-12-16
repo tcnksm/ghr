@@ -7,6 +7,7 @@ import (
 
 	"code.google.com/p/goauth2/oauth"
 	"github.com/google/go-github/github"
+	"strings"
 )
 
 // GitHubAPIOpts are the options for GitHub API.
@@ -67,9 +68,9 @@ func NewOAuthedClient(apiOpts *GitHubAPIOpts) *github.Client {
 
 // extractUploadURL extracts uploadURL.
 func ExtractUploadURL(apiOpts *GitHubAPIOpts) *url.URL {
-	u, _ := url.Parse(apiOpts.UploadURL)
-	uploadURL, _ := url.Parse(fmt.Sprintf("%s://%s", u.Scheme, u.Host))
-	return uploadURL
+	bracket := strings.Index(apiOpts.UploadURL, "repos/")
+	u, _ := url.Parse(apiOpts.UploadURL[0:bracket])
+	return u
 }
 
 // checkStatusOK checks http status returned by API is 200
