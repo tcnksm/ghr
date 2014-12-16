@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"code.google.com/p/goauth2/oauth"
 	"github.com/google/go-github/github"
@@ -10,6 +11,10 @@ import (
 
 // GitHubAPIOpts are the options for GitHub API.
 type GitHubAPIOpts struct {
+	// BaseURL is a GitHub API URL that ghr try to access.
+	// Default is https://api.github.com/
+	BaseURL *url.URL
+
 	// Token is the GitHub API token
 	Token string
 
@@ -43,14 +48,28 @@ type GitHubAPIOpts struct {
 }
 
 // NewOAuthedClient create client with oauth
-func NewOAuthedClient(token string) *github.Client {
+func NewOAuthedClient(apiOpts *GitHubAPIOpts) *github.Client {
 	// Create OAuth client
 	t := &oauth.Transport{
-		Token: &oauth.Token{AccessToken: token},
+		Token: &oauth.Token{AccessToken: apiOpts.Token},
 	}
 
 	// Create GitHub API client with OAuth client
-	return github.NewClient(t.Client())
+	client := github.NewClient(t.Client())
+
+	// If other URL is provided, Set it
+	if apiOpts.BaseURL != nil {
+		client.BaseURL = apiOpts.BaseURL
+	}
+
+	return client
+}
+
+// extractUploadURL extracts uploadURL.
+func ExtractUploadURL(apiOpts *GitHubAPIOpts) *url.URL {
+	u, _ := url.Parse(apiOpts.UploadURL)
+	uploadURL, _ := url.Parse(fmt.Sprintf("%s://%s", u.Scheme, u.Host))
+	return uploadURL
 }
 
 // checkStatusOK checks http status returned by API is 200

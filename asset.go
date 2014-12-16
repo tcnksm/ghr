@@ -74,7 +74,11 @@ func UploadAssets(assets []*Asset, ghrOpts *GhrOpts, apiOpts *GitHubAPIOpts) (er
 // UploadAsset upload asset to GitHub release
 func UploadAsset(asset *Asset, apiOpts *GitHubAPIOpts) (err error) {
 	// Create client
-	client := NewOAuthedClient(apiOpts.Token)
+	client := NewOAuthedClient(apiOpts)
+
+	// Set upload URL.
+	// Upload URL is provided when Creating release.
+	client.UploadURL = ExtractUploadURL(apiOpts)
 
 	// OpenFile
 	file, err := os.Open(asset.Path)
@@ -102,7 +106,7 @@ func UploadAsset(asset *Asset, apiOpts *GitHubAPIOpts) (err error) {
 // DeleteAsset deletes asset on Github
 func DeleteAsset(asset *Asset, apiOpts *GitHubAPIOpts) (err error) {
 	// Create client
-	client := NewOAuthedClient(apiOpts.Token)
+	client := NewOAuthedClient(apiOpts)
 
 	// Delete asset on GitHub
 	res, err := client.Repositories.DeleteReleaseAsset(apiOpts.OwnerName, apiOpts.RepoName, asset.ID)
@@ -121,7 +125,7 @@ func DeleteAsset(asset *Asset, apiOpts *GitHubAPIOpts) (err error) {
 // FetchAssetID fetches all assets which are already uploaded on Github.
 func FetchAssetID(assets []*Asset, apiOpts *GitHubAPIOpts) error {
 	// Create client
-	client := NewOAuthedClient(apiOpts.Token)
+	client := NewOAuthedClient(apiOpts)
 
 	// Get all assets on Github related to its relase ID
 	releasedAssets, res, err := client.Repositories.ListReleaseAssets(apiOpts.OwnerName, apiOpts.RepoName, apiOpts.ID, nil)

@@ -34,7 +34,7 @@ func CreateRelease(ghrOpts *GhrOpts, apiOpts *GitHubAPIOpts) (err error) {
 	}
 
 	// Create client
-	client := NewOAuthedClient(apiOpts.Token)
+	client := NewOAuthedClient(apiOpts)
 
 	// Create Release
 	request := CreateReleaseRequest(apiOpts)
@@ -61,7 +61,7 @@ func CreateRelease(ghrOpts *GhrOpts, apiOpts *GitHubAPIOpts) (err error) {
 // If it's not exist, it sets ReleaseIDNotFound(=0) to `GithubAPIOpts.ID`
 func GetReleaseID(apiOpts *GitHubAPIOpts) (err error) {
 	// Create client
-	client := NewOAuthedClient(apiOpts.Token)
+	client := NewOAuthedClient(apiOpts)
 
 	// Fetch all releases on GitHub
 	releases, res, err := client.Repositories.ListReleases(apiOpts.OwnerName, apiOpts.RepoName, nil)
@@ -107,7 +107,7 @@ func DeleteRelease(apiOpts *GitHubAPIOpts) (err error) {
 	}
 
 	// Create client
-	client := NewOAuthedClient(apiOpts.Token)
+	client := NewOAuthedClient(apiOpts)
 
 	// Delete release.
 	res, err := client.Repositories.DeleteRelease(apiOpts.OwnerName, apiOpts.RepoName, apiOpts.ID)

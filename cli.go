@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"runtime"
 
@@ -18,6 +19,7 @@ const (
 	ExitCodeError = 10 + iota
 	ExitCodeParseFlagsError
 	ExitCodeBadArgs
+	ExitCodeInvalidURL
 	ExitCodeTokenNotFound
 	ExitCodeOwnerNotFound
 	ExitCodeRepoNotFound
@@ -105,6 +107,9 @@ func (cli *CLI) Run(args []string) int {
 	if *debug {
 		os.Setenv("DEBUG", "1")
 	}
+
+	// Set BaseURL
+	_ = setBaseURL(&githubAPIOpts)
 
 	// Set Token
 	err = setToken(&githubAPIOpts)
@@ -204,6 +209,30 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	return ExitCodeOK
+}
+
+// setBaseURL sets Base GitHub API URL
+// Default is https://api.github.com
+func setBaseURL(githubOpts *GitHubAPIOpts) (err error) {
+	if os.Getenv("GITHUB_API") == "" {
+		return nil
+	}
+
+	// Use Environmental value.
+	u := os.Getenv("GITHUB_API")
+
+	// Pase it as url.URL
+	baseURL, err := url.Parse(u)
+	if err != nil {
+		return fmt.Errorf("failed to parse url %s", u)
+	}
+
+	Debug("BaseURL:", baseURL)
+
+	// Set it
+	githubOpts.BaseURL = baseURL
+
+	return nil
 }
 
 // setToken sets GitHub API Token.
