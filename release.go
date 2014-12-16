@@ -126,7 +126,7 @@ func DeleteRelease(apiOpts *GitHubAPIOpts) (err error) {
 	// This is because sometimes process of deleting tag on GitHub is more fast
 	// than deleting release and it breaks release.
 	// I know this is stupid implementation.
-	time.Sleep(3 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	// Delete tag related to its release
 	ref := "tags/" + apiOpts.TagName

@@ -1,3 +1,22 @@
+## 0.4.0 (2014-12-17)
+
+### Added
+
+- Support Github Enterprise (supported by [**@zoncoen**](https://github.com/zoncoen))
+- Add more tests
+
+### Deprecated
+
+- Nothing
+
+### Removed
+
+- Nothing
+
+### Fixed
+
+- `--delete` sometimes breaks relase. This is temporary solution.
+
 ## 0.3.0 (2014-12-15)
 
 ### Added
