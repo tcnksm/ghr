@@ -137,6 +137,7 @@ func (cli *CLI) Run(args []string) int {
 		return ExitCodeRepoNotFound
 	}
 
+	// Display statical information.
 	if stat {
 		err = ShowStat(cli.outStream, &githubAPIOpts)
 		if err != nil {
@@ -172,7 +173,8 @@ func (cli *CLI) Run(args []string) int {
 		return ExitCodeError
 	}
 
-	// Fetch All assets ID which is already on Github
+	// Fetch All assets ID which is already on Github.
+	// This is invorked when `--replace` option is used.
 	if ghrOpts.Replace {
 		err = FetchAssetID(assets, &githubAPIOpts)
 		if err != nil {

@@ -48,6 +48,8 @@ func CreateRelease(ghrOpts *GhrOpts, apiOpts *GitHubAPIOpts) (err error) {
 		return err
 	}
 
+	Debug("CreateRelease:", rel)
+
 	// Set ReleaseID and UploadURL
 	apiOpts.ID = *rel.ID
 	apiOpts.UploadURL = *rel.UploadURL
@@ -80,6 +82,9 @@ func GetReleaseID(apiOpts *GitHubAPIOpts) (err error) {
 			// Set ID if relase is already exist
 			apiOpts.ID = *r.ID
 			apiOpts.UploadURL = *r.UploadURL
+
+			// Debug
+			Debug("GetRelease(ID, UploadURL):", *r.ID, *r.UploadURL)
 
 			return nil
 		}
