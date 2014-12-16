@@ -48,7 +48,7 @@ func ShowStat(outStream io.Writer, apiOpts *GitHubAPIOpts) (err error) {
 func GetStat(apiOpts *GitHubAPIOpts) (stats []*Stat, err error) {
 
 	// Create client
-	client := NewOAuthedClient(apiOpts.Token)
+	client := NewOAuthedClient(apiOpts)
 
 	// Get All releases
 	releases, res, err := client.Repositories.ListReleases(apiOpts.OwnerName, apiOpts.RepoName, nil)
