@@ -183,5 +183,9 @@ func GetLocalAssets(path string) ([]*Asset, error) {
 		assets = append(assets, &Asset{Path: f, Name: filepath.Base(f)})
 	}
 
+	if len(assets) == 0 {
+		return assets, fmt.Errorf("assets to upload are not found")
+	}
+
 	return assets, nil
 }

@@ -155,7 +155,7 @@ func (cli *CLI) Run(args []string) int {
 	// Get the parsed arguments
 	parsedArgs := flags.Args()
 	if len(parsedArgs) != 2 {
-		fmt.Fprintf(cli.errStream, ColoredError("Argument error: must specify two arguments - tag, path\n\n"))
+		fmt.Fprintf(cli.errStream, ColoredError("Argument error: must specify two arguments - tag, path\n"))
 		fmt.Fprintf(cli.errStream, helpText)
 		return ExitCodeBadArgs
 	}
@@ -167,7 +167,9 @@ func (cli *CLI) Run(args []string) int {
 	// Get the asset to upload.
 	assets, err := GetLocalAssets(path)
 	if err != nil {
-		fmt.Fprintf(cli.errStream, ColoredError(err.Error()))
+		errMsg := fmt.Sprintf("Failed to get assets from %s: %s\n", path, err)
+		errMsg += "Path must be included more than one file.\n"
+		fmt.Fprintf(cli.errStream, ColoredError(errMsg))
 		return ExitCodeError
 	}
 
