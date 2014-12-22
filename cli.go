@@ -136,7 +136,7 @@ func (cli *CLI) Run(args []string) int {
 	err = setRepo(&githubAPIOpts)
 	if err != nil {
 		errMsg := fmt.Sprintf("Could not retrieve repository name: %s\n", err)
-		errMsg += "ghr try to retrieve github repository name from `.git/cofig` file.\n"
+		errMsg += "ghr try to retrieve github repository name from `.git/config` file.\n"
 		errMsg += "Please be sure you're in github repository. Or set one via `-r` options.\n"
 		fmt.Fprintf(cli.errStream, ColoredError(errMsg))
 		return ExitCodeRepoNotFound
