@@ -46,9 +46,9 @@ $ git config --global github.token "....."
 
 Enviromental variable takes priority over gitconfig value.
 
-### GitHub Enterise
+### GitHub Enterprise
 
-You can use `ghr` for GitHub Enterpise. Change API endpoint via the enviromental variable.
+You can use `ghr` for GitHub Enterprise. Change API endpoint via the enviromental variable.
 
 ```bash
 $ export GITHUB_API=http://github.company.com/api/v3
