@@ -67,6 +67,8 @@ func (cli *CLI) Run(args []string) int {
 		"GitHub username")
 	flags.StringVar(&githubAPIOpts.RepoName, []string{"r", "-repository"}, "",
 		"Repository name")
+	flags.StringVar(&githubAPIOpts.TargetCommitish, []string{"c", "-commitish"}, "",
+		"Target commitish")
 	flags.StringVar(&githubAPIOpts.Token, []string{"t", "-token"}, "",
 		"GitHub API Token")
 	flags.BoolVar(&githubAPIOpts.Draft, []string{"-draft"}, false,
@@ -334,6 +336,7 @@ Options:
   -u, --username     Github username
   -t, --token        Github API Token
   -r, --repository   Github repository name
+  -c, --commitish    Target commitish, branch or commit SHA
   -p, --parallel=-1  Amount of parallelism, defaults to number of CPUs
   --stat             Show how many tool donwloaded
 　--replace          Replace asset if target already exists
