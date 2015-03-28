@@ -271,10 +271,7 @@ func setOwner(githubOpts *GitHubAPIOpts) (err error) {
 	// Use .gitconfig value.
 	githubOpts.OwnerName, err = gitconfig.GithubUser()
 	if err != nil {
-		githubOpts.OwnerName, err = gitconfig.Username()
-		if err != nil {
-			return err
-		}
+		githubOpts.OwnerName, _ = gitconfig.Username()
 	}
 
 	// Confirm value is not blank.
