@@ -19,7 +19,7 @@ Easily ship your project to your user using Github Releases.
 
 ## Demo
 
-![](http://deeeet.com/writing/images/post/ghr.gif)
+![](http://deeeet.com/images/ghr.gif)
 
 Result is [here](https://github.com/tcnksm/ghr/releases/tag/v0.1.0).
 
