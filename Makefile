@@ -1,6 +1,9 @@
 DEBUG_FLAG = $(if $(DEBUG),-debug)
 COMMIT = $$(git describe --always)
 
+clean:
+	rm $(GOPATH)/bin/ghr
+
 deps:
 	go get -d -t ./...
 

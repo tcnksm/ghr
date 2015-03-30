@@ -37,6 +37,12 @@ type GhrOpts struct {
 
 	// Detele determines delete release if it exists.
 	Delete bool
+
+	// OutCh receive info output from uploading process
+	outCh chan string
+
+	// ErrCH receive error output from uploading process
+	errCh chan string
 }
 
 // CLI is the command line object
@@ -200,13 +206,29 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	// Start releasing
-	errors := UploadAssets(assets, &ghrOpts, &githubAPIOpts)
-	if len(errors) > 0 {
-		errMsg := fmt.Sprintf("%d errors occurred:\n", len(errors))
-		fmt.Fprintf(cli.errStream, ColoredError(errMsg))
-		for _, err := range errors {
-			fmt.Fprintf(cli.errStream, ColoredError(fmt.Sprintf("--> %s\n", err)))
+	doneCh, outCh, errCh := UploadAssets(assets, &ghrOpts, &githubAPIOpts)
+
+	// Receive messages
+	statusCh := make(chan bool)
+	go func() {
+		errOccurred := false
+		for {
+			select {
+			case out := <-outCh:
+				fmt.Fprintf(cli.outStream, out)
+			case err := <-errCh:
+				fmt.Fprintf(cli.errStream, ColoredError(err))
+				errOccurred = true
+			case <-doneCh:
+				statusCh <- errOccurred
+				break
+			}
 		}
+	}()
+
+	// If more than one error is occured, return non-zero value
+	errOccurred := <-statusCh
+	if errOccurred {
 		return ExitCodeRleaseError
 	}
 
