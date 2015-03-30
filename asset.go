@@ -29,46 +29,52 @@ type Asset struct {
 }
 
 // UploadAssets uploads assets parallelly.
-func UploadAssets(assets []*Asset, ghrOpts *GhrOpts, apiOpts *GitHubAPIOpts) (errors []string) {
+func UploadAssets(assets []*Asset, ghrOpts *GhrOpts, apiOpts *GitHubAPIOpts) (<-chan bool, <-chan string, <-chan string) {
 
-	var errorLock sync.Mutex
+	// Done channel for sending process is done
+	doneCh := make(chan bool)
+
+	// out/error channel for sending message
+	outCh, errCh := make(chan string), make(chan string)
+
+	// Semaphore channel for limit parallel
+	semaphore := make(chan int, ghrOpts.Parallel)
+
+	// Block until all release is done
 	var wg sync.WaitGroup
 
-	errors = make([]string, 0)
-	semaphore := make(chan int, ghrOpts.Parallel)
-	for _, asset := range assets {
-		wg.Add(1)
-		go func(asset *Asset) {
-			defer wg.Done()
-			semaphore <- 1
+	go func() {
+		for _, asset := range assets {
+			wg.Add(1)
+			go func(asset *Asset) {
+				defer wg.Done()
+				semaphore <- 1
 
-			// If `--replace` flag is set and asset is already
-			// uploaded on Github. ghr delete it in advance.
-			if ghrOpts.Replace && asset.ID != AssetIDNotFound {
-				fmt.Fprintf(os.Stderr, "--> Deleting: %15s\n", asset.Name)
-				if err := DeleteAsset(asset, apiOpts); err != nil {
-					errorLock.Lock()
-					defer errorLock.Unlock()
-					errors = append(errors,
-						fmt.Sprintf("delete %s error: %s", asset.Name, err))
+				// If `--replace` flag is set and asset is already
+				// uploaded on Github. ghr delete it in advance.
+				if ghrOpts.Replace && asset.ID != AssetIDNotFound {
+					outCh <- fmt.Sprintf("--> Deleting: %15s\n", asset.Name)
+					if err := DeleteAsset(asset, apiOpts); err != nil {
+						errCh <- fmt.Sprintf("delete %s error: %s", asset.Name, err)
+					}
 				}
-			}
 
-			// Upload asset.
-			fmt.Fprintf(os.Stderr, "--> Uploading: %15s\n", asset.Name)
-			if err := UploadAsset(asset, apiOpts); err != nil {
-				errorLock.Lock()
-				defer errorLock.Unlock()
-				errors = append(errors,
-					fmt.Sprintf("upload %s error: %s", asset.Name, err))
-			}
+				// Upload asset.
+				outCh <- fmt.Sprintf("--> Uploading: %15s\n", asset.Name)
+				if err := UploadAsset(asset, apiOpts); err != nil {
+					errCh <- fmt.Sprintf("upload %s error: %s", asset.Name, err)
+				}
 
-			<-semaphore
-		}(asset)
-	}
-	wg.Wait()
+				<-semaphore
+			}(asset)
+		}
 
-	return errors
+		// Tell process is done
+		wg.Wait()
+		doneCh <- true
+	}()
+
+	return doneCh, outCh, errCh
 }
 
 // UploadAsset upload asset to GitHub release
