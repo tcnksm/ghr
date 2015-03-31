@@ -84,6 +84,7 @@ $ ghr \
     -t <token> \       # Set Github API Token
     -u <username> \    # Set Github username
     -r <repository> \  # Set repository name
+    -c <commitish> \   # Set target commitish, branch or commit SHA
     -p <num> \         # Set amount of parallelism (Default is number of CPU)
     --replace \        # Replace asset if target is already exists
     --delete \         # Delete release and its git tag in advance if it exists
