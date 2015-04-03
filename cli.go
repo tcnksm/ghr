@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"runtime"
+	"time"
 
 	flag "github.com/dotcloud/docker/pkg/mflag"
 	"github.com/tcnksm/go-gitconfig"
@@ -102,6 +103,20 @@ func (cli *CLI) Run(args []string) int {
 	// Version
 	if *version {
 		fmt.Fprintf(cli.errStream, "ghr version %s, build %s \n", Version, GitCommit)
+
+	LOOP:
+		for {
+			select {
+			case res := <-verCheckCh:
+				if res != nil && res.Outdated {
+					msg := fmt.Sprintf("Latest version of ghr is %s, please update it\n", res.Current)
+					fmt.Fprint(cli.errStream, ColoredError(msg))
+				}
+				break LOOP
+			case <-time.After(CheckTimeout):
+				break LOOP
+			}
+		}
 		return ExitCodeOK
 	}
 
@@ -113,7 +128,7 @@ func (cli *CLI) Run(args []string) int {
 
 	// Run as DEBUG mode
 	if *debug {
-		os.Setenv("DEBUG", "1")
+		os.Setenv("GHR_DEBUG", "1")
 	}
 
 	// Set BaseURL
