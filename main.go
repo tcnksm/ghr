@@ -13,7 +13,7 @@ func main() {
 // Debug display values when DEBUG mode
 // This is used only for developer
 func Debug(v ...interface{}) {
-	if os.Getenv("DEBUG") != "" {
+	if os.Getenv("GHR_DEBUG") != "" {
 		log.Println(v...)
 	}
 }
