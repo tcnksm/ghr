@@ -8,8 +8,8 @@ import (
 	"runtime"
 	"time"
 
-	flag "github.com/dotcloud/docker/pkg/mflag"
 	"github.com/tcnksm/go-gitconfig"
+	flag "github.com/tcnksm/mflag"
 )
 
 // Exit codes are in value that represnet an exit code for a paticular error.
@@ -62,67 +62,75 @@ func (cli *CLI) Run(args []string) int {
 
 	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
 	flags.SetOutput(cli.errStream)
+	flags.SetUsageSynopsis("ghr [options] TAG PATH")
+	flags.SetUsageDescription(
+		"ghr is a tool to create Release on Github and upload your artifacts to it. \n" +
+			"  ghr parallelizes upload multiple artifacts. \n\n" +
+			"  You can use ghr on GitHub Enterprise. Change URL by `GITHUB_API` env var.",
+	)
+	flags.AddUsageExample("$ ghr v1.0 dist/", "Upload artifacts in `dist` directory with verion v1.0.")
+	flags.AddUsageExample("$ ghr --stat", "Show statical information, download number of each release.")
 
-	// Receive options for GitHub API.
+	// Options for GitHub API.
 	flags.StringVar(&githubAPIOpts.OwnerName, []string{"u", "-username"}, "",
-		"GitHub username")
+		"GitHub username. By default, ghr extracts user name from global gitconfig value.",
+	)
+
 	flags.StringVar(&githubAPIOpts.RepoName, []string{"r", "-repository"}, "",
-		"Repository name")
-	flags.StringVar(&githubAPIOpts.TargetCommitish, []string{"c", "-commitish"}, "",
-		"Target commitish")
+		"GitHub repository name. By default, ghr extracts repository name from "+
+			"current directory's `.git/config` value.",
+	)
+
 	flags.StringVar(&githubAPIOpts.Token, []string{"t", "-token"}, "",
-		"GitHub API Token")
-	flags.BoolVar(&githubAPIOpts.Draft, []string{"-draft"}, false,
-		"Create unpublised release")
-	flags.BoolVar(&githubAPIOpts.Prerelease, []string{"-prerelease"}, false,
-		"Create prerelease")
+		"GitHub API Token. To use ghr, you will first need to create a GitHub API token "+
+			"with an account which has enough permissions to be able to create releases. "+
+			"You can set this value via GITHUB_TOKEN env var.",
+	)
+	flags.StringVar(&githubAPIOpts.TargetCommitish, []string{"#c", "#-commitish"}, "", "Target commitish")
+	flags.BoolVar(&githubAPIOpts.Draft, []string{"#-draft"}, false, "Create unpublised release")
+	flags.BoolVar(&githubAPIOpts.Prerelease, []string{"#-prerelease"}, false, "Create prerelease")
 
-	// Receive options to change ghr work.
-	flags.IntVar(&ghrOpts.Parallel, []string{"p", "--parallel"}, -1,
-		"Parallelization factor")
+	// Options to change ghr work.
+	flags.IntVar(&ghrOpts.Parallel, []string{"p", "-parallel"}, -1,
+		"Parallelization factor. This option limit amount of parallelism of uploading. "+
+			"By default, ghr uses number of logic CPU of your PC.",
+	)
 	flags.BoolVar(&ghrOpts.Replace, []string{"-replace"}, false,
-		"Replace asset if target is already uploaded")
+		"Replace artifacts if it is already uploaded. Same artifact measn, same release "+
+			"and same artifact name. ",
+	)
 	flags.BoolVar(&ghrOpts.Delete, []string{"-delete"}, false,
-		"Delete release if it exists")
+		"Delete release if it already created. "+
+			"If you want to recreate release itself from begining, use this. "+
+			"Just want to upload same artifacts to same release again, use `--replace` option.",
+	)
 	flags.BoolVar(&stat, []string{"-stat"}, false,
-		"Show statical infomation")
+		"Show statical infomation like number of downloading of each release.",
+	)
 
-	// Receive general options.
-	version := flags.Bool([]string{"v", "-version"}, false,
-		"Print version information and quit")
-	help := flags.Bool([]string{"h", "-help"}, false,
-		"Print this message and quit")
-	debug := flags.Bool([]string{"-debug"}, false,
-		"Run as DEBUG mode")
+	// General options
+	version := flags.Bool([]string{"#v", "#-version"}, false, "Print version information and quit.")
+	debug := flags.Bool([]string{"#-debug"}, false, "Run as DEBUG mode.")
 
 	// Parse all the flags
 	if err := flags.Parse(args[1:]); err != nil {
 		return ExitCodeParseFlagsError
 	}
 
-	// Version
+	// Show version. It also try to fetch latest version information from github
 	if *version {
 		fmt.Fprintf(cli.errStream, "ghr version %s, build %s \n", Version, GitCommit)
 
-	LOOP:
-		for {
-			select {
-			case res := <-verCheckCh:
-				if res != nil && res.Outdated {
-					msg := fmt.Sprintf("Latest version of ghr is %s, please update it\n", res.Current)
-					fmt.Fprint(cli.errStream, ColoredError(msg))
-				}
-				break LOOP
-			case <-time.After(CheckTimeout):
-				break LOOP
+		select {
+		case res := <-verCheckCh:
+			if res != nil && res.Outdated {
+				msg := fmt.Sprintf("Latest version of ghr is %s, please update it\n", res.Current)
+				fmt.Fprint(cli.errStream, ColoredError(msg))
 			}
+		case <-time.After(CheckTimeout):
+			// do nothing
 		}
-		return ExitCodeOK
-	}
 
-	// Help
-	if *help {
-		fmt.Fprintf(cli.errStream, helpText)
 		return ExitCodeOK
 	}
 
@@ -137,10 +145,11 @@ func (cli *CLI) Run(args []string) int {
 	// Set Token
 	err = setToken(&githubAPIOpts)
 	if err != nil {
-		errMsg := fmt.Sprintf("Could not retrieve GitHub API Token.\n")
-		errMsg += "Please set your Github API Token in the GITHUB_TOKEN env var.\n"
-		errMsg += "Or set one via `-t` option.\n"
-		errMsg += "See about GitHub API Token on https://github.com/blog/1509-personal-api-tokens\n"
+		errMsg := fmt.Sprintf("Could not retrieve GitHub API Token.\n" +
+			"Please set your Github API Token in the GITHUB_TOKEN env var.\n" +
+			"Or set one via `-t` option.\n" +
+			"See about GitHub API Token on https://github.com/blog/1509-personal-api-tokens\n",
+		)
 		fmt.Fprint(cli.errStream, ColoredError(errMsg))
 		return ExitCodeTokenNotFound
 	}
@@ -148,9 +157,10 @@ func (cli *CLI) Run(args []string) int {
 	// Set repository owner name.
 	err = setOwner(&githubAPIOpts)
 	if err != nil {
-		errMsg := fmt.Sprintf("Could not retrieve repository user name: %s\n", err)
-		errMsg += "ghr try to retrieve git user name from `~/.gitcofig` file.\n"
-		errMsg += "Please set one via -u option or `~/.gitconfig` file.\n"
+		errMsg := fmt.Sprintf("Could not retrieve repository user name: %s\n"+
+			"ghr try to retrieve git user name from `~/.gitcofig` file.\n"+
+			"Please set one via -u option or `~/.gitconfig` file.\n",
+			err)
 		fmt.Fprintf(cli.errStream, ColoredError(errMsg))
 		return ExitCodeOwnerNotFound
 	}
@@ -158,9 +168,10 @@ func (cli *CLI) Run(args []string) int {
 	// Set repository owner name.
 	err = setRepo(&githubAPIOpts)
 	if err != nil {
-		errMsg := fmt.Sprintf("Could not retrieve repository name: %s\n", err)
-		errMsg += "ghr try to retrieve github repository name from `.git/config` file.\n"
-		errMsg += "Please be sure you're in github repository. Or set one via `-r` options.\n"
+		errMsg := fmt.Sprintf("Could not retrieve repository name: %s\n"+
+			"ghr try to retrieve github repository name from `.git/config` file.\n"+
+			"Please be sure you're in github repository. Or set one via `-r` options.\n",
+			err)
 		fmt.Fprintf(cli.errStream, ColoredError(errMsg))
 		return ExitCodeRepoNotFound
 	}
@@ -179,7 +190,6 @@ func (cli *CLI) Run(args []string) int {
 	parsedArgs := flags.Args()
 	if len(parsedArgs) != 2 {
 		fmt.Fprintf(cli.errStream, ColoredError("Argument error: must specify two arguments - tag, path\n"))
-		fmt.Fprintf(cli.errStream, helpText)
 		return ExitCodeBadArgs
 	}
 
@@ -190,8 +200,9 @@ func (cli *CLI) Run(args []string) int {
 	// Get the asset to upload.
 	assets, err := GetLocalAssets(path)
 	if err != nil {
-		errMsg := fmt.Sprintf("Failed to get assets from %s: %s\n", path, err)
-		errMsg += "Path must be included more than one file.\n"
+		errMsg := fmt.Sprintf("Failed to get assets from %s: %s\n"+
+			"Path must be included more than one file.\n",
+			path, err)
 		fmt.Fprintf(cli.errStream, ColoredError(errMsg))
 		return ExitCodeError
 	}
@@ -341,29 +352,3 @@ func setRepo(githubOpts *GitHubAPIOpts) (err error) {
 
 	return nil
 }
-
-const helpText = `Usage: ghr [option] <tag> <artifacts>
-
-ghr - easy to release to Github in parallel
-
-Options:
-
-  -u, --username     Github username
-  -t, --token        Github API Token
-  -r, --repository   Github repository name
-  -c, --commitish    Target commitish, branch or commit SHA
-  -p, --parallel=-1  Amount of parallelism, defaults to number of CPUs
-  --stat             Show how many tool donwloaded
-　--replace          Replace asset if target already exists
-　--delete           Delete release and its git tag if same version exists
-  --draft            Create unpublised release
-  --prerelease       Create prerelease
-  -h, --help         Print this message and quit
-  -v, --version      Print version information and quit
-  --debug=false      Run as DEBUG mode
-
-Example:
-  $ ghr v1.0.0 dist/
-  $ ghr v1.0.2 dist/tool.zip
-  $ ghr --stat
-`
