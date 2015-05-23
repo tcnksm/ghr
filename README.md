@@ -102,7 +102,7 @@ $ brew tap tcnksm/ghr
 $ brew install ghr
 ```
 
-If you are in another platform, you can download binary from [relase page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory.
+If you are in another platform, you can download binary from [release page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory.
 
 ## Integration with CI-as-a-Service
 
