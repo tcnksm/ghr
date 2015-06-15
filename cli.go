@@ -8,8 +8,8 @@ import (
 	"runtime"
 	"time"
 
+	flag "github.com/dotcloud/docker/pkg/mflag"
 	"github.com/tcnksm/go-gitconfig"
-	flag "github.com/tcnksm/mflag"
 )
 
 // Exit codes are in value that represnet an exit code for a paticular error.
@@ -62,55 +62,27 @@ func (cli *CLI) Run(args []string) int {
 
 	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
 	flags.SetOutput(cli.errStream)
-	flags.SetUsageSynopsis("ghr [options] TAG PATH")
-	flags.SetUsageDescription(
-		"ghr is a tool to create Release on Github and upload your artifacts to it. \n" +
-			"  ghr parallelizes upload multiple artifacts. \n\n" +
-			"  You can use ghr on GitHub Enterprise. Change URL by `GITHUB_API` env var.",
-	)
-	flags.AddUsageExample("$ ghr v1.0 dist/", "Upload artifacts in `dist` directory with verion v1.0.")
-	flags.AddUsageExample("$ ghr --stat", "Show statical information, download number of each release.")
+	flags.Usage = func() {
+		fmt.Fprint(cli.errStream, helpText)
+	}
 
 	// Options for GitHub API.
-	flags.StringVar(&githubAPIOpts.OwnerName, []string{"u", "-username"}, "",
-		"GitHub username. By default, ghr extracts user name from global gitconfig value.",
-	)
-
-	flags.StringVar(&githubAPIOpts.RepoName, []string{"r", "-repository"}, "",
-		"GitHub repository name. By default, ghr extracts repository name from "+
-			"current directory's `.git/config` value.",
-	)
-
-	flags.StringVar(&githubAPIOpts.Token, []string{"t", "-token"}, "",
-		"GitHub API Token. To use ghr, you will first need to create a GitHub API token "+
-			"with an account which has enough permissions to be able to create releases. "+
-			"You can set this value via GITHUB_TOKEN env var.",
-	)
-	flags.StringVar(&githubAPIOpts.TargetCommitish, []string{"#c", "#-commitish"}, "", "Target commitish")
-	flags.BoolVar(&githubAPIOpts.Draft, []string{"#-draft"}, false, "Create unpublised release")
-	flags.BoolVar(&githubAPIOpts.Prerelease, []string{"#-prerelease"}, false, "Create prerelease")
+	flags.StringVar(&githubAPIOpts.OwnerName, []string{"u", "-username"}, "", "")
+	flags.StringVar(&githubAPIOpts.RepoName, []string{"r", "-repository"}, "", "")
+	flags.StringVar(&githubAPIOpts.Token, []string{"t", "-token"}, "", "")
+	flags.StringVar(&githubAPIOpts.TargetCommitish, []string{"c", "-commitish"}, "", "")
+	flags.BoolVar(&githubAPIOpts.Draft, []string{"-draft"}, false, "")
+	flags.BoolVar(&githubAPIOpts.Prerelease, []string{"-prerelease"}, false, "")
 
 	// Options to change ghr work.
-	flags.IntVar(&ghrOpts.Parallel, []string{"p", "-parallel"}, -1,
-		"Parallelization factor. This option limit amount of parallelism of uploading. "+
-			"By default, ghr uses number of logic CPU of your PC.",
-	)
-	flags.BoolVar(&ghrOpts.Replace, []string{"-replace"}, false,
-		"Replace artifacts if it is already uploaded. Same artifact measn, same release "+
-			"and same artifact name. ",
-	)
-	flags.BoolVar(&ghrOpts.Delete, []string{"-delete"}, false,
-		"Delete release if it already created. "+
-			"If you want to recreate release itself from begining, use this. "+
-			"Just want to upload same artifacts to same release again, use `--replace` option.",
-	)
-	flags.BoolVar(&stat, []string{"-stat"}, false,
-		"Show statical infomation like number of downloading of each release.",
-	)
+	flags.IntVar(&ghrOpts.Parallel, []string{"p", "-parallel"}, -1, "")
+	flags.BoolVar(&ghrOpts.Replace, []string{"-replace"}, false, "")
+	flags.BoolVar(&ghrOpts.Delete, []string{"-delete"}, false, "")
+	flags.BoolVar(&stat, []string{"-stat"}, false, "")
 
 	// General options
-	version := flags.Bool([]string{"#v", "#-version"}, false, "Print version information and quit.")
-	debug := flags.Bool([]string{"#-debug"}, false, "Run as DEBUG mode.")
+	version := flags.Bool([]string{"v", "-version"}, false, "")
+	debug := flags.Bool([]string{"-debug"}, false, "")
 
 	// Parse all the flags
 	if err := flags.Parse(args[1:]); err != nil {
@@ -352,3 +324,50 @@ func setRepo(githubOpts *GitHubAPIOpts) (err error) {
 
 	return nil
 }
+
+var helpText = `
+Usage: ghr [options] TAG PATH
+
+  ghr is a tool to create Release on Github and upload your artifacts to
+  it. ghr parallelizes upload multiple artifacts.
+
+  You can use ghr on GitHub Enterprise. Change URL by GITHUB_API env var.
+
+Options:
+
+  --username, -u        GitHub username. By default, ghr extracts user
+                        name from global gitconfig value.
+
+  --repository, -r      GitHub repository name. By default, ghr extracts
+                        repository name from current directory's .git/config
+                        value.
+
+  --token, -t           GitHub API Token. To use ghr, you will first need
+                        to create a GitHub API token with an account which
+                        has enough permissions to be able to create releases.
+                        You can set this value via GITHUB_TOKEN env var.
+
+  --parallel=-1         Parallelization factor. This option limit amount
+                        of parallelism of uploading. By default, ghr uses
+                        number of logic CPU of your PC.
+
+  --delete              Delete release if it already created. If you want
+                        to recreate release itself from begining, use
+                        this. Just want to upload same artifacts to same
+                        release again, use --replace option.
+
+  --replace             Replace artifacts if it is already uploaded. Same
+                        artifact measn, same release and same artifact
+                        name.
+
+  --stat=false          Show number of download of each release and quit.
+                        This is special command.
+
+Examples:
+
+  $ ghr v1.0 dist/     Upload all artifacts which are in dist directory
+                       with verion v1.0. 
+
+  $ ghr --stat         Show download number of each relase and quit.
+
+`
