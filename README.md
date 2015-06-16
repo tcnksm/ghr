@@ -128,7 +128,7 @@ You can get source with `go get`:
 
 ```bash
 $ go get -d github.com/tcnksm/ghr
-$ cd $GOPATH/src/github.com/tcnksm/cli-init
+$ cd $GOPATH/src/github.com/tcnksm/ghr
 $ make install
 ```
 
