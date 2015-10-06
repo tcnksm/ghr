@@ -25,7 +25,7 @@ func TestGetLocalAssets_noAssets(t *testing.T) {
 	// Create empty directory
 	path, err := ioutil.TempDir("", "test")
 	if err != nil {
-		t.Fatal("err: %s", err)
+		t.Fatalf("err: %s", err)
 	}
 
 	out, err := GetLocalAssets(path)

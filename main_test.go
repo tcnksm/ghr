@@ -11,7 +11,7 @@ import (
 func genAssets(t *testing.T) string {
 	tmpDir, err := ioutil.TempDir("", "test")
 	if err != nil {
-		t.Fatal("err: %s", err)
+		t.Fatalf("err: %s", err)
 	}
 
 	for _, f := range []string{"fileA", "fileB", "fileC"} {
