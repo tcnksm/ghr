@@ -11,17 +11,18 @@ clean:
 
 deps:
 	go get -d -t ./...
+	go get golang.org/x/tools/cmd/cover
+	go get golang.org/x/tools/cmd/vet
 
 install: deps
 	go install -ldflags "-X main.GitCommit=\"$(COMMIT)\""
 
 test: deps
 	go test -v -timeout=30s -parallel=4 ./...
+	go test -race ./...
+	go vet .
 
 cover: deps
-	@go tool cover 2>/dev/null; if [ $$? -eq 3 ]; then \
-        go get -u golang.org/x/tools/cmd/cover; \
-	fi	
 	go test $(TEST) -coverprofile=coverage.out
 	go tool cover -html=coverage.out
 	rm coverage.out
