@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-
-	"code.google.com/p/goauth2/oauth"
-	"github.com/google/go-github/github"
 	"strings"
+
+	"github.com/google/go-github/github"
+	"golang.org/x/oauth2"
 )
 
 // GitHubAPIOpts are the options for GitHub API.
@@ -51,12 +51,13 @@ type GitHubAPIOpts struct {
 // NewOAuthedClient create client with oauth
 func NewOAuthedClient(apiOpts *GitHubAPIOpts) *github.Client {
 	// Create OAuth client
-	t := &oauth.Transport{
-		Token: &oauth.Token{AccessToken: apiOpts.Token},
-	}
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: apiOpts.Token},
+	)
+	tc := oauth2.NewClient(oauth2.NoContext, ts)
 
 	// Create GitHub API client with OAuth client
-	client := github.NewClient(t.Client())
+	client := github.NewClient(tc)
 
 	// If other URL is provided, Set it
 	if apiOpts.BaseURL != nil {
