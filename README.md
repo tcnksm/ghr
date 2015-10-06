@@ -11,22 +11,17 @@ ghr
 [license]: https://github.com/tcnksm/ghr/blob/master/LICENSE
 [godocs]: http://godoc.org/github.com/tcnksm/ghr
 
-Easily ship your project to your user using Github Releases.
-
-## Description
-
-`ghr` enable you to create Release on Github and upload your artifacts to it. `ghr` will parallelize upload multiple artifacts.
+`ghr` is a simple tool to create GitHub Release and upload artifacts by one command. `ghr` uploads multiple artifacts in parallel. 
 
 ## Demo
 
 ![](http://deeeet.com/images/ghr.gif)
 
-Result is [here](https://github.com/tcnksm/ghr/releases/tag/v0.1.0).
-
+You can see results [here](https://github.com/tcnksm/ghr/releases/tag/v0.1.0).
 
 ## Usage
 
-Run it in your project directory:
+Run it in your project directory,
 
 ```bash
 $ ghr [option] <tag> <artifacts>
@@ -132,13 +127,6 @@ $ cd $GOPATH/src/github.com/tcnksm/ghr
 $ make install
 ```
 
-## Support
-
-If you have something to ask me or request for new features, feel free to join gitter room.
-
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/tcnksm/ghr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-
 ## Author
 
-[tcnksm](https://github.com/tcnksm)
+[Taichi Nakashima](https://github.com/tcnksm)
