@@ -366,7 +366,7 @@ Options:
 Examples:
 
   $ ghr v1.0 dist/     Upload all artifacts which are in dist directory
-                       with verion v1.0. 
+                       with version v1.0. 
 
   $ ghr --stat         Show download number of each relase and quit.
 
