@@ -130,7 +130,7 @@ func (cli *CLI) Run(args []string) int {
 	err = setOwner(&githubAPIOpts)
 	if err != nil {
 		errMsg := fmt.Sprintf("Could not retrieve repository user name: %s\n"+
-			"ghr try to retrieve git user name from `~/.gitcofig` file.\n"+
+			"ghr try to retrieve git user name from `~/.gitconfig` file.\n"+
 			"Please set one via -u option or `~/.gitconfig` file.\n",
 			err)
 		fmt.Fprintf(cli.errStream, ColoredError(errMsg))
