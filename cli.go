@@ -160,7 +160,27 @@ func (cli *CLI) Run(args []string) int {
 
 	// Get the parsed arguments
 	parsedArgs := flags.Args()
-	if len(parsedArgs) != 2 {
+	switch len(parsedArgs) {
+	case 2:
+	case 1:
+		// Delete release and exit if only one argument is given.
+		if ghrOpts.Delete {
+			githubAPIOpts.TagName = parsedArgs[0]
+			err = GetReleaseID(&githubAPIOpts)
+			if err != nil {
+				fmt.Fprintf(cli.errStream, ColoredError(err.Error()))
+				return ExitCodeError
+			}
+			err = DeleteRelease(&githubAPIOpts)
+			if err != nil {
+				fmt.Fprintf(cli.errStream, ColoredError(err.Error()))
+				return ExitCodeError
+			}
+			return ExitCodeOK
+		}
+		fmt.Fprintf(cli.errStream, ColoredError("Argument error: you can specify one argument only when use --delete option\n"))
+		return ExitCodeBadArgs
+	default:
 		fmt.Fprintf(cli.errStream, ColoredError("Argument error: must specify two arguments - tag, path\n"))
 		return ExitCodeBadArgs
 	}
