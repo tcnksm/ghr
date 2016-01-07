@@ -141,6 +141,10 @@ func DeleteRelease(apiOpts *GitHubAPIOpts) (err error) {
 		return err
 	}
 
+	// This is because sometimes process of creating release on GitHub is more
+	// fast than deleting tag.
+	time.Sleep(5 * time.Second)
+
 	// Set const value to tell other func there is no release
 	apiOpts.ID = ReleaseIDNotFound
 	apiOpts.UploadURL = ""
