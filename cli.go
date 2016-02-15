@@ -329,7 +329,7 @@ var helpText = `
 Usage: ghr [options] TAG PATH
 
   ghr is a tool to create Release on Github and upload your artifacts to
-  it. ghr parallelizes upload multiple artifacts.
+  it. ghr parallelizes upload of multiple artifacts.
 
   You can use ghr on GitHub Enterprise. Change URL by GITHUB_API env var.
 
@@ -347,20 +347,20 @@ Options:
                         has enough permissions to be able to create releases.
                         You can set this value via GITHUB_TOKEN env var.
 
-  --parallel=-1         Parallelization factor. This option limit amount
+  --parallel=-1         Parallelization factor. This option limits amount
                         of parallelism of uploading. By default, ghr uses
                         number of logic CPU of your PC.
 
   --delete              Delete release if it already created. If you want
-                        to recreate release itself from begining, use
+                        to recreate release itself from beginning, use
                         this. Just want to upload same artifacts to same
                         release again, use --replace option.
 
   --replace             Replace artifacts if it is already uploaded. Same
-                        artifact measn, same release and same artifact
+                        artifact means, same release and same artifact
                         name.
 
-  --stat=false          Show number of download of each release and quit.
+  --stat=false          Show number of downloads of each release and quit.
                         This is special command.
 
 Examples:
@@ -368,6 +368,6 @@ Examples:
   $ ghr v1.0 dist/     Upload all artifacts which are in dist directory
                        with version v1.0. 
 
-  $ ghr --stat         Show download number of each relase and quit.
+  $ ghr --stat         Show download number of each release and quit.
 
 `
