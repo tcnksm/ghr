@@ -7,6 +7,8 @@ import (
 )
 
 const (
+	// ReleaseIDNotFound is ID which represent that
+	// release is not yet created.
 	ReleaseIDNotFound int = 0
 )
 
@@ -57,8 +59,8 @@ func CreateRelease(ghrOpts *GhrOpts, apiOpts *GitHubAPIOpts) (err error) {
 	return nil
 }
 
-// GetRleaseID gets release ID
-// If it's not exist, it sets ReleaseIDNotFound(=0) to `GithubAPIOpts.ID`
+// GetReleaseID gets release ID. If it's not exist, it sets
+// ReleaseIDNotFound(=0) to `GithubAPIOpts.ID`
 func GetReleaseID(apiOpts *GitHubAPIOpts) (err error) {
 	// Create client
 	client := NewOAuthedClient(apiOpts)

@@ -5,6 +5,7 @@ import (
 	"io"
 )
 
+// Stat represent stat information
 type Stat struct {
 	// TagName is relase tag
 	TagName string

@@ -67,14 +67,14 @@ func NewOAuthedClient(apiOpts *GitHubAPIOpts) *github.Client {
 	return client
 }
 
-// extractUploadURL extracts uploadURL.
+// ExtractUploadURL extracts uploadURL.
 func ExtractUploadURL(apiOpts *GitHubAPIOpts) *url.URL {
 	bracket := strings.Index(apiOpts.UploadURL, "repos/")
 	u, _ := url.Parse(apiOpts.UploadURL[0:bracket])
 	return u
 }
 
-// checkStatusOK checks http status returned by API is 200
+// CheckStatusOK checks http status returned by API is 200
 func CheckStatusOK(res *github.Response) error {
 	if res.StatusCode != http.StatusOK {
 		return fmt.Errorf("Github returned %s\n", res.Status)
@@ -94,7 +94,7 @@ func CheckStatusCreated(res *github.Response) error {
 	return nil
 }
 
-// checkStatusNoContent checks http status returned by API is 204
+// CheckStatusNoContent checks http status returned by API is 204
 // In github API, this means DELETE request is success.
 func CheckStatusNoContent(res *github.Response) error {
 	if res.StatusCode != http.StatusNoContent {
