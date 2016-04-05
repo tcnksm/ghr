@@ -6,7 +6,7 @@ import (
 )
 
 func TestNewClient(t *testing.T) {
-	reset := setEnv("GITHUB_API", "")
+	reset := setEnv(EnvGitHubAPI, "")
 	defer reset()
 
 	exp, _ := url.Parse("https://api.github.com/")
@@ -23,7 +23,7 @@ func TestNewClient(t *testing.T) {
 func TestNewClient_enterprise(t *testing.T) {
 	// Set API endpoint via environmental variable
 	in := "http://github.company.com/api/v3/"
-	reset := setEnv("GITHUB_API", in)
+	reset := setEnv(EnvGitHubAPI, in)
 	defer reset()
 
 	exp, _ := url.Parse(in)
