@@ -11,13 +11,15 @@ ghr
 [license]: https://github.com/tcnksm/ghr/blob/master/LICENSE
 [godocs]: http://godoc.org/github.com/tcnksm/ghr
 
-`ghr` is a simple tool to create GitHub Release and upload artifacts by one command. `ghr` uploads multiple artifacts in parallel. 
+`ghr` is a simple tool to create GitHub Release and upload artifacts by only one command. `ghr` uploads multiple artifacts in parallel. 
 
 ## Demo
 
-![](http://deeeet.com/images/ghr.gif)
+This demo shows simple usage of `ghr`. It creates GitHub Release page for version `v1.0.0` and uploads cross-compiled golang binaries there. 
 
-You can see results [here](https://github.com/tcnksm/ghr/releases/tag/v0.1.0).
+![](doc/ghr.gif)
+
+You can see release page [here](https://github.com/tcnksm/ghr-demo/releases/tag/v1.0.0).
 
 ## Usage
 
