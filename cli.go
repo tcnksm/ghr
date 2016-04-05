@@ -12,6 +12,18 @@ import (
 	"github.com/tcnksm/go-gitconfig"
 )
 
+// EnvDebug is environmental var to handle debug mode
+const EnvDebug = "GHR_DEBUG"
+
+const (
+	// EnvGitHubToken is environmental var to set GitHub API token
+	EnvGitHubToken = "GITHUB_TOKEN"
+
+	// EnvGitHubAPI is environmental var to set GitHub API base endpoint.
+	// This is used mainly by GitHub Enterprise user.
+	EnvGitHubAPI = "GITHUB_API"
+)
+
 // Exit codes are in value that represnet an exit code for a paticular error.
 const (
 	ExitCodeOK int = 0
@@ -26,9 +38,6 @@ const (
 	ExitCodeRepoNotFound
 	ExitCodeRleaseError
 )
-
-// EnvDebug is environmental var to handle debug mode
-const EnvDebug = "GHR_DEBUG"
 
 // Debugf prints debug output when EnvDebug is given
 func Debugf(format string, args ...interface{}) {
@@ -116,9 +125,9 @@ func (cli *CLI) Run(args []string) int {
 		return ExitCodeOK
 	}
 
-	// Run as DEBUG mode
 	if *debug {
-		os.Setenv("GHR_DEBUG", "1")
+		os.Setenv(EnvDebug, "1")
+		Debugf("Run as DEBUG mode")
 	}
 
 	// Set BaseURL
@@ -248,12 +257,12 @@ func (cli *CLI) Run(args []string) int {
 // setBaseURL sets Base GitHub API URL
 // Default is https://api.github.com
 func setBaseURL(githubOpts *GitHubAPIOpts) (err error) {
-	if os.Getenv("GITHUB_API") == "" {
+	if os.Getenv(EnvGitHubAPI) == "" {
 		return nil
 	}
 
 	// Use Environmental value.
-	u := os.Getenv("GITHUB_API")
+	u := os.Getenv(EnvGitHubAPI)
 
 	// Pase it as url.URL
 	baseURL, err := url.Parse(u)
@@ -269,15 +278,15 @@ func setBaseURL(githubOpts *GitHubAPIOpts) (err error) {
 }
 
 // setToken sets GitHub API Token.
-func setToken(githubOpts *GitHubAPIOpts) (err error) {
+func setToken(githubOpts *GitHubAPIOpts) error {
 	// Use flag value.
 	if githubOpts.Token != "" {
 		return nil
 	}
 
 	// Use Environmental value.
-	if os.Getenv("GITHUB_TOKEN") != "" {
-		githubOpts.Token = os.Getenv("GITHUB_TOKEN")
+	if os.Getenv(EnvGitHubToken) != "" {
+		githubOpts.Token = os.Getenv(EnvGitHubToken)
 		return nil
 	}
 
