@@ -8,12 +8,15 @@ import (
 	"github.com/tcnksm/go-latest"
 )
 
+// Name is application name
 const Name = "ghr"
+
+// Version is application version
 const Version string = "v0.5.0"
 
-// Describe latest commit hash.
+// GitCommit describes latest commit hash.
 // This is automatically extracted by git describe --always.
-var GitCommit string = ""
+var GitCommit string
 
 // verCheckCh is channel which gets go-latest.Response
 var verCheckCh = make(chan *latest.CheckResponse)
