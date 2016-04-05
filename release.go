@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/google/go-github/github"
 	"time"
+
+	"github.com/google/go-github/github"
 )
 
 const (
@@ -49,8 +50,6 @@ func CreateRelease(ghrOpts *GhrOpts, apiOpts *GitHubAPIOpts) (err error) {
 		return err
 	}
 
-	Debug("CreateRelease:", rel)
-
 	// Set ReleaseID and UploadURL
 	apiOpts.ID = *rel.ID
 	apiOpts.UploadURL = *rel.UploadURL
@@ -84,8 +83,8 @@ func GetReleaseID(apiOpts *GitHubAPIOpts) (err error) {
 			apiOpts.ID = *r.ID
 			apiOpts.UploadURL = *r.UploadURL
 
-			// Debug
-			Debug("GetRelease(ID, UploadURL):", *r.ID, *r.UploadURL)
+			Debugf("Release ID: %s", *r.ID)
+			Debugf("Upload URL: %s", *r.UploadURL)
 
 			return nil
 		}

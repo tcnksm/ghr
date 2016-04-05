@@ -27,6 +27,16 @@ const (
 	ExitCodeRleaseError
 )
 
+// EnvDebug is environmental var to handle debug mode
+const EnvDebug = "GHR_DEBUG"
+
+// Debugf prints debug output when EnvDebug is given
+func Debugf(format string, args ...interface{}) {
+	if env := os.Getenv(EnvDebug); len(env) != 0 {
+		fmt.Fprintf(os.Stdout, "[DEBUG] "+format+"\n", args...)
+	}
+}
+
 // GhrOpts are the options for ghr related
 type GhrOpts struct {
 	// Parallel determines number of amount of parallelism.
@@ -250,8 +260,7 @@ func setBaseURL(githubOpts *GitHubAPIOpts) (err error) {
 	if err != nil {
 		return fmt.Errorf("failed to parse url %s", u)
 	}
-
-	Debug("BaseURL:", baseURL)
+	Debugf("Base GitHub API URL: %s", baseURL)
 
 	// Set it
 	githubOpts.BaseURL = baseURL
