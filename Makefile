@@ -10,7 +10,7 @@ clean:
 	rm bin/ghr
 
 deps:
-	go get -d -t ./...
+	go get -d -t -v ./...
 	go get golang.org/x/tools/cmd/cover
 	go get golang.org/x/tools/cmd/vet
 
@@ -31,15 +31,7 @@ cover: deps
 build: deps
 	go build -ldflags "-X main.GitCommit=\"$(COMMIT)\"" -o bin/ghr
 
-# build-docker exec 'make build' inside docker contaner.
-build-docker:
-	/usr/local/bin/docker run --rm -v $(REPO_PATH):/gopath/src/$(REPO) -w /gopath/src/$(REPO) tcnksm/gox:1.5.1 sh -c "make build"
-
 # package runs compile.sh to run gox and zip them.
 # Artifacts will be generated in './pkg' directory
 package: deps
 	@sh -c "'$(CURDIR)/scripts/package.sh'"
-
-# package-docker runs 'make package' inside docker container
-package-docker:
-	/usr/local/bin/docker run --rm -v $(REPO_PATH):/gopath/src/$(REPO) -w /gopath/src/$(REPO) tcnksm/gox:1.5.1 sh -c "make package"

@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"time"
 
-	flag "github.com/dotcloud/docker/pkg/mflag"
+	flag "github.com/docker/docker/pkg/mflag"
 	"github.com/tcnksm/go-gitconfig"
 )
 
