@@ -2,12 +2,11 @@ ghr
 ====
 
 [![GitHub release](http://img.shields.io/github/release/tcnksm/ghr.svg?style=flat-square)][release]
-[![Wercker](http://img.shields.io/wercker/ci/54393fe184570fc622001411.svg?style=flat-square)][wercker]
+[![Travis](https://img.shields.io/travis/tcnksm/ghr.svg?style=flat-square)]()
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)][license]
 [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godocs]
 
 [release]: https://github.com/tcnksm/ghr/releases
-[wercker]: https://app.wercker.com/project/bykey/a181c474f1e25e1870d0ba387723046b
 [license]: https://github.com/tcnksm/ghr/blob/master/LICENSE
 [godocs]: http://godoc.org/github.com/tcnksm/ghr
 
