@@ -37,7 +37,7 @@ You must provide `TAG` (git tag to use this release) and `PATH` to artifacts you
 
 To be able to use `ghr`, you will first need to create a GitHub token with an account which has enough permissions to be able to create releases. First, go to Account settings page, then go to Applications for the user. Here you can create a token in the Personal access tokens section. For a private repository you will need the `repo` scope and for a public repository you will need the `public_repo` scope.
 
-Then you need set it via environmental var `GITHUB_TOKEN`, `--token` command line option or `github.token` property in `.gitconfig` file.
+Then you need set it via environmental var `GITHUB_TOKEN`, `-token` command line option or `github.token` property in `.gitconfig` file.
 
 For instance, to set it via environmental variable:
 
@@ -48,7 +48,7 @@ $ export GITHUB_TOKEN="....."
 Or set it in `github.token` in gitconfig:
 
 ```bash
-$ git config --global github.token "....."
+$ git config -global github.token "....."
 ```
 
 Note that environmental variable takes priority over gitconfig value.
@@ -79,7 +79,7 @@ $ ghr v0.1.0 pkg/
 Or if you want to replace artifact which is already uploaded:
 
 ```bash
-$ ghr --replace v0.1.0 pkg/
+$ ghr -replace v0.1.0 pkg/
 ```
 
 ## Options
@@ -88,16 +88,16 @@ You can set some options:
 
 ```bash
 $ ghr \
-    -t <token> \       # Set Github API Token
-    -u <username> \    # Set Github username
-    -r <repository> \  # Set repository name
-    -c <commitish> \   # Set target commitish, branch or commit SHA
-    -p <num> \         # Set amount of parallelism (Default is number of CPU)
-    --replace \        # Replace asset if target is already exists
-    --delete \         # Delete release and its git tag in advance if it exists
-    --draft \          # Release as draft (Unpublish)
-    --prerelease \     # Crate prerelease
-    <tag> <artifacts>
+    -t TOKEN \        # Set Github API Token
+    -u USERNAME \     # Set Github username
+    -r REPO \         # Set repository name
+    -c COMMIT \       # Set target commitish, branch or commit SHA
+    -p NUM \          # Set amount of parallelism (Default is number of CPU)
+    -replace \        # Replace asset if target is already exists
+    -delete \         # Delete release and its git tag in advance if it exists
+    -draft \          # Release as draft (Unpublish)
+    -prerelease \     # Crate prerelease
+    TAG PATH
 ```
 
 ## Install
