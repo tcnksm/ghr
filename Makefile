@@ -30,8 +30,7 @@ test-race:
 	@go test -race .
 
 vet:
-	@go get golang.org/x/tools/cmd/vet
-	go tool vet *.go
+	go vet *.go
 
 lint:
 	@go get github.com/golang/lint/golint
