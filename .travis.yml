@@ -1,0 +1,8 @@
+language: go
+
+go:
+  - 1.7rc3
+  - tip
+
+script:
+  - make test-all
