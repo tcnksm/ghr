@@ -1,11 +1,14 @@
 package main
 
 import (
-	"github.com/google/go-github/github"
 	"time"
+
+	"github.com/google/go-github/github"
 )
 
 const (
+	// ReleaseIDNotFound is ID which represent that
+	// release is not yet created.
 	ReleaseIDNotFound int = 0
 )
 
@@ -49,8 +52,6 @@ func CreateRelease(ghrOpts *GhrOpts, apiOpts *GitHubAPIOpts) (err error) {
 		return err
 	}
 
-	Debug("CreateRelease:", rel)
-
 	// Set ReleaseID and UploadURL
 	apiOpts.ID = *rel.ID
 	apiOpts.UploadURL = *rel.UploadURL
@@ -58,8 +59,8 @@ func CreateRelease(ghrOpts *GhrOpts, apiOpts *GitHubAPIOpts) (err error) {
 	return nil
 }
 
-// GetRleaseID gets release ID
-// If it's not exist, it sets ReleaseIDNotFound(=0) to `GithubAPIOpts.ID`
+// GetReleaseID gets release ID. If it's not exist, it sets
+// ReleaseIDNotFound(=0) to `GithubAPIOpts.ID`
 func GetReleaseID(apiOpts *GitHubAPIOpts) (err error) {
 	// Create client
 	client := NewOAuthedClient(apiOpts)
@@ -84,8 +85,8 @@ func GetReleaseID(apiOpts *GitHubAPIOpts) (err error) {
 			apiOpts.ID = *r.ID
 			apiOpts.UploadURL = *r.UploadURL
 
-			// Debug
-			Debug("GetRelease(ID, UploadURL):", *r.ID, *r.UploadURL)
+			Debugf("Release ID: %s", *r.ID)
+			Debugf("Upload URL: %s", *r.UploadURL)
 
 			return nil
 		}
