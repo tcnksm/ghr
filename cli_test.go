@@ -33,7 +33,7 @@ func TestRun_parseError(t *testing.T) {
 		t.Errorf("expected %d to eq %d", status, ExitCodeParseFlagsError)
 	}
 
-	expected := "flag provided but not defined: --not-exis"
+	expected := "flag provided but not defined"
 	if !strings.Contains(errStream.String(), expected) {
 		t.Fatalf("expected %q to contain %q", errStream.String(), expected)
 	}

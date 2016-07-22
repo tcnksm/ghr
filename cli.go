@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"net/url"
@@ -8,12 +9,8 @@ import (
 	"runtime"
 	"time"
 
-	flag "github.com/docker/docker/pkg/mflag"
 	"github.com/tcnksm/go-gitconfig"
 )
-
-// EnvDebug is environmental var to handle debug mode
-const EnvDebug = "GHR_DEBUG"
 
 const (
 	// EnvGitHubToken is environmental var to set GitHub API token
@@ -22,6 +19,9 @@ const (
 	// EnvGitHubAPI is environmental var to set GitHub API base endpoint.
 	// This is used mainly by GitHub Enterprise user.
 	EnvGitHubAPI = "GITHUB_API"
+
+	// EnvDebug is environmental var to handle debug mode
+	EnvDebug = "GHR_DEBUG"
 )
 
 // Exit codes are in value that represnet an exit code for a paticular error.
@@ -74,10 +74,15 @@ type CLI struct {
 
 // Run invokes the CLI with the given arguments.
 func (cli *CLI) Run(args []string) int {
-	var githubAPIOpts GitHubAPIOpts
-	var ghrOpts GhrOpts
-	var stat bool
-	var err error
+
+	var (
+		githubAPIOpts GitHubAPIOpts
+		ghrOpts       GhrOpts
+
+		stat    bool
+		version bool
+		debug   bool
+	)
 
 	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
 	flags.SetOutput(cli.errStream)
@@ -86,30 +91,47 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	// Options for GitHub API.
-	flags.StringVar(&githubAPIOpts.OwnerName, []string{"u", "-username"}, "", "")
-	flags.StringVar(&githubAPIOpts.RepoName, []string{"r", "-repository"}, "", "")
-	flags.StringVar(&githubAPIOpts.Token, []string{"t", "-token"}, "", "")
-	flags.StringVar(&githubAPIOpts.TargetCommitish, []string{"c", "-commitish"}, "", "")
-	flags.BoolVar(&githubAPIOpts.Draft, []string{"-draft"}, false, "")
-	flags.BoolVar(&githubAPIOpts.Prerelease, []string{"-prerelease"}, false, "")
+	flags.StringVar(&githubAPIOpts.OwnerName, "username", "", "")
+	flags.StringVar(&githubAPIOpts.OwnerName, "u", "", "")
+
+	flags.StringVar(&githubAPIOpts.RepoName, "repository", "", "")
+	flags.StringVar(&githubAPIOpts.RepoName, "r", "", "")
+
+	flags.StringVar(&githubAPIOpts.Token, "token", "", "")
+	flags.StringVar(&githubAPIOpts.Token, "t", "", "")
+
+	flags.StringVar(&githubAPIOpts.TargetCommitish, "commitish", "", "")
+	flags.StringVar(&githubAPIOpts.TargetCommitish, "c", "", "")
+
+	flags.BoolVar(&githubAPIOpts.Draft, "draft", false, "")
+	flags.BoolVar(&githubAPIOpts.Prerelease, "prerelease", false, "")
 
 	// Options to change ghr work.
-	flags.IntVar(&ghrOpts.Parallel, []string{"p", "-parallel"}, -1, "")
-	flags.BoolVar(&ghrOpts.Replace, []string{"-replace"}, false, "")
-	flags.BoolVar(&ghrOpts.Delete, []string{"-delete"}, false, "")
-	flags.BoolVar(&stat, []string{"-stat"}, false, "")
+	flags.IntVar(&ghrOpts.Parallel, "parallel", -1, "")
+	flags.IntVar(&ghrOpts.Parallel, "p", -1, "")
+
+	flags.BoolVar(&ghrOpts.Replace, "replace", false, "")
+	flags.BoolVar(&ghrOpts.Delete, "delete", false, "")
+	flags.BoolVar(&stat, "stat", false, "")
 
 	// General options
-	version := flags.Bool([]string{"v", "-version"}, false, "")
-	debug := flags.Bool([]string{"-debug"}, false, "")
+	flags.BoolVar(&version, "version", false, "")
+	flags.BoolVar(&version, "v", false, "")
+	flags.BoolVar(&debug, "debug", false, "")
 
 	// Parse all the flags
 	if err := flags.Parse(args[1:]); err != nil {
 		return ExitCodeParseFlagsError
 	}
 
+	// Enable debug first
+	if debug {
+		os.Setenv(EnvDebug, "1")
+		Debugf("Run as DEBUG mode")
+	}
+
 	// Show version. It also try to fetch latest version information from github
-	if *version {
+	if version {
 		fmt.Fprintf(cli.errStream, "ghr version %s, build %s \n", Version, GitCommit)
 
 		select {
@@ -125,16 +147,11 @@ func (cli *CLI) Run(args []string) int {
 		return ExitCodeOK
 	}
 
-	if *debug {
-		os.Setenv(EnvDebug, "1")
-		Debugf("Run as DEBUG mode")
-	}
-
 	// Set BaseURL
 	_ = setBaseURL(&githubAPIOpts)
 
 	// Set Token
-	err = setToken(&githubAPIOpts)
+	err := setToken(&githubAPIOpts)
 	if err != nil {
 		errMsg := fmt.Sprintf("Could not retrieve GitHub API Token.\n" +
 			"Please set your Github API Token in the GITHUB_TOKEN env var.\n" +
@@ -353,32 +370,32 @@ Usage: ghr [options] TAG PATH
 
 Options:
 
-  --username, -u        GitHub username. By default, ghr extracts user
+  -username, -u        GitHub username. By default, ghr extracts user
                         name from global gitconfig value.
 
-  --repository, -r      GitHub repository name. By default, ghr extracts
+  -repository, -r      GitHub repository name. By default, ghr extracts
                         repository name from current directory's .git/config
                         value.
 
-  --token, -t           GitHub API Token. To use ghr, you will first need
+  -token, -t           GitHub API Token. To use ghr, you will first need
                         to create a GitHub API token with an account which
                         has enough permissions to be able to create releases.
                         You can set this value via GITHUB_TOKEN env var.
 
-  --parallel=-1         Parallelization factor. This option limits amount
+  -parallel=-1         Parallelization factor. This option limits amount
                         of parallelism of uploading. By default, ghr uses
                         number of logic CPU of your PC.
 
-  --delete              Delete release if it already created. If you want
+  -delete              Delete release if it already created. If you want
                         to recreate release itself from beginning, use
                         this. Just want to upload same artifacts to same
-                        release again, use --replace option.
+                        release again, use -replace option.
 
-  --replace             Replace artifacts if it is already uploaded. Same
+  -replace             Replace artifacts if it is already uploaded. Same
                         artifact means, same release and same artifact
                         name.
 
-  --stat=false          Show number of downloads of each release and quit.
+  -stat=false          Show number of downloads of each release and quit.
                         This is special command.
 
 Examples:
@@ -386,6 +403,6 @@ Examples:
   $ ghr v1.0 dist/     Upload all artifacts which are in dist directory
                        with version v1.0. 
 
-  $ ghr --stat         Show download number of each release and quit.
+  $ ghr -stat         Show download number of each release and quit.
 
 `
