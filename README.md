@@ -138,8 +138,6 @@ $ cd $GOPATH/src/github.com/tcnksm/ghr
 $ make install
 ```
 
-`ghr` uses vendoring feature for some third party packages. If you use `go1.5`, then set `GO15VENDOREXPERIMENT=1`. 
-
 ## Author
 
 [Taichi Nakashima](https://github.com/tcnksm)
