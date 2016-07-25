@@ -232,10 +232,6 @@ func (cli *CLI) Run(args []string) int {
 		}
 	}
 
-	// Use CPU efficiently
-	cpu := runtime.NumCPU()
-	runtime.GOMAXPROCS(cpu)
-
 	// Limit amount of parallelism by number of logic CPU
 	if ghrOpts.Parallel <= 0 {
 		ghrOpts.Parallel = runtime.NumCPU()
