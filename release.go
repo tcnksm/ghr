@@ -85,7 +85,7 @@ func GetReleaseID(apiOpts *GitHubAPIOpts) (err error) {
 			apiOpts.ID = *r.ID
 			apiOpts.UploadURL = *r.UploadURL
 
-			Debugf("Release ID: %s", *r.ID)
+			Debugf("Release ID: %d", *r.ID)
 			Debugf("Upload URL: %s", *r.UploadURL)
 
 			return nil
