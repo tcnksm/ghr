@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/tcnksm/go-gitconfig"
+	latest "github.com/tcnksm/go-latest"
 )
 
 const (
@@ -37,6 +39,10 @@ const (
 	ExitCodeOwnerNotFound
 	ExitCodeRepoNotFound
 	ExitCodeRleaseError
+)
+
+const (
+	defaultCheckTimeout = 2 * time.Second
 )
 
 // Debugf prints debug output when EnvDebug is given
@@ -119,7 +125,7 @@ func (cli *CLI) Run(args []string) int {
 	flags.BoolVar(&version, "v", false, "")
 	flags.BoolVar(&debug, "debug", false, "")
 
-	// Parse all the flags
+	// Parse flag
 	if err := flags.Parse(args[1:]); err != nil {
 		return ExitCodeParseFlagsError
 	}
@@ -130,18 +136,43 @@ func (cli *CLI) Run(args []string) int {
 		Debugf("Run as DEBUG mode")
 	}
 
-	// Show version. It also try to fetch latest version information from github
+	// Show version and check latest version release
 	if version {
-		fmt.Fprintf(cli.errStream, "ghr version %s, build %s \n", Version, GitCommit)
+		var buf bytes.Buffer
+		fmt.Fprintf(&buf, "%s version %s", Name, Version)
+		if len(GitCommit) != 0 {
+			fmt.Fprintf(&buf, " (%s)", GitCommit)
+		}
+		fmt.Fprintln(cli.outStream, buf.String())
+
+		// Check latest version is release or not.
+		verCheckCh := make(chan *latest.CheckResponse)
+		go func() {
+			fixFunc := latest.DeleteFrontV()
+			githubTag := &latest.GithubTag{
+				Owner:             "tcnksm",
+				Repository:        "ghr",
+				FixVersionStrFunc: fixFunc,
+			}
+
+			res, err := latest.Check(githubTag, fixFunc(Version))
+			if err != nil {
+				Debugf("[ERROR] Check lastet version is failed: %s", err)
+				return
+			}
+			verCheckCh <- res
+		}()
 
 		select {
+		case <-time.After(defaultCheckTimeout):
 		case res := <-verCheckCh:
-			if res != nil && res.Outdated {
-				msg := fmt.Sprintf("Latest version of ghr is %s, please update it\n", res.Current)
+			if res.Outdated {
+				msg := fmt.Sprintf(
+					"Latest version of ghr is %s, please upgrade!\n",
+					res.Current)
 				fmt.Fprint(cli.errStream, ColoredError(msg))
 			}
-		case <-time.After(CheckTimeout):
-			// do nothing
+		case <-time.After(defaultCheckTimeout):
 		}
 
 		return ExitCodeOK

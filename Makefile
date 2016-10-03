@@ -11,7 +11,7 @@ deps:
 
 # build generate binary on './bin' directory.
 build: deps
-	go build -ldflags "-X main.GitCommit=\"$(COMMIT)\"" -o bin/ghr
+	go build -ldflags "-X main.GitCommit=$(COMMIT)" -o bin/ghr
 
 # package runs compile.sh to run gox and zip them.
 # Artifacts will be generated in './pkg' directory
@@ -19,7 +19,7 @@ package: deps
 	@sh -c "'$(CURDIR)/scripts/package.sh'"
 
 install: deps
-	go install -ldflags "-X main.GitCommit=\"$(COMMIT)\""
+	go install -ldflags "-X main.GitCommit=$(COMMIT)"
 
 test-all: test test-race vet lint
 
