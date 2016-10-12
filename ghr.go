@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"path/filepath"
 	"time"
 
@@ -13,8 +11,6 @@ import (
 	"github.com/google/go-github/github"
 	"github.com/pkg/errors"
 )
-
-var discardLogger = log.New(ioutil.Discard, "", log.LstdFlags)
 
 type GHR struct {
 	GitHub GitHub

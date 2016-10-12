@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 
@@ -46,14 +47,21 @@ func NewGitHubClient(owner, repo, token string, urlStr string) (GitHub, error) {
 	}
 
 	if len(urlStr) == 0 {
-		return nil, errors.New("missgin GitHub API URL")
+		return nil, errors.New("missgig GitHub API URL")
+	}
+
+	baseURL, err := url.ParseRequestURI(urlStr)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to parse Github API URL")
 	}
 
 	ts := oauth2.StaticTokenSource(&oauth2.Token{
 		AccessToken: token,
 	})
 	tc := oauth2.NewClient(oauth2.NoContext, ts)
+
 	client := github.NewClient(tc)
+	client.BaseURL = baseURL
 
 	return &GitHubClient{
 		Owner:  owner,
