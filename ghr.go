@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"golang.org/x/sync/errgroup"
-
 	"github.com/google/go-github/github"
 	"github.com/pkg/errors"
 )
