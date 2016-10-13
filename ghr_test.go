@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io/ioutil"
 	"testing"
 	"time"
 
@@ -9,11 +10,12 @@ import (
 )
 
 func TestGHR_CreateRelease(t *testing.T) {
-	t.Skip("TODO")
+	t.Parallel()
 
 	githubClient := testGithubClient(t)
 	GHR := &GHR{
-		GitHub: githubClient,
+		GitHub:    githubClient,
+		outStream: ioutil.Discard,
 	}
 
 	testTag := "create-release"
@@ -33,14 +35,14 @@ func TestGHR_CreateRelease(t *testing.T) {
 
 func TestGHR_CreateReleaseWithExistingRelease(t *testing.T) {
 	t.Parallel()
-	t.Skip("TODO")
 
 	githubClient := testGithubClient(t)
 	GHR := &GHR{
-		GitHub: githubClient,
+		GitHub:    githubClient,
+		outStream: ioutil.Discard,
 	}
 
-	testTag := "v1.2.3"
+	testTag := "create-with-existing"
 	existingReq := &github.RepositoryRelease{
 		TagName: github.String(testTag),
 		Draft:   github.Bool(false),
@@ -147,7 +149,8 @@ func TestGHR_CreateReleaseWithExistingRelease(t *testing.T) {
 func TestGHR_UploadAssets(t *testing.T) {
 	githubClient := testGithubClient(t)
 	GHR := &GHR{
-		GitHub: githubClient,
+		GitHub:    githubClient,
+		outStream: ioutil.Discard,
 	}
 
 	testTag := "ghr-upload-assets"
@@ -168,7 +171,7 @@ func TestGHR_UploadAssets(t *testing.T) {
 		}
 	}()
 
-	localTestAssets, err := LocalAssets(testDir)
+	localTestAssets, err := LocalAssets(TestDir)
 	if err != nil {
 		t.Fatal("LocalAssets failed:", err)
 	}

@@ -27,28 +27,11 @@ func testGithubClient(t *testing.T) GitHub {
 	return client
 }
 
-// TODO(tcnksm): delete this function
-func devGithubClient(t *testing.T) *GitHubClient {
-	token := os.Getenv(EnvGitHubToken)
-	client, err := NewGitHubClient(TestOwner, TestRepo, token, defaultBaseURL)
-	if err != nil {
-		t.Fatal("NewGitHubClient failed:", err)
-	}
-
-	c, ok := client.(*GitHubClient)
-	if !ok {
-		t.Fatal("Faield to asset to GithubClient")
-	}
-
-	return c
-}
-
 func TestGitHubClient(t *testing.T) {
 	t.Parallel()
-	t.Skip("TODO")
 
 	c := testGithubClient(t)
-	testTag := "v0.0.1"
+	testTag := "github-client"
 	cases := []struct {
 		Request *github.RepositoryRelease
 	}{

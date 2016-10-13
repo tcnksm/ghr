@@ -3,11 +3,11 @@ package main
 import "testing"
 
 const (
-	testDir = "./testdata"
+	TestDir = "./testdata"
 )
 
 func TestLocalAssets(t *testing.T) {
-	localAssets, err := LocalAssets(testDir)
+	localAssets, err := LocalAssets(TestDir)
 	if err != nil {
 		t.Fatal("LocalAssets failed:", err)
 	}

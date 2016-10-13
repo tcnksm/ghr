@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"path/filepath"
 	"time"
 
@@ -14,6 +15,8 @@ import (
 
 type GHR struct {
 	GitHub GitHub
+
+	outStream io.Writer
 }
 
 func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, recreate bool) (*github.RepositoryRelease, error) {
@@ -21,7 +24,7 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 	// When draft release creation is requested,
 	// create it witout any check (it can).
 	if *req.Draft {
-		Debugf("Create draft release")
+		fmt.Fprintln(g.outStream, "==> Create a draft release")
 		return g.GitHub.CreateRelease(ctx, req)
 	}
 
@@ -34,6 +37,14 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 		}
 		Debugf("Release (with tag %s) is not found: create a new one",
 			*req.TagName)
+
+		if recreate {
+			fmt.Fprintf(g.outStream,
+				"WARNING: '-recreate' is specified but release (%s) is not found",
+				*req.TagName)
+		}
+
+		fmt.Fprintln(g.outStream, "==> Create a new release")
 		return g.GitHub.CreateRelease(ctx, req)
 	}
 
@@ -42,12 +53,13 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 		Debugf("Release (with tag %s) exists: use exsiting one",
 			*req.TagName)
 
+		fmt.Fprintln(g.outStream, "WARNING: found release (%s). Use existing one.")
 		return release, nil
 	}
 
 	// When recreate is requested, delete exsiting release
 	// and create a new release.
-	Debugf("Re-create release (with tag %s)", *req.TagName)
+	fmt.Fprintln(g.outStream, "==> Recreate a release")
 	if err := g.DeleteRelease(ctx, *release.ID, *req.TagName); err != nil {
 		return nil, err
 	}
@@ -86,7 +98,7 @@ func (g *GHR) UploadAssets(ctx context.Context, releaseID int, localAssets []str
 				<-semaphore
 			}()
 
-			fmt.Printf("--> Uploading: %15s\n", filepath.Base(localAsset))
+			fmt.Fprintf(g.outStream, "--> Uploading: %15s\n", filepath.Base(localAsset))
 			_, err := g.GitHub.UploadAsset(ctx, releaseID, localAsset)
 			if err != nil {
 				return errors.Wrapf(err,
@@ -130,7 +142,7 @@ func (g *GHR) DeleteAssets(ctx context.Context, releaseID int, localAssets []str
 						<-semaphore
 					}()
 
-					fmt.Printf("--> Deleting: %15s\n", *asset.Name)
+					fmt.Fprintf(g.outStream, "--> Deleting: %15s\n", *asset.Name)
 					if err := g.GitHub.DeleteAsset(ctx, *asset.ID); err != nil {
 						return errors.Wrapf(err,
 							"failed to delete asset: %s", *asset.Name)

@@ -34,9 +34,9 @@ You must provide `TAG` (git tag to use this release) and `PATH` to artifacts you
 
 ### GitHub API Token 
 
-To be able to use `ghr`, you will first need to create a GitHub token with an account which has enough permissions to be able to create releases. First, go to Account settings page, then go to Applications for the user. Here you can create a token in the Personal access tokens section. For a private repository you will need the `repo` scope and for a public repository you will need the `public_repo` scope.
+To use `ghr`, you need to get a GitHub token with an account which has enough permissions to to create releases. To get token, first, visit GitHub account settings page, then go to Applications for the user. Here you can create a token in the Personal access tokens section. For a private repository youneed `repo` scope and for a public repository you need `public_repo` scope.
 
-Then you need set it via environmental var `GITHUB_TOKEN`, `-token` command line option or `github.token` property in `.gitconfig` file.
+When using `ghr`, you can set it via `GITHUB_TOKEN` env var, `-token` command line option or `github.token` property in `.gitconfig` file.
 
 For instance, to set it via environmental variable:
 
@@ -75,12 +75,6 @@ $ ghr v0.1.0 pkg/
 --> Uploading: pkg/ghr_0.1.0_windows_amd64.zip
 ```
 
-Or if you want to replace artifact which is already uploaded:
-
-```bash
-$ ghr -replace v0.1.0 pkg/
-```
-
 ## Options
 
 You can set some options:
@@ -92,7 +86,6 @@ $ ghr \
     -r REPO \         # Set repository name
     -c COMMIT \       # Set target commitish, branch or commit SHA
     -p NUM \          # Set amount of parallelism (Default is number of CPU)
-    -replace \        # Replace asset if target is already exists
     -delete \         # Delete release and its git tag in advance if it exists
     -draft \          # Release as draft (Unpublish)
     -prerelease \     # Crate prerelease
@@ -109,12 +102,6 @@ $ brew install ghr
 ```
 
 If you are in another platform, you can download binary from [release page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory.
-
-## Integration with CI-as-a-Service
-
-You can integrate ghr with CI-as-a-Service to release your artifacts after test passed. It's very easy to provide latest build to your user continuously.
-
-See [Integrate ghr with CI as a Service](https://github.com/tcnksm/ghr/wiki/Integrate-ghr-with-CI-as-a-Service) page.
 
 ## VS.
 

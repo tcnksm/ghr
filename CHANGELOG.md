@@ -1,4 +1,4 @@
-## 0.5.0 (2016-04)
+## 0.5.0 (2016-10)
 
 ### Added
 
@@ -6,7 +6,7 @@
 
 ### Deprecated
 
-- Nothing
+- `-stat` option
 
 ### Removed
 
@@ -14,7 +14,7 @@
 
 ### Fixed
 
-- Nothing
+- Refactoring & Adding a lots of tests
 
 ## 0.4.0 (2014-12-17)
 
