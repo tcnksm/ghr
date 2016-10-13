@@ -11,7 +11,7 @@ COMMIT=`git describe --always`
 
 rm -rf pkg/
 gox \
-    -ldflags "-X main.GitCommit \"${COMMIT}\"" \
+    -ldflags "-X main.GitCommit=${COMMIT}" \
     -os="${XC_OS}" \
     -arch="${XC_ARCH}" \
     -output "pkg/{{.OS}}_{{.Arch}}/{{.Dir}}"

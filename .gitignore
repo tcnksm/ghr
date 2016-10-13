@@ -1,3 +1,4 @@
 ghr
+pkg/
 .envrc
 *.test
