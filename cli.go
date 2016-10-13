@@ -1,14 +1,19 @@
+// Command ghr is a tool to create a Github Release and upload your
+// artifacts in parallel.
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io"
-	"net/url"
+	"log"
 	"os"
 	"runtime"
 	"time"
 
+	"github.com/google/go-github/github"
+	"github.com/mitchellh/colorstring"
 	"github.com/tcnksm/go-gitconfig"
 )
 
@@ -21,7 +26,8 @@ const (
 	EnvGitHubAPI = "GITHUB_API"
 
 	// EnvDebug is environmental var to handle debug mode
-	EnvDebug = "GHR_DEBUG"
+	EnvDebug      = "GHR_DEBUG"
+	EnvStackTrace = "GHR_TRACE"
 )
 
 // Exit codes are in value that represnet an exit code for a paticular error.
@@ -39,30 +45,23 @@ const (
 	ExitCodeRleaseError
 )
 
+const (
+	defaultCheckTimeout = 2 * time.Second
+	defaultBaseURL      = "https://api.github.com/"
+	DefaultParallel     = -1
+)
+
 // Debugf prints debug output when EnvDebug is given
 func Debugf(format string, args ...interface{}) {
 	if env := os.Getenv(EnvDebug); len(env) != 0 {
-		fmt.Fprintf(os.Stdout, "[DEBUG] "+format+"\n", args...)
+		log.Printf("[DEBUG] "+format+"\n", args...)
 	}
 }
 
-// GhrOpts are the options for ghr related
-type GhrOpts struct {
-	// Parallel determines number of amount of parallelism.
-	// Default is number of CPU.
-	Parallel int
-
-	// Replace determines repalce asset on GitHub if it exists.
-	Replace bool
-
-	// Detele determines delete release if it exists.
-	Delete bool
-
-	// OutCh receive info output from uploading process
-	outCh chan string
-
-	// ErrCH receive error output from uploading process
-	errCh chan string
+// PrintErrorf prints red error message on console.
+func PrintRedf(w io.Writer, format string, args ...interface{}) {
+	fmt.Fprint(w,
+		colorstring.Color(fmt.Sprintf("[red]%s[reset]"+format, args...)))
 }
 
 // CLI is the command line object
@@ -76,8 +75,18 @@ type CLI struct {
 func (cli *CLI) Run(args []string) int {
 
 	var (
-		githubAPIOpts GitHubAPIOpts
-		ghrOpts       GhrOpts
+		owner string
+		repo  string
+		token string
+
+		commitish  string
+		draft      bool
+		prerelease bool
+
+		parallel int
+
+		recreate bool
+		replace  bool
 
 		stat    bool
 		version bool
@@ -90,315 +99,230 @@ func (cli *CLI) Run(args []string) int {
 		fmt.Fprint(cli.errStream, helpText)
 	}
 
-	// Options for GitHub API.
-	flags.StringVar(&githubAPIOpts.OwnerName, "username", "", "")
-	flags.StringVar(&githubAPIOpts.OwnerName, "u", "", "")
+	flags.StringVar(&owner, "username", "", "")
+	flags.StringVar(&owner, "owner", "", "")
+	flags.StringVar(&owner, "u", "", "")
 
-	flags.StringVar(&githubAPIOpts.RepoName, "repository", "", "")
-	flags.StringVar(&githubAPIOpts.RepoName, "r", "", "")
+	flags.StringVar(&repo, "repository", "", "")
+	flags.StringVar(&repo, "r", "", "")
 
-	flags.StringVar(&githubAPIOpts.Token, "token", "", "")
-	flags.StringVar(&githubAPIOpts.Token, "t", "", "")
+	flags.StringVar(&token, "token", os.Getenv(EnvGitHubToken), "")
+	flags.StringVar(&token, "t", os.Getenv(EnvGitHubToken), "")
 
-	flags.StringVar(&githubAPIOpts.TargetCommitish, "commitish", "", "")
-	flags.StringVar(&githubAPIOpts.TargetCommitish, "c", "", "")
+	flags.StringVar(&commitish, "commitish", "", "")
+	flags.StringVar(&commitish, "c", "", "")
 
-	flags.BoolVar(&githubAPIOpts.Draft, "draft", false, "")
-	flags.BoolVar(&githubAPIOpts.Prerelease, "prerelease", false, "")
+	flags.BoolVar(&draft, "draft", false, "")
+	flags.BoolVar(&prerelease, "prerelease", false, "")
 
-	// Options to change ghr work.
-	flags.IntVar(&ghrOpts.Parallel, "parallel", -1, "")
-	flags.IntVar(&ghrOpts.Parallel, "p", -1, "")
+	flags.IntVar(&parallel, "parallel", DefaultParallel, "")
+	flags.IntVar(&parallel, "p", DefaultParallel, "")
 
-	flags.BoolVar(&ghrOpts.Replace, "replace", false, "")
-	flags.BoolVar(&ghrOpts.Delete, "delete", false, "")
-	flags.BoolVar(&stat, "stat", false, "")
+	flags.BoolVar(&recreate, "delete", false, "")
+	flags.BoolVar(&recreate, "recreate", false, "")
 
-	// General options
+	flags.BoolVar(&replace, "replace", false, "")
+
 	flags.BoolVar(&version, "version", false, "")
 	flags.BoolVar(&version, "v", false, "")
+
 	flags.BoolVar(&debug, "debug", false, "")
 
-	// Parse all the flags
+	// Deprecated
+	flags.BoolVar(&stat, "stat", false, "")
+
+	// Parse flag
 	if err := flags.Parse(args[1:]); err != nil {
 		return ExitCodeParseFlagsError
 	}
 
-	// Enable debug first
 	if debug {
 		os.Setenv(EnvDebug, "1")
 		Debugf("Run as DEBUG mode")
 	}
 
-	// Show version. It also try to fetch latest version information from github
+	// Show version and check latest version release
 	if version {
-		fmt.Fprintf(cli.errStream, "ghr version %s, build %s \n", Version, GitCommit)
-
-		select {
-		case res := <-verCheckCh:
-			if res != nil && res.Outdated {
-				msg := fmt.Sprintf("Latest version of ghr is %s, please update it\n", res.Current)
-				fmt.Fprint(cli.errStream, ColoredError(msg))
-			}
-		case <-time.After(CheckTimeout):
-			// do nothing
-		}
-
+		fmt.Fprintf(cli.outStream, OutputVersion())
 		return ExitCodeOK
 	}
 
-	// Set BaseURL
-	_ = setBaseURL(&githubAPIOpts)
-
-	// Set Token
-	err := setToken(&githubAPIOpts)
-	if err != nil {
-		errMsg := fmt.Sprintf("Could not retrieve GitHub API Token.\n" +
-			"Please set your Github API Token in the GITHUB_TOKEN env var.\n" +
-			"Or set one via `-t` option.\n" +
-			"See about GitHub API Token on https://github.com/blog/1509-personal-api-tokens\n",
-		)
-		fmt.Fprint(cli.errStream, ColoredError(errMsg))
-		return ExitCodeTokenNotFound
-	}
-
-	// Set repository owner name.
-	err = setOwner(&githubAPIOpts)
-	if err != nil {
-		errMsg := fmt.Sprintf("Could not retrieve repository user name: %s\n"+
-			"ghr try to retrieve git user name from `~/.gitconfig` file.\n"+
-			"Please set one via -u option or `~/.gitconfig` file.\n",
-			err)
-		fmt.Fprintf(cli.errStream, ColoredError(errMsg))
-		return ExitCodeOwnerNotFound
-	}
-
-	// Set repository owner name.
-	err = setRepo(&githubAPIOpts)
-	if err != nil {
-		errMsg := fmt.Sprintf("Could not retrieve repository name: %s\n"+
-			"ghr try to retrieve github repository name from `.git/config` file.\n"+
-			"Please be sure you're in github repository. Or set one via `-r` options.\n",
-			err)
-		fmt.Fprintf(cli.errStream, ColoredError(errMsg))
-		return ExitCodeRepoNotFound
-	}
-
-	// Display statical information.
-	if stat {
-		err = ShowStat(cli.outStream, &githubAPIOpts)
-		if err != nil {
-			fmt.Fprintf(cli.errStream, ColoredError(err.Error()))
-			return ExitCodeError
-		}
-		return ExitCodeOK
-	}
-
-	// Get the parsed arguments
 	parsedArgs := flags.Args()
 	if len(parsedArgs) != 2 {
-		fmt.Fprintf(cli.errStream, ColoredError("Argument error: must specify two arguments - tag, path\n"))
+		PrintRedf(cli.errStream,
+			"Invalid argument: you must set TAG and PATH name.")
 		return ExitCodeBadArgs
 	}
-
-	// Get the tag of release and path
 	tag, path := parsedArgs[0], parsedArgs[1]
-	githubAPIOpts.TagName = tag
 
-	// Get the asset to upload.
-	assets, err := GetLocalAssets(path)
-	if err != nil {
-		errMsg := fmt.Sprintf("Failed to get assets from %s: %s\n"+
-			"Path must be included more than one file.\n",
-			path, err)
-		fmt.Fprintf(cli.errStream, ColoredError(errMsg))
-		return ExitCodeError
-	}
-
-	// Create release.
-	err = CreateRelease(&ghrOpts, &githubAPIOpts)
-	if err != nil {
-		fmt.Fprintf(cli.errStream, ColoredError(err.Error()))
-		return ExitCodeError
-	}
-
-	// Fetch All assets ID which is already on Github.
-	// This is invorked when `--replace` option is used.
-	if ghrOpts.Replace {
-		err = FetchAssetID(assets, &githubAPIOpts)
+	// Extract github repository owner name.
+	// If it's not provided via command line flag, read it from .gitconfig
+	// (github user or git user).
+	if len(owner) == 0 {
+		var err error
+		owner, err = gitconfig.GithubUser()
 		if err != nil {
-			fmt.Fprintf(cli.errStream, ColoredError(err.Error()))
+			owner, err = gitconfig.Username()
+		}
+
+		if err != nil {
+			PrintRedf(cli.errStream,
+				"Failed to set up ghr: repository owner name not found\n")
+			fmt.Fprintf(cli.errStream,
+				"Please set it via `-u` option.\n\n"+
+					"You can set default owner name in `github.username` or `user.name`\n"+
+					"in `~/.gitconfig` file")
+			return ExitCodeOwnerNotFound
+		}
+	}
+	Debugf("Owner: %s", owner)
+
+	// Extract repository name from files.
+	// If not provided, read it from .git/config file.
+	if len(repo) == 0 {
+		var err error
+		repo, err = gitconfig.Repository()
+		if err != nil {
+			PrintRedf(cli.errStream,
+				"Failed to set up ghr: repository name not found\n")
+			fmt.Fprintf(cli.errStream,
+				"ghr reads it from `.git/config` file. Change directory to \n"+
+					"repository root directory or setup git repository.\n"+
+					"Or set it via `-r` option.\n")
+			return ExitCodeOwnerNotFound
+		}
+	}
+	Debugf("Repository: %s", repo)
+
+	// If GitHub api token is not provided via command line flag
+	// or env var then read it from .gitconfig file.
+	if len(token) == 0 {
+		var err error
+		token, err = gitconfig.GithubToken()
+		if err != nil {
+			PrintRedf(cli.errStream, "Failed to set up ghr: token not found\n")
+			fmt.Fprintf(cli.errStream,
+				"To use ghr, you need a GitHub API token.\n"+
+					"Please set it via `%s` env var or `-t` option.\n\n"+
+					"If you don't have one, visit official doc (goo.gl/jSnoI)\n"+
+					"and get it first.\n",
+				EnvGitHubToken)
+			return ExitCodeTokenNotFound
+		}
+	}
+	Debugf("Github API Token: %s", maskString(token))
+
+	// Set Base GitHub API. Base URL can be provided via env var. This is for GHE.
+	baseURLStr := defaultBaseURL
+	if urlStr := os.Getenv(EnvGitHubAPI); len(urlStr) != 0 {
+		baseURLStr = urlStr
+	}
+	Debugf("Base GitHub API URL: %s", baseURLStr)
+
+	if parallel <= 0 {
+		parallel = runtime.NumCPU()
+	}
+	Debugf("Parallel factor: %d", parallel)
+
+	localAssets, err := LocalAssets(path)
+	if err != nil {
+		PrintRedf(cli.errStream,
+			"Failed to find assets from %s: %s\n", path, err)
+		return ExitCodeError
+	}
+	Debugf("Number of file to upload: %d", len(localAssets))
+
+	// Create a GitHub client
+	gitHubClient, err := NewGitHubClient(owner, repo, token, baseURLStr)
+	if err != nil {
+		PrintRedf(cli.errStream, "Failed to construct GitHub client: %s", err)
+		return ExitCodeError
+	}
+
+	ghr := GHR{
+		GitHub:    gitHubClient,
+		outStream: cli.outStream,
+	}
+
+	// Prepare create release request
+	req := &github.RepositoryRelease{
+		TagName:         github.String(tag),
+		Prerelease:      github.Bool(prerelease),
+		Draft:           github.Bool(draft),
+		TargetCommitish: github.String(commitish),
+	}
+
+	ctx := context.TODO()
+	release, err := ghr.CreateRelease(ctx, req, recreate)
+	if err != nil {
+		PrintRedf(cli.errStream, "Failed to create GitHub release page: %s", err)
+		return ExitCodeError
+	}
+
+	if replace {
+		err := ghr.DeleteAssets(ctx, *release.ID, localAssets, parallel)
+		if err != nil {
+			PrintRedf(cli.errStream, "Failed to delete existing assets: %s", err)
 			return ExitCodeError
 		}
 	}
 
-	// Limit amount of parallelism by number of logic CPU
-	if ghrOpts.Parallel <= 0 {
-		ghrOpts.Parallel = runtime.NumCPU()
-	}
-
-	// Start releasing
-	doneCh, outCh, errCh := UploadAssets(assets, &ghrOpts, &githubAPIOpts)
-
-	// Receive messages
-	statusCh := make(chan bool)
-	go func() {
-		errOccurred := false
-		for {
-			select {
-			case out := <-outCh:
-				fmt.Fprintf(cli.outStream, out)
-			case err := <-errCh:
-				fmt.Fprintf(cli.errStream, ColoredError(err))
-				errOccurred = true
-			case <-doneCh:
-				statusCh <- errOccurred
-				break
-			}
-		}
-	}()
-
-	// If more than one error is occured, return non-zero value
-	errOccurred := <-statusCh
-	if errOccurred {
-		return ExitCodeRleaseError
+	err = ghr.UploadAssets(ctx, *release.ID, localAssets, parallel)
+	if err != nil {
+		PrintRedf(cli.errStream, "Failed to upload one of assets: %s", err)
+		return ExitCodeError
 	}
 
 	return ExitCodeOK
 }
 
-// setBaseURL sets Base GitHub API URL
-// Default is https://api.github.com
-func setBaseURL(githubOpts *GitHubAPIOpts) (err error) {
-	if os.Getenv(EnvGitHubAPI) == "" {
-		return nil
+// maskString is used to mask string which should not be displayed
+// directly like auth token
+func maskString(s string) string {
+	if len(s) < 5 {
+		return "**** (masked)"
 	}
 
-	// Use Environmental value.
-	u := os.Getenv(EnvGitHubAPI)
-
-	// Pase it as url.URL
-	baseURL, err := url.Parse(u)
-	if err != nil {
-		return fmt.Errorf("failed to parse url %s", u)
-	}
-	Debugf("Base GitHub API URL: %s", baseURL)
-
-	// Set it
-	githubOpts.BaseURL = baseURL
-
-	return nil
+	return s[:5] + "**** (masked)"
 }
 
-// setToken sets GitHub API Token.
-func setToken(githubOpts *GitHubAPIOpts) error {
-	// Use flag value.
-	if githubOpts.Token != "" {
-		return nil
-	}
+var helpText = `Usage: ghr [options...] TAG PATH
 
-	// Use Environmental value.
-	if os.Getenv(EnvGitHubToken) != "" {
-		githubOpts.Token = os.Getenv(EnvGitHubToken)
-		return nil
-	}
+ghr is a tool to create Release on Github and upload your
+artifacts to it. ghr parallelizes upload of multiple artifacts.
 
-	// Use .gitconfig value.
-	githubOpts.Token, _ = gitconfig.GithubToken()
+You must specify tag (e.g., v1.0.0) and PATH to local artifacts.
+If PATH is directory, ghr globs all files in the directory and
+upload it. If PATH is a file then, upload only it.
 
-	// Confirm value is not blank.
-	if githubOpts.Token == "" {
-		return fmt.Errorf("GitHub API token is not found.")
-	}
+And you also must provide GitHub API token which has enough permission
+(For a private repository you need the 'repo' scope and for a public
+repository need 'public_repo' scope). You can get token from GitHub's
+account setting page.
 
-	return nil
-}
-
-// setOwner sets repository owner name.
-func setOwner(githubOpts *GitHubAPIOpts) (err error) {
-	// Use flag value.
-	if githubOpts.OwnerName != "" {
-		return nil
-	}
-
-	// Use .gitconfig value.
-	githubOpts.OwnerName, err = gitconfig.GithubUser()
-	if err != nil {
-		githubOpts.OwnerName, _ = gitconfig.Username()
-	}
-
-	// Confirm value is not blank.
-	if githubOpts.OwnerName == "" {
-		return fmt.Errorf("key `user.name` is not found in `~/.gitconfig`")
-	}
-
-	return nil
-}
-
-// setRepo sets repository name.
-func setRepo(githubOpts *GitHubAPIOpts) (err error) {
-	// Use flag value.
-	if githubOpts.RepoName != "" {
-		return nil
-	}
-
-	// Use .gitconfig value.
-	githubOpts.RepoName, err = gitconfig.Repository()
-	if err != nil {
-		return err
-	}
-
-	// Confirm value is not blank.
-	if githubOpts.RepoName == "" {
-		return fmt.Errorf("key `remote.origin.url` is not found in `.git/config`")
-	}
-
-	return nil
-}
-
-var helpText = `
-Usage: ghr [options] TAG PATH
-
-  ghr is a tool to create Release on Github and upload your artifacts to
-  it. ghr parallelizes upload of multiple artifacts.
-
-  You can use ghr on GitHub Enterprise. Change URL by GITHUB_API env var.
+You can use ghr on GitHub Enterprise. Set base URL via GITHUB_API
+environment variable.
 
 Options:
 
-  -username, -u        GitHub username. By default, ghr extracts user
-                        name from global gitconfig value.
+  -username, -u      Github repository onwer name. By default, ghr
+                     extracts it from global gitconfig value.
 
-  -repository, -r      GitHub repository name. By default, ghr extracts
-                        repository name from current directory's .git/config
-                        value.
+  -repository, -r    GitHub repository name. By default, ghr extracts
+                     repository name from current directory's .git/config.
 
-  -token, -t           GitHub API Token. To use ghr, you will first need
-                        to create a GitHub API token with an account which
-                        has enough permissions to be able to create releases.
-                        You can set this value via GITHUB_TOKEN env var.
+  -token, -t         GitHub API Token. By default, ghr reads it from
+                     'GITHUB_TOKEN' env var.
 
-  -parallel=-1         Parallelization factor. This option limits amount
-                        of parallelism of uploading. By default, ghr uses
-                        number of logic CPU of your PC.
+  -parallel=-1       Parallelization factor. This option limits amount
+                     of parallelism of uploading. By default, ghr uses
+                     number of logic CPU.
 
-  -delete              Delete release if it already created. If you want
-                        to recreate release itself from beginning, use
-                        this. Just want to upload same artifacts to same
-                        release again, use -replace option.
+  -recreate          Recreate release if it already exists. If want to
+                     upload to same release and replace use '-replace'.
 
-  -replace             Replace artifacts if it is already uploaded. Same
-                        artifact means, same release and same artifact
-                        name.
-
-  -stat=false          Show number of downloads of each release and quit.
-                        This is special command.
-
-Examples:
-
-  $ ghr v1.0 dist/     Upload all artifacts which are in dist directory
-                       with version v1.0. 
-
-  $ ghr -stat         Show download number of each release and quit.
+  -replace           Replace artifacts if it is already uploaded. ghr
+                     thinks it's same when local artifact base name
+                     and uploaded file name are same.
 
 `

@@ -1,11 +1,11 @@
 package main
 
 import (
-	"os"
-	"strconv"
+	"bytes"
+	"fmt"
 	"time"
 
-	"github.com/tcnksm/go-latest"
+	latest "github.com/tcnksm/go-latest"
 )
 
 // Name is application name
@@ -18,31 +18,16 @@ const Version string = "v0.5.0"
 // This is automatically extracted by git describe --always.
 var GitCommit string
 
-// verCheckCh is channel which gets go-latest.Response
-var verCheckCh = make(chan *latest.CheckResponse)
-
-// CheckTimeout is timeout of go-latest.Check executiom
-var CheckTimeout time.Duration
-
-// defaultCheckTimeout is default timeout of go-latest.Check
-// execution.
-var defaultCheckTimeout = 2 * time.Second
-
-// envCheckTimeout is environmental varible to
-// set go-latest.Check execution timeout.
-const envCheckTimeout = "GHR_CHECK_WAIT"
-
-func init() {
-
-	CheckTimeout = defaultCheckTimeout
-	if timeStr := os.Getenv(envCheckTimeout); timeStr != "" {
-		t, err := strconv.Atoi(timeStr)
-		// If wait to conv, ignore env value
-		if err == nil {
-			CheckTimeout = time.Duration(t)
-		}
+func OutputVersion() string {
+	var buf bytes.Buffer
+	fmt.Fprintf(&buf, "%s version %s", Name, Version)
+	if len(GitCommit) != 0 {
+		fmt.Fprintf(&buf, " (%s)", GitCommit)
 	}
+	fmt.Fprintf(&buf, "\n")
 
+	// Check latest version is release or not.
+	verCheckCh := make(chan *latest.CheckResponse)
 	go func() {
 		fixFunc := latest.DeleteFrontV()
 		githubTag := &latest.GithubTag{
@@ -51,9 +36,24 @@ func init() {
 			FixVersionStrFunc: fixFunc,
 		}
 
-		// Ignore error, because it's not important for ghr fucntion
-		res, _ := latest.Check(githubTag, fixFunc(Version))
+		res, err := latest.Check(githubTag, fixFunc(Version))
+		if err != nil {
+			// Don't return error
+			Debugf("[ERROR] Check lastet version is failed: %s", err)
+			return
+		}
 		verCheckCh <- res
 	}()
 
+	select {
+	case <-time.After(defaultCheckTimeout):
+	case res := <-verCheckCh:
+		if res.Outdated {
+			fmt.Fprintf(&buf,
+				"Latest version of ghr is %s, please upgrade!",
+				res.Current)
+		}
+	}
+
+	return buf.String()
 }
