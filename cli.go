@@ -267,6 +267,13 @@ func (cli *CLI) Run(args []string) int {
 		}
 	}
 
+	// FIXME(tcnksm): More ideal way to change this
+	// This is for Github enterprise
+	if err := ghr.GitHub.SetUploadURL(*release.UploadURL); err != nil {
+		fmt.Fprintf(cli.errStream, "Failed to set upload URL %s: %s", *release.UploadURL, err)
+		return ExitCodeError
+	}
+
 	err = ghr.UploadAssets(ctx, *release.ID, localAssets, parallel)
 	if err != nil {
 		PrintRedf(cli.errStream, "Failed to upload one of assets: %s", err)
