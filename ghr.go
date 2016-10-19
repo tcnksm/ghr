@@ -52,7 +52,8 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 		Debugf("Release (with tag %s) exists: use exsiting one",
 			*req.TagName)
 
-		fmt.Fprintln(g.outStream, "WARNING: found release (%s). Use existing one.")
+		fmt.Fprintf(g.outStream, "WARNING: found release (%s). Use existing one.",
+			*req.TagName)
 		return release, nil
 	}
 
