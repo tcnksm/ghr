@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/google/go-github/github"
 	"github.com/pkg/errors"
@@ -26,6 +27,8 @@ type GitHub interface {
 	UploadAsset(ctx context.Context, releaseID int, filename string) (*github.ReleaseAsset, error)
 	DeleteAsset(ctx context.Context, assetID int) error
 	ListAssets(ctx context.Context, releaseID int) ([]*github.ReleaseAsset, error)
+
+	SetUploadURL(urlStr string) error
 }
 
 type GitHubClient struct {
@@ -68,6 +71,17 @@ func NewGitHubClient(owner, repo, token string, urlStr string) (GitHub, error) {
 		Repo:   repo,
 		Client: client,
 	}, nil
+}
+
+func (c *GitHubClient) SetUploadURL(urlStr string) error {
+	i := strings.Index(urlStr, "repos/")
+	parsedURL, err := url.ParseRequestURI(urlStr[:i])
+	if err != nil {
+		return errors.Wrap(err, "faield to parse upload URL")
+	}
+
+	c.UploadURL = parsedURL
+	return nil
 }
 
 func (c *GitHubClient) CreateRelease(ctx context.Context, req *github.RepositoryRelease) (*github.RepositoryRelease, error) {
