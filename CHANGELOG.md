@@ -1,3 +1,10 @@
+## 0.5.1 (2016-10-19)
+
+### Fixed
+
+- Can not use GitHub Enterprise environment #48
+- Format verbs shows up on output #50
+
 ## 0.5.0 (2016-10)
 
 ### Added
