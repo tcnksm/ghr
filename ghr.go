@@ -79,6 +79,10 @@ func (g *GHR) DeleteRelease(ctx context.Context, ID int, tag string) error {
 		return err
 	}
 
+	// This is because sometimes process of creating release on GitHub is more
+	// fast than deleting tag.
+	time.Sleep(5 * time.Second)
+
 	return nil
 }
 
