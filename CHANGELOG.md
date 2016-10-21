@@ -1,3 +1,10 @@
+## 0.5.2 (2016-10-21)
+
+### Fixed
+
+- Output format
+- Fix overlapping of DeleteRelease and CreateRelease #52
+
 ## 0.5.1 (2016-10-19)
 
 ### Fixed
