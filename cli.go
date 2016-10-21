@@ -60,8 +60,9 @@ func Debugf(format string, args ...interface{}) {
 
 // PrintErrorf prints red error message on console.
 func PrintRedf(w io.Writer, format string, args ...interface{}) {
+	format = fmt.Sprintf("[red]%s[reset]", format)
 	fmt.Fprint(w,
-		colorstring.Color(fmt.Sprintf("[red]%s[reset]"+format, args...)))
+		colorstring.Color(fmt.Sprintf(format, args...)))
 }
 
 // CLI is the command line object
