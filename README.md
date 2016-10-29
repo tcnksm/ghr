@@ -103,6 +103,12 @@ $ brew install ghr
 
 If you are in another platform, you can download binary from [release page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory.
 
+Or you can use `go get` (you need to use go1.7 or later),
+
+```bash
+$ go get -u github.com/tcnksm/ghr
+```
+
 ## VS.
 
 - [aktau/github-release](https://github.com/aktau/github-release) - `github-release` can also create and edit releases and upload artifacts. It has many options. `ghr` is a simple alternative. And `ghr` will parallelize upload artifacts.
@@ -117,13 +123,7 @@ If you are in another platform, you can download binary from [release page](http
 1. Run `gofmt -s`
 1. Create new Pull Request
 
-You can get source with `go get`:
 
-```bash
-$ go get -d github.com/tcnksm/ghr
-$ cd $GOPATH/src/github.com/tcnksm/ghr
-$ make install
-```
 
 ## Author
 
