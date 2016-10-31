@@ -50,7 +50,7 @@ func OutputVersion() string {
 	case res := <-verCheckCh:
 		if res.Outdated {
 			fmt.Fprintf(&buf,
-				"Latest version of ghr is %s, please upgrade!\n",
+				"Latest version of ghr is v%s, please upgrade!\n",
 				res.Current)
 		}
 	}
