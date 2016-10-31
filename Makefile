@@ -1,4 +1,5 @@
-COMMIT = $$(git describe --always)
+VERSION ?= $$(grep 'Version string' version.go | sed -E 's/.*"(.+)"$$/\1/')
+COMMIT ?= $$(git describe --always)
 
 default: test
 
@@ -18,13 +19,21 @@ build: deps
 package: deps
 	@sh -c "'$(CURDIR)/scripts/package.sh'"
 
+brew: deps
+	go run release/main.go $(VERSION) pkg/dist/$(VERSION)/ghr_$(VERSION)_darwin_amd64.zip > ../homebrew-ghr/ghr.rb
+
+ghr: brew build
+	bin/ghr -v
+	bin/ghr $(VERSION) pkg/dist/$(VERSION)
+
+
 install: deps
 	go install -ldflags "-X main.GitCommit=$(COMMIT)"
 
-test-all: test test-race vet lint
+test-all: vet test
 
 test: 
-	go test -v -timeout=30s -parallel=4 .
+	go test -v -parallel=4 .
 
 test-race: 
 	@go test -race .
