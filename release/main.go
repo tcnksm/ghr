@@ -18,7 +18,7 @@ class {{ .Name | Title }} < Formula
   homepage "https://github.com/tcnksm/{{ .Name }}"
   version '{{ .Version }}'
 
-  url "https://github.com/tcnksm/{{ .Name }}/releases/download/{{ .Version }}/ghr_{{ .Version }}darwin_amd64.zip"
+  url "https://github.com/tcnksm/{{ .Name }}/releases/download/{{ .Version }}/ghr_{{ .Version }}_darwin_amd64.zip"
   sha256 "{{ .Sha256 }}"
 
   def install
