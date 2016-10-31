@@ -59,7 +59,6 @@ func TestRun(t *testing.T) {
 }
 
 func TestRun_recreate(t *testing.T) {
-	t.Parallel()
 	outStream, errStream := new(bytes.Buffer), new(bytes.Buffer)
 	cli := &CLI{outStream: outStream, errStream: errStream}
 
@@ -89,6 +88,7 @@ func TestRun_recreate(t *testing.T) {
 		t.Fatalf("GetRelease failed: %s\n\n%s", err, outStream.String())
 	}
 	defer func() {
+		time.Sleep(5 * time.Second)
 		if err := client.DeleteRelease(context.TODO(), *release.ID); err != nil {
 			t.Fatal("DeleteRelease failed:", err)
 		}
