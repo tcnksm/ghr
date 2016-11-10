@@ -34,7 +34,7 @@ You must provide `TAG` (git tag) and `PATH` to artifacts you want to upload. You
 
 ### GitHub API Token 
 
-To use `ghr`, you need to get a GitHub token with an account which has enough permissions to to create releases. To get token, first, visit GitHub account settings page, then go to Applications for the user. Here you can create a token in the Personal access tokens section. For a private repository youneed `repo` scope and for a public repository you need `public_repo` scope.
+To use `ghr`, you need to get a GitHub token with an account which has enough permissions to to create releases. To get token, first, visit GitHub account settings page, then go to Applications for the user. Here you can create a token in the Personal access tokens section. For a private repository you need `repo` scope and for a public repository you need `public_repo` scope.
 
 When using `ghr`, you can set it via `GITHUB_TOKEN` env var, `-token` command line option or `github.token` property in `.gitconfig` file.
 
