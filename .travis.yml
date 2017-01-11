@@ -2,8 +2,6 @@ language: go
 
 go:
   - 1.7.4
-  - 1.8rc1
-  - tip
 
 script:
   - make test-all

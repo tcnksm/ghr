@@ -22,6 +22,7 @@ func TestGHR_CreateRelease(t *testing.T) {
 	req := &github.RepositoryRelease{
 		TagName: &testTag,
 		Draft:   github.Bool(false),
+		Body:    github.String("This is test release"),
 	}
 
 	recreate := false
