@@ -10,11 +10,11 @@ ghr
 [license]: https://github.com/tcnksm/ghr/blob/master/LICENSE
 [godocs]: http://godoc.org/github.com/tcnksm/ghr
 
-`ghr` creates GitHub Release and uploads artifacts in parallel. 
+`ghr` creates GitHub Release and uploads artifacts in parallel.
 
 ## Demo
 
-This demo creates GitHub Release page with `v1.0.0` tag and uploads cross-compiled golang binaries. 
+This demo creates GitHub Release page with `v1.0.0` tag and uploads cross-compiled golang binaries.
 
 ![](doc/ghr.gif)
 
@@ -30,9 +30,9 @@ $ ghr [option] TAG PATH
 
 You must provide `TAG` (git tag) and `PATH` to artifacts you want to upload. You can specify a file or a directory. If you provide a directory, all files in that directory uploaded.
 
-`ghr` assumes that you are in the GitHub repository root when executed. This is because normally the artifacts you want to upload to a GitHub Release page is in that repository or generated there. With this assumption, `ghr` *implicitly* reads repository URL from `.git/config` file. But You can change this kind of information via option, see [Options](#options) section. 
+`ghr` assumes that you are in the GitHub repository root when executed. This is because normally the artifacts you want to upload to a GitHub Release page is in that repository or generated there. With this assumption, `ghr` *implicitly* reads repository URL from `.git/config` file. But You can change this kind of information via option, see [Options](#options) section.
 
-### GitHub API Token 
+### GitHub API Token
 
 To use `ghr`, you need to get a GitHub token with an account which has enough permissions to to create releases. To get token, first, visit GitHub account settings page, then go to Applications for the user. Here you can create a token in the Personal access tokens section. For a private repository you need `repo` scope and for a public repository you need `public_repo` scope.
 
@@ -85,6 +85,7 @@ $ ghr \
     -u USERNAME \     # Set Github username
     -r REPO \         # Set repository name
     -c COMMIT \       # Set target commitish, branch or commit SHA
+    -b BODY \         # Set text describing the contents of the release
     -p NUM \          # Set amount of parallelism (Default is number of CPU)
     -delete \         # Delete release and its git tag in advance if it exists
     -draft \          # Release as draft (Unpublish)

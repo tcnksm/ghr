@@ -81,6 +81,7 @@ func (cli *CLI) Run(args []string) int {
 		token string
 
 		commitish  string
+		body       string
 		draft      bool
 		prerelease bool
 
@@ -112,6 +113,9 @@ func (cli *CLI) Run(args []string) int {
 
 	flags.StringVar(&commitish, "commitish", "", "")
 	flags.StringVar(&commitish, "c", "", "")
+
+	flags.StringVar(&body, "body", "", "")
+	flags.StringVar(&body, "b", "", "")
 
 	flags.BoolVar(&draft, "draft", false, "")
 	flags.BoolVar(&prerelease, "prerelease", false, "")
@@ -251,6 +255,7 @@ func (cli *CLI) Run(args []string) int {
 		Prerelease:      github.Bool(prerelease),
 		Draft:           github.Bool(draft),
 		TargetCommitish: github.String(commitish),
+		Body:            github.String(body),
 	}
 
 	ctx := context.TODO()
