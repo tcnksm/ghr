@@ -1,3 +1,9 @@
+## 0.5.4 (2017-01-11)
+
+### Added 
+
+- Allow to specify body [#55](https://github.com/tcnksm/ghr/pull/55)
+
 ## 0.5.3 (2016-10-31)
 
 ### Fixed
