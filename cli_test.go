@@ -17,7 +17,7 @@ func TestRun(t *testing.T) {
 
 	tag := "run"
 	command := fmt.Sprintf(
-		"ghr -repository %s %s %s", TestRepo, tag, TestDir)
+		"ghr -username %s -repository %s %s %s", TestOwner, TestRepo, tag, TestDir)
 
 	args := strings.Split(command, " ")
 	if got, want := cli.Run(args), ExitCodeOK; got != want {
@@ -64,7 +64,7 @@ func TestRun_recreate(t *testing.T) {
 
 	tag := "run-recreate"
 	command := fmt.Sprintf(
-		"ghr -repository %s %s %s", TestRepo, tag, TestDir)
+		"ghr -username %s -repository %s %s %s", TestOwner, TestRepo, tag, TestDir)
 
 	args := strings.Split(command, " ")
 	if got, want := cli.Run(args), ExitCodeOK; got != want {

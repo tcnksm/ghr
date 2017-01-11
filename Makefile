@@ -19,7 +19,7 @@ build: deps
 package: deps
 	@sh -c "'$(CURDIR)/scripts/package.sh'"
 
-brew: deps
+brew: deps package
 	go run release/main.go $(VERSION) pkg/dist/$(VERSION)/ghr_$(VERSION)_darwin_amd64.zip > ../homebrew-ghr/ghr.rb
 
 ghr: brew build
