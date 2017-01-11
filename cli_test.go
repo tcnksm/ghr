@@ -75,7 +75,7 @@ func TestRun_recreate(t *testing.T) {
 	time.Sleep(3 * time.Second)
 
 	command = fmt.Sprintf(
-		"ghr -repository %s -recreate %s %s", TestRepo, tag, TestDir)
+		"ghr -username %s -repository %s -recreate %s %s", TestOwner, TestRepo, tag, TestDir)
 
 	args = strings.Split(command, " ")
 	if got, want := cli.Run(args), ExitCodeOK; got != want {

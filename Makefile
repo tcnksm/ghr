@@ -22,7 +22,7 @@ package: deps
 brew: deps package
 	go run release/main.go $(VERSION) pkg/dist/$(VERSION)/ghr_$(VERSION)_darwin_amd64.zip > ../homebrew-ghr/ghr.rb
 
-ghr: brew build
+ghr: build
 	bin/ghr -v
 	bin/ghr $(VERSION) pkg/dist/$(VERSION)
 
