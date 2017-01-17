@@ -251,6 +251,7 @@ func (cli *CLI) Run(args []string) int {
 
 	// Prepare create release request
 	req := &github.RepositoryRelease{
+		Name:            github.String(tag),
 		TagName:         github.String(tag),
 		Prerelease:      github.Bool(prerelease),
 		Draft:           github.Bool(draft),
