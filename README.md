@@ -3,8 +3,8 @@ ghr
 
 [![GitHub release](http://img.shields.io/github/release/tcnksm/ghr.svg?style=flat-square)][release]
 [![Travis](https://img.shields.io/travis/tcnksm/ghr.svg?style=flat-square)](https://travis-ci.org/tcnksm/ghr)
-[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)][license]
 [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godocs]
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)][license]
 
 [release]: https://github.com/tcnksm/ghr/releases
 [license]: https://github.com/tcnksm/ghr/blob/master/LICENSE

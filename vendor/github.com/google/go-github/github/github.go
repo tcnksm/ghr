@@ -406,6 +406,12 @@ func (c *Client) Do(req *http.Request, v interface{}) (*Response, error) {
 
 	resp, err := c.client.Do(req)
 	if err != nil {
+		if e, ok := err.(*url.Error); ok {
+			if url, err := url.Parse(e.URL); err == nil {
+				e.URL = sanitizeURL(url).String()
+				return nil, e
+			}
+		}
 		return nil, err
 	}
 
@@ -550,7 +556,7 @@ func (r *AbuseRateLimitError) Error() string {
 }
 
 // sanitizeURL redacts the client_secret parameter from the URL which may be
-// exposed to the user, specifically in the ErrorResponse error message.
+// exposed to the user.
 func sanitizeURL(uri *url.URL) *url.URL {
 	if uri == nil {
 		return nil

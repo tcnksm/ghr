@@ -1,54 +1,56 @@
-VERSION ?= $$(grep 'Version string' version.go | sed -E 's/.*"(.+)"$$/\1/')
-COMMIT ?= $$(git describe --always)
+VERSION = $(shell grep 'Version string' version.go | sed -E 's/.*"(.+)"$$/\1/')
+COMMIT = $(shell git describe --always)
+PACKAGES = $(shell go list ./... | grep -v '/vendor/')
+EXTERNAL_TOOLS = github.com/mitchellh/gox	
 
 default: test
 
-clean:
-	rm $(GOPATH)/bin/ghr
-	rm bin/ghr
-
-deps:
-	go get -d -t -v .
+# install external tools for this project
+bootstrap:
+	@for tool in $(EXTERNAL_TOOLS) ; do \
+		echo "Installing $$tool" ; \
+    	go get $$tool; \
+	done
 
 # build generate binary on './bin' directory.
-build: deps
+build: 
 	go build -ldflags "-X main.GitCommit=$(COMMIT)" -o bin/ghr
+
+# install installs binary on $GOPATH/bin directory.
+install: 
+	go install -ldflags "-X main.GitCommit=$(COMMIT)"
 
 # package runs compile.sh to run gox and zip them.
 # Artifacts will be generated in './pkg' directory
-package: deps
+package: 
 	@sh -c "'$(CURDIR)/scripts/package.sh'"
 
-brew: deps package
+brew: package
 	go run release/main.go $(VERSION) pkg/dist/$(VERSION)/ghr_$(VERSION)_darwin_amd64.zip > ../homebrew-ghr/ghr.rb
 
-ghr: build
+upload: build
 	bin/ghr -v
 	bin/ghr $(VERSION) pkg/dist/$(VERSION)
 
-
-install: deps
-	go install -ldflags "-X main.GitCommit=$(COMMIT)"
-
-test-all: vet test
+test-all: vet lint test
 
 test: 
-	go test -v -parallel=4 .
+	go test -v -parallel=4 ${PACKAGES}
 
-test-race: 
-	@go test -race .
+test-race:
+	go test -v -race ${PACKAGES}
 
 vet:
-	go vet *.go
+	go vet ${PACKAGES}
 
 lint:
 	@go get github.com/golang/lint/golint
-	golint ./...
+	go list ./... | grep -v vendor | xargs -n1 golint 
 
-# cover shows test coverages
 cover:
 	@go get golang.org/x/tools/cmd/cover		
-	godep go test -coverprofile=cover.out
+	go test -coverprofile=cover.out
 	go tool cover -html cover.out
 	rm cover.out
 
+.PHONY: bootstrap build install package brew test test-race test-all vet lint cover  
