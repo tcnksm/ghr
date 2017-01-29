@@ -32,7 +32,7 @@ upload: build
 	bin/ghr -v
 	bin/ghr $(VERSION) pkg/dist/$(VERSION)
 
-test-all: vet lint test test-race
+test-all: vet lint test
 
 test: 
 	go test -v -parallel=4 ${PACKAGES}
