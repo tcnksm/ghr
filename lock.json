@@ -12,7 +12,7 @@
         {
             "name": "github.com/google/go-github",
             "branch": "master",
-            "revision": "cec1afe99df659573e7220907135778489b4da91",
+            "revision": "c9c37fd6ce0247943d1aa34fc3813c62c5cb0225",
             "packages": [
                 "github"
             ]
