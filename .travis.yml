@@ -5,10 +5,14 @@ go:
   - 1.8rc3
   - tip
 
+os:
+  - linux
+  - osx
+
 sudo: false
 
 install:
-  - echo "skipping travis' default"
+  - echo "skipping travis default"
 
 script:
   - make test-all
