@@ -47,7 +47,7 @@ $ export GITHUB_TOKEN="....."
 Or set it in `github.token` in gitconfig:
 
 ```bash
-$ git config -global github.token "....."
+$ git config --global github.token "....."
 ```
 
 Note that environmental variable takes priority over gitconfig value.
