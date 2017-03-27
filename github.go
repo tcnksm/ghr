@@ -194,14 +194,27 @@ func (c *GitHubClient) DeleteAsset(ctx context.Context, assetID int) error {
 }
 
 func (c *GitHubClient) ListAssets(ctx context.Context, releaseID int) ([]*github.ReleaseAsset, error) {
-	assets, res, err := c.Repositories.ListReleaseAssets(c.Owner, c.Repo, releaseID, nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to list assets")
+	result := []*github.ReleaseAsset{}
+	page := 1
+
+	for {
+		assets, res, err := c.Repositories.ListReleaseAssets(c.Owner, c.Repo, releaseID, &github.ListOptions{Page: page})
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to list assets")
+		}
+
+		if res.StatusCode != http.StatusOK {
+			return nil, errors.Errorf("list release assets: invalid status code: %s", res.Status)
+		}
+
+		result = append(result, assets...)
+
+		if res.NextPage <= page {
+			break
+		}
+
+		page = res.NextPage
 	}
 
-	if res.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("list release assets: invalid status code: %s", res.Status)
-	}
-
-	return assets, nil
+	return result, nil
 }
