@@ -47,9 +47,9 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 		return g.GitHub.CreateRelease(ctx, req)
 	}
 
-	// recreate is not true. Then use that exiting release.
+	// recreate is not true. Then use that existing release.
 	if !recreate {
-		Debugf("Release (with tag %s) exists: use exsiting one",
+		Debugf("Release (with tag %s) exists: use existing one",
 			*req.TagName)
 
 		fmt.Fprintf(g.outStream, "WARNING: found release (%s). Use existing one.",
@@ -57,7 +57,7 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 		return release, nil
 	}
 
-	// When recreate is requested, delete exsiting release
+	// When recreate is requested, delete existing release
 	// and create a new release.
 	fmt.Fprintln(g.outStream, "==> Recreate a release")
 	if err := g.DeleteRelease(ctx, *release.ID, *req.TagName); err != nil {
