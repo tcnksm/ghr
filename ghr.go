@@ -21,7 +21,7 @@ type GHR struct {
 func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, recreate bool) (*github.RepositoryRelease, error) {
 
 	// When draft release creation is requested,
-	// create it witout any check (it can).
+	// create it without any check (it can).
 	if *req.Draft {
 		fmt.Fprintln(g.outStream, "==> Create a draft release")
 		return g.GitHub.CreateRelease(ctx, req)
