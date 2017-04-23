@@ -47,7 +47,7 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 		return g.GitHub.CreateRelease(ctx, req)
 	}
 
-	// recreae is not true. Then use that exiting release.
+	// recreate is not true. Then use that exiting release.
 	if !recreate {
 		Debugf("Release (with tag %s) exists: use exsiting one",
 			*req.TagName)
