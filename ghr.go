@@ -27,19 +27,19 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 		return g.GitHub.CreateRelease(ctx, req)
 	}
 
-	// Check release is exist or not.
+	// Check release exists.
 	// If release is not found, then create a new release.
 	release, err := g.GitHub.GetRelease(ctx, *req.TagName)
 	if err != nil {
 		if err != RelaseNotFound {
 			return nil, errors.Wrap(err, "failed to get release")
 		}
-		Debugf("Release (with tag %s) is not found: create a new one",
+		Debugf("Release (with tag %s) not found: create a new one",
 			*req.TagName)
 
 		if recreate {
 			fmt.Fprintf(g.outStream,
-				"WARNING: '-recreate' is specified but release (%s) is not found",
+				"WARNING: '-recreate' is specified but release (%s) not found",
 				*req.TagName)
 		}
 
@@ -52,13 +52,14 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 		Debugf("Release (with tag %s) exists: use existing one",
 			*req.TagName)
 
-		fmt.Fprintf(g.outStream, "WARNING: found release (%s). Use existing one.",
+		fmt.Fprintf(g.outStream, "WARNING: found release (%s). Use existing one.\n",
 			*req.TagName)
 		return release, nil
 	}
 
-	// When recreate is requested, delete existing release
-	// and create a new release.
+
+	// When recreate is requested, delete existing release and create a
+	// new release.
 	fmt.Fprintln(g.outStream, "==> Recreate a release")
 	if err := g.DeleteRelease(ctx, *release.ID, *req.TagName); err != nil {
 		return nil, err
@@ -79,8 +80,8 @@ func (g *GHR) DeleteRelease(ctx context.Context, ID int, tag string) error {
 		return err
 	}
 
-	// This is because sometimes process of creating release on GitHub is more
-	// fast than deleting tag.
+	// This is because sometimes the process of creating a release on GitHub
+	// is faster than deleting a tag.
 	time.Sleep(5 * time.Second)
 
 	return nil
@@ -113,7 +114,7 @@ func (g *GHR) UploadAssets(ctx context.Context, releaseID int, localAssets []str
 	}
 
 	if err := eg.Wait(); err != nil {
-		return errors.Wrap(err, "one of goroutines is failed")
+		return errors.Wrap(err, "one of the goroutines failed")
 	}
 
 	return nil
@@ -158,7 +159,7 @@ func (g *GHR) DeleteAssets(ctx context.Context, releaseID int, localAssets []str
 	}
 
 	if err := eg.Wait(); err != nil {
-		return errors.Wrap(err, "one of goroutines is failed")
+		return errors.Wrap(err, "one of the goroutines failed")
 	}
 
 	return nil
