@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	RelaseNotFound = errors.New("release is not found")
+	ReleaseNotFound = errors.New("release is not found")
 )
 
 type GitHub interface {
@@ -112,7 +112,7 @@ func (c *GitHubClient) GetRelease(ctx context.Context, tag string) (*github.Repo
 				"get release tag: invalid status: %s", res.Status)
 		}
 
-		return nil, RelaseNotFound
+		return nil, ReleaseNotFound
 	}
 
 	return release, nil
