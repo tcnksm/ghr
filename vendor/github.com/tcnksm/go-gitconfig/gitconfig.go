@@ -28,14 +28,6 @@ import (
 	"syscall"
 )
 
-type ErrNotFound struct {
-	Key string
-}
-
-func (e *ErrNotFound) Error() string {
-	return fmt.Sprintf("the key `%s` is not found", e.Key)
-}
-
 // Entire extracts configuration value from `$HOME/.gitconfig` file ,
 // `$GIT_CONFIG`, /etc/gitconfig or include.path files.
 func Entire(key string) (string, error) {
@@ -104,7 +96,7 @@ func execGitConfig(args ...string) (string, error) {
 	if exitError, ok := err.(*exec.ExitError); ok {
 		if waitStatus, ok := exitError.Sys().(syscall.WaitStatus); ok {
 			if waitStatus.ExitStatus() == 1 {
-				return "", &ErrNotFound{Key: args[len(args)-1]}
+				return "", fmt.Errorf("the key `%s` is not found", args[len(args)-1])
 			}
 		}
 		return "", err

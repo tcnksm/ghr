@@ -19,6 +19,9 @@ go-gitconfig
 Sometimes you want to extract username or its email address **implicitly** in your tool.
 Now most of developer use `git`, so we can use its configuration variables. `go-gitconfig` is for that.
 
+`go-gitconfig` is very small, so it may not be included what you want to use.
+If you want to use more git specific variable, check [Other](##VS).
+
 ## Usage
 
 If you want to use git user name defined in `~/.gitconfig`: 

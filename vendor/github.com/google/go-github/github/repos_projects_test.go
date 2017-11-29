@@ -1,4 +1,4 @@
-// Copyright 2016 The go-github AUTHORS. All rights reserved.
+// Copyright 2017 The go-github AUTHORS. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -6,6 +6,7 @@
 package github
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -24,8 +25,8 @@ func TestRepositoriesService_ListProjects(t *testing.T) {
 		fmt.Fprint(w, `[{"id":1}]`)
 	})
 
-	opt := &ListOptions{Page: 2}
-	projects, _, err := client.Repositories.ListProjects("o", "r", opt)
+	opt := &ProjectListOptions{ListOptions: ListOptions{Page: 2}}
+	projects, _, err := client.Repositories.ListProjects(context.Background(), "o", "r", opt)
 	if err != nil {
 		t.Errorf("Repositories.ListProjects returned error: %v", err)
 	}
@@ -55,7 +56,7 @@ func TestRepositoriesService_CreateProject(t *testing.T) {
 		fmt.Fprint(w, `{"id":1}`)
 	})
 
-	project, _, err := client.Repositories.CreateProject("o", "r", input)
+	project, _, err := client.Repositories.CreateProject(context.Background(), "o", "r", input)
 	if err != nil {
 		t.Errorf("Repositories.CreateProject returned error: %v", err)
 	}
