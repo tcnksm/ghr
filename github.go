@@ -140,6 +140,7 @@ func (c *GitHubClient) DeleteRelease(ctx context.Context, releaseID int) error {
 	return nil
 }
 
+// DeleteTag deletes a tag from the GitHub API
 func (c *GitHubClient) DeleteTag(ctx context.Context, tag string) error {
 	ref := fmt.Sprintf("tags/%s", tag)
 	res, err := c.Git.DeleteRef(c.Owner, c.Repo, ref)
