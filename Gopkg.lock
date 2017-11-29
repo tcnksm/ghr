@@ -46,8 +46,7 @@
 [[projects]]
   name = "github.com/tcnksm/go-latest"
   packages = ["."]
-  revision = "86500ab1363a867dafe16905b5b85293a0d838eb"
-  version = "0.1.1"
+  revision = "79c2c6c7fa60f1bd7e1f204606aae7b9082f7304"
 
 [[projects]]
   branch = "master"
