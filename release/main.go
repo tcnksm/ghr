@@ -11,7 +11,7 @@ import (
 	"text/template"
 )
 
-// formulaTmpl is temaplate for homebrew formula
+// formulaTmpl holds a go temaplate for the homebrew formula
 var formulaTmpl = `require "formula"
 
 class {{ .Name | Title }} < Formula

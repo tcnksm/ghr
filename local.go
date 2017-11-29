@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// LocalAssets contains the local objects to be uploaded
 func LocalAssets(path string) ([]string, error) {
 	path, err := filepath.Abs(path)
 	if err != nil {
