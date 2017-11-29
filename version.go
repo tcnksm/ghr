@@ -18,6 +18,9 @@ const Version string = "v0.5.4"
 // This is automatically extracted by git describe --always.
 var GitCommit string
 
+// OutputVersion checks the current version and compares it against releases
+// available on GitHub. If there is a newer version available, it prints an
+// update warning.
 func OutputVersion() string {
 	var buf bytes.Buffer
 	fmt.Fprintf(&buf, "%s version %s", Name, Version)
