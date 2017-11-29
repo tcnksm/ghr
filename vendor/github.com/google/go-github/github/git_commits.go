@@ -6,7 +6,6 @@
 package github
 
 import (
-	"context"
 	"fmt"
 	"time"
 )
@@ -28,7 +27,6 @@ type Commit struct {
 	Tree         *Tree                  `json:"tree,omitempty"`
 	Parents      []Commit               `json:"parents,omitempty"`
 	Stats        *CommitStats           `json:"stats,omitempty"`
-	HTMLURL      *string                `json:"html_url,omitempty"`
 	URL          *string                `json:"url,omitempty"`
 	Verification *SignatureVerification `json:"verification,omitempty"`
 
@@ -60,7 +58,7 @@ func (c CommitAuthor) String() string {
 // GetCommit fetchs the Commit object for a given SHA.
 //
 // GitHub API docs: https://developer.github.com/v3/git/commits/#get-a-commit
-func (s *GitService) GetCommit(ctx context.Context, owner string, repo string, sha string) (*Commit, *Response, error) {
+func (s *GitService) GetCommit(owner string, repo string, sha string) (*Commit, *Response, error) {
 	u := fmt.Sprintf("repos/%v/%v/git/commits/%v", owner, repo, sha)
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
@@ -71,7 +69,7 @@ func (s *GitService) GetCommit(ctx context.Context, owner string, repo string, s
 	req.Header.Set("Accept", mediaTypeGitSigningPreview)
 
 	c := new(Commit)
-	resp, err := s.client.Do(ctx, req, c)
+	resp, err := s.client.Do(req, c)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -89,33 +87,29 @@ type createCommit struct {
 }
 
 // CreateCommit creates a new commit in a repository.
-// commit must not be nil.
 //
 // The commit.Committer is optional and will be filled with the commit.Author
 // data if omitted. If the commit.Author is omitted, it will be filled in with
 // the authenticated user’s information and the current date.
 //
 // GitHub API docs: https://developer.github.com/v3/git/commits/#create-a-commit
-func (s *GitService) CreateCommit(ctx context.Context, owner string, repo string, commit *Commit) (*Commit, *Response, error) {
-	if commit == nil {
-		return nil, nil, fmt.Errorf("commit must be provided")
-	}
-
+func (s *GitService) CreateCommit(owner string, repo string, commit *Commit) (*Commit, *Response, error) {
 	u := fmt.Sprintf("repos/%v/%v/git/commits", owner, repo)
 
-	parents := make([]string, len(commit.Parents))
-	for i, parent := range commit.Parents {
-		parents[i] = *parent.SHA
-	}
+	body := &createCommit{}
+	if commit != nil {
+		parents := make([]string, len(commit.Parents))
+		for i, parent := range commit.Parents {
+			parents[i] = *parent.SHA
+		}
 
-	body := &createCommit{
-		Author:    commit.Author,
-		Committer: commit.Committer,
-		Message:   commit.Message,
-		Parents:   parents,
-	}
-	if commit.Tree != nil {
-		body.Tree = commit.Tree.SHA
+		body = &createCommit{
+			Author:    commit.Author,
+			Committer: commit.Committer,
+			Message:   commit.Message,
+			Tree:      commit.Tree.SHA,
+			Parents:   parents,
+		}
 	}
 
 	req, err := s.client.NewRequest("POST", u, body)
@@ -124,7 +118,7 @@ func (s *GitService) CreateCommit(ctx context.Context, owner string, repo string
 	}
 
 	c := new(Commit)
-	resp, err := s.client.Do(ctx, req, c)
+	resp, err := s.client.Do(req, c)
 	if err != nil {
 		return nil, resp, err
 	}

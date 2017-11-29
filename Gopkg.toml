@@ -22,8 +22,8 @@
 
 
 [[constraint]]
-  branch = "master"
   name = "github.com/google/go-github"
+  revision = "82629e04595093a1cebd5e2aa8096ad87a3a81d1"
 
 [[constraint]]
   branch = "master"

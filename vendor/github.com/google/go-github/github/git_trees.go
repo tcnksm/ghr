@@ -5,10 +5,7 @@
 
 package github
 
-import (
-	"context"
-	"fmt"
-)
+import "fmt"
 
 // Tree represents a GitHub tree.
 type Tree struct {
@@ -30,7 +27,6 @@ type TreeEntry struct {
 	Type    *string `json:"type,omitempty"`
 	Size    *int    `json:"size,omitempty"`
 	Content *string `json:"content,omitempty"`
-	URL     *string `json:"url,omitempty"`
 }
 
 func (t TreeEntry) String() string {
@@ -40,7 +36,7 @@ func (t TreeEntry) String() string {
 // GetTree fetches the Tree object for a given sha hash from a repository.
 //
 // GitHub API docs: https://developer.github.com/v3/git/trees/#get-a-tree
-func (s *GitService) GetTree(ctx context.Context, owner string, repo string, sha string, recursive bool) (*Tree, *Response, error) {
+func (s *GitService) GetTree(owner string, repo string, sha string, recursive bool) (*Tree, *Response, error) {
 	u := fmt.Sprintf("repos/%v/%v/git/trees/%v", owner, repo, sha)
 	if recursive {
 		u += "?recursive=1"
@@ -52,7 +48,7 @@ func (s *GitService) GetTree(ctx context.Context, owner string, repo string, sha
 	}
 
 	t := new(Tree)
-	resp, err := s.client.Do(ctx, req, t)
+	resp, err := s.client.Do(req, t)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -71,7 +67,7 @@ type createTree struct {
 // that tree with the new path contents and write a new tree out.
 //
 // GitHub API docs: https://developer.github.com/v3/git/trees/#create-a-tree
-func (s *GitService) CreateTree(ctx context.Context, owner string, repo string, baseTree string, entries []TreeEntry) (*Tree, *Response, error) {
+func (s *GitService) CreateTree(owner string, repo string, baseTree string, entries []TreeEntry) (*Tree, *Response, error) {
 	u := fmt.Sprintf("repos/%v/%v/git/trees", owner, repo)
 
 	body := &createTree{
@@ -84,7 +80,7 @@ func (s *GitService) CreateTree(ctx context.Context, owner string, repo string, 
 	}
 
 	t := new(Tree)
-	resp, err := s.client.Do(ctx, req, t)
+	resp, err := s.client.Do(req, t)
 	if err != nil {
 		return nil, resp, err
 	}

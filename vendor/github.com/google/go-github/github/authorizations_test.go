@@ -6,7 +6,6 @@
 package github
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -25,7 +24,7 @@ func TestAuthorizationsService_List(t *testing.T) {
 	})
 
 	opt := &ListOptions{Page: 1, PerPage: 2}
-	got, _, err := client.Authorizations.List(context.Background(), opt)
+	got, _, err := client.Authorizations.List(opt)
 	if err != nil {
 		t.Errorf("Authorizations.List returned error: %v", err)
 	}
@@ -45,7 +44,7 @@ func TestAuthorizationsService_Get(t *testing.T) {
 		fmt.Fprint(w, `{"id":1}`)
 	})
 
-	got, _, err := client.Authorizations.Get(context.Background(), 1)
+	got, _, err := client.Authorizations.Get(1)
 	if err != nil {
 		t.Errorf("Authorizations.Get returned error: %v", err)
 	}
@@ -76,7 +75,7 @@ func TestAuthorizationsService_Create(t *testing.T) {
 		fmt.Fprint(w, `{"ID":1}`)
 	})
 
-	got, _, err := client.Authorizations.Create(context.Background(), input)
+	got, _, err := client.Authorizations.Create(input)
 	if err != nil {
 		t.Errorf("Authorizations.Create returned error: %v", err)
 	}
@@ -107,7 +106,7 @@ func TestAuthorizationsService_GetOrCreateForApp(t *testing.T) {
 		fmt.Fprint(w, `{"ID":1}`)
 	})
 
-	got, _, err := client.Authorizations.GetOrCreateForApp(context.Background(), "id", input)
+	got, _, err := client.Authorizations.GetOrCreateForApp("id", input)
 	if err != nil {
 		t.Errorf("Authorizations.GetOrCreateForApp returned error: %v", err)
 	}
@@ -139,7 +138,7 @@ func TestAuthorizationsService_GetOrCreateForApp_Fingerprint(t *testing.T) {
 		fmt.Fprint(w, `{"ID":1}`)
 	})
 
-	got, _, err := client.Authorizations.GetOrCreateForApp(context.Background(), "id", input)
+	got, _, err := client.Authorizations.GetOrCreateForApp("id", input)
 	if err != nil {
 		t.Errorf("Authorizations.GetOrCreateForApp returned error: %v", err)
 	}
@@ -170,7 +169,7 @@ func TestAuthorizationsService_Edit(t *testing.T) {
 		fmt.Fprint(w, `{"ID":1}`)
 	})
 
-	got, _, err := client.Authorizations.Edit(context.Background(), 1, input)
+	got, _, err := client.Authorizations.Edit(1, input)
 	if err != nil {
 		t.Errorf("Authorizations.Edit returned error: %v", err)
 	}
@@ -190,7 +189,7 @@ func TestAuthorizationsService_Delete(t *testing.T) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	_, err := client.Authorizations.Delete(context.Background(), 1)
+	_, err := client.Authorizations.Delete(1)
 	if err != nil {
 		t.Errorf("Authorizations.Delete returned error: %v", err)
 	}
@@ -205,7 +204,7 @@ func TestAuthorizationsService_Check(t *testing.T) {
 		fmt.Fprint(w, `{"id":1}`)
 	})
 
-	got, _, err := client.Authorizations.Check(context.Background(), "id", "t")
+	got, _, err := client.Authorizations.Check("id", "t")
 	if err != nil {
 		t.Errorf("Authorizations.Check returned error: %v", err)
 	}
@@ -225,7 +224,7 @@ func TestAuthorizationsService_Reset(t *testing.T) {
 		fmt.Fprint(w, `{"ID":1}`)
 	})
 
-	got, _, err := client.Authorizations.Reset(context.Background(), "id", "t")
+	got, _, err := client.Authorizations.Reset("id", "t")
 	if err != nil {
 		t.Errorf("Authorizations.Reset returned error: %v", err)
 	}
@@ -245,7 +244,7 @@ func TestAuthorizationsService_Revoke(t *testing.T) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	_, err := client.Authorizations.Revoke(context.Background(), "id", "t")
+	_, err := client.Authorizations.Revoke("id", "t")
 	if err != nil {
 		t.Errorf("Authorizations.Revoke returned error: %v", err)
 	}
@@ -260,7 +259,7 @@ func TestListGrants(t *testing.T) {
 		fmt.Fprint(w, `[{"id": 1}]`)
 	})
 
-	got, _, err := client.Authorizations.ListGrants(context.Background(), nil)
+	got, _, err := client.Authorizations.ListGrants()
 	if err != nil {
 		t.Errorf("OAuthAuthorizations.ListGrants returned error: %v", err)
 	}
@@ -268,24 +267,6 @@ func TestListGrants(t *testing.T) {
 	want := []*Grant{{ID: Int(1)}}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("OAuthAuthorizations.ListGrants = %+v, want %+v", got, want)
-	}
-}
-
-func TestListGrants_withOptions(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/applications/grants", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "GET")
-		testFormValues(t, r, values{
-			"page": "2",
-		})
-		fmt.Fprint(w, `[{"id": 1}]`)
-	})
-
-	_, _, err := client.Authorizations.ListGrants(context.Background(), &ListOptions{Page: 2})
-	if err != nil {
-		t.Errorf("OAuthAuthorizations.ListGrants returned error: %v", err)
 	}
 }
 
@@ -298,7 +279,7 @@ func TestGetGrant(t *testing.T) {
 		fmt.Fprint(w, `{"id": 1}`)
 	})
 
-	got, _, err := client.Authorizations.GetGrant(context.Background(), 1)
+	got, _, err := client.Authorizations.GetGrant(1)
 	if err != nil {
 		t.Errorf("OAuthAuthorizations.GetGrant returned error: %v", err)
 	}
@@ -317,7 +298,7 @@ func TestDeleteGrant(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	_, err := client.Authorizations.DeleteGrant(context.Background(), 1)
+	_, err := client.Authorizations.DeleteGrant(1)
 	if err != nil {
 		t.Errorf("OAuthAuthorizations.DeleteGrant returned error: %v", err)
 	}
@@ -333,7 +314,7 @@ func TestAuthorizationsService_CreateImpersonation(t *testing.T) {
 	})
 
 	req := &AuthorizationRequest{Scopes: []Scope{ScopePublicRepo}}
-	got, _, err := client.Authorizations.CreateImpersonation(context.Background(), "u", req)
+	got, _, err := client.Authorizations.CreateImpersonation("u", req)
 	if err != nil {
 		t.Errorf("Authorizations.CreateImpersonation returned error: %+v", err)
 	}
@@ -352,7 +333,7 @@ func TestAuthorizationsService_DeleteImpersonation(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	_, err := client.Authorizations.DeleteImpersonation(context.Background(), "u")
+	_, err := client.Authorizations.DeleteImpersonation("u")
 	if err != nil {
 		t.Errorf("Authorizations.DeleteImpersonation returned error: %+v", err)
 	}

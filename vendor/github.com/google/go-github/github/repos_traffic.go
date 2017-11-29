@@ -5,10 +5,7 @@
 
 package github
 
-import (
-	"context"
-	"fmt"
-)
+import "fmt"
 
 // TrafficReferrer represent information about traffic from a referrer .
 type TrafficReferrer struct {
@@ -55,7 +52,7 @@ type TrafficBreakdownOptions struct {
 // ListTrafficReferrers list the top 10 referrers over the last 14 days.
 //
 // GitHub API docs: https://developer.github.com/v3/repos/traffic/#list-referrers
-func (s *RepositoriesService) ListTrafficReferrers(ctx context.Context, owner, repo string) ([]*TrafficReferrer, *Response, error) {
+func (s *RepositoriesService) ListTrafficReferrers(owner, repo string) ([]*TrafficReferrer, *Response, error) {
 	u := fmt.Sprintf("repos/%v/%v/traffic/popular/referrers", owner, repo)
 
 	req, err := s.client.NewRequest("GET", u, nil)
@@ -64,7 +61,7 @@ func (s *RepositoriesService) ListTrafficReferrers(ctx context.Context, owner, r
 	}
 
 	var trafficReferrers []*TrafficReferrer
-	resp, err := s.client.Do(ctx, req, &trafficReferrers)
+	resp, err := s.client.Do(req, &trafficReferrers)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -75,7 +72,7 @@ func (s *RepositoriesService) ListTrafficReferrers(ctx context.Context, owner, r
 // ListTrafficPaths list the top 10 popular content over the last 14 days.
 //
 // GitHub API docs: https://developer.github.com/v3/repos/traffic/#list-paths
-func (s *RepositoriesService) ListTrafficPaths(ctx context.Context, owner, repo string) ([]*TrafficPath, *Response, error) {
+func (s *RepositoriesService) ListTrafficPaths(owner, repo string) ([]*TrafficPath, *Response, error) {
 	u := fmt.Sprintf("repos/%v/%v/traffic/popular/paths", owner, repo)
 
 	req, err := s.client.NewRequest("GET", u, nil)
@@ -84,7 +81,7 @@ func (s *RepositoriesService) ListTrafficPaths(ctx context.Context, owner, repo 
 	}
 
 	var paths []*TrafficPath
-	resp, err := s.client.Do(ctx, req, &paths)
+	resp, err := s.client.Do(req, &paths)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -95,7 +92,7 @@ func (s *RepositoriesService) ListTrafficPaths(ctx context.Context, owner, repo 
 // ListTrafficViews get total number of views for the last 14 days and breaks it down either per day or week.
 //
 // GitHub API docs: https://developer.github.com/v3/repos/traffic/#views
-func (s *RepositoriesService) ListTrafficViews(ctx context.Context, owner, repo string, opt *TrafficBreakdownOptions) (*TrafficViews, *Response, error) {
+func (s *RepositoriesService) ListTrafficViews(owner, repo string, opt *TrafficBreakdownOptions) (*TrafficViews, *Response, error) {
 	u := fmt.Sprintf("repos/%v/%v/traffic/views", owner, repo)
 	u, err := addOptions(u, opt)
 	if err != nil {
@@ -108,7 +105,7 @@ func (s *RepositoriesService) ListTrafficViews(ctx context.Context, owner, repo 
 	}
 
 	trafficViews := new(TrafficViews)
-	resp, err := s.client.Do(ctx, req, &trafficViews)
+	resp, err := s.client.Do(req, &trafficViews)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -119,7 +116,7 @@ func (s *RepositoriesService) ListTrafficViews(ctx context.Context, owner, repo 
 // ListTrafficClones get total number of clones for the last 14 days and breaks it down either per day or week for the last 14 days.
 //
 // GitHub API docs: https://developer.github.com/v3/repos/traffic/#views
-func (s *RepositoriesService) ListTrafficClones(ctx context.Context, owner, repo string, opt *TrafficBreakdownOptions) (*TrafficClones, *Response, error) {
+func (s *RepositoriesService) ListTrafficClones(owner, repo string, opt *TrafficBreakdownOptions) (*TrafficClones, *Response, error) {
 	u := fmt.Sprintf("repos/%v/%v/traffic/clones", owner, repo)
 	u, err := addOptions(u, opt)
 	if err != nil {
@@ -132,7 +129,7 @@ func (s *RepositoriesService) ListTrafficClones(ctx context.Context, owner, repo
 	}
 
 	trafficClones := new(TrafficClones)
-	resp, err := s.client.Do(ctx, req, &trafficClones)
+	resp, err := s.client.Do(req, &trafficClones)
 	if err != nil {
 		return nil, resp, err
 	}

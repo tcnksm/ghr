@@ -3,13 +3,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:generate go run gen-accessors.go
-
 package github
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -27,7 +24,12 @@ import (
 )
 
 const (
-	libraryVersion = "14"
+	// StatusUnprocessableEntity is the status code returned when sending a request with invalid fields.
+	StatusUnprocessableEntity = 422
+)
+
+const (
+	libraryVersion = "2"
 	defaultBaseURL = "https://api.github.com/"
 	uploadBaseURL  = "https://uploads.github.com/"
 	userAgent      = "go-github/" + libraryVersion
@@ -67,6 +69,10 @@ const (
 	// https://developer.github.com/changes/2016-05-12-reactions-api-preview/
 	mediaTypeReactionsPreview = "application/vnd.github.squirrel-girl-preview"
 
+	// https://developer.github.com/changes/2016-04-01-squash-api-preview/
+	// https://developer.github.com/changes/2016-09-26-pull-request-merge-api-update/
+	mediaTypeSquashPreview = "application/vnd.github.polaris-preview+json"
+
 	// https://developer.github.com/changes/2016-04-04-git-signing-api-preview/
 	mediaTypeGitSigningPreview = "application/vnd.github.cryptographer-preview+json"
 
@@ -85,32 +91,14 @@ const (
 	// https://developer.github.com/changes/2016-09-14-Integrations-Early-Access/
 	mediaTypeIntegrationPreview = "application/vnd.github.machine-man-preview+json"
 
+	// https://developer.github.com/changes/2016-11-28-preview-org-membership/
+	mediaTypeOrgMembershipPreview = "application/vnd.github.korra-preview+json"
+
 	// https://developer.github.com/changes/2017-01-05-commit-search-api/
 	mediaTypeCommitSearchPreview = "application/vnd.github.cloak-preview+json"
 
-	// https://developer.github.com/changes/2017-02-28-user-blocking-apis-and-webhook/
-	mediaTypeBlockUsersPreview = "application/vnd.github.giant-sentry-fist-preview+json"
-
-	// https://developer.github.com/changes/2017-02-09-community-health/
-	mediaTypeRepositoryCommunityHealthMetricsPreview = "application/vnd.github.black-panther-preview+json"
-
-	// https://developer.github.com/changes/2017-05-23-coc-api/
-	mediaTypeCodesOfConductPreview = "application/vnd.github.scarlet-witch-preview+json"
-
-	// https://developer.github.com/changes/2017-07-17-update-topics-on-repositories/
-	mediaTypeTopicsPreview = "application/vnd.github.mercy-preview+json"
-
-	// https://developer.github.com/changes/2017-07-26-team-review-request-thor-preview/
-	mediaTypeTeamReviewPreview = "application/vnd.github.thor-preview+json"
-
-	// https://developer.github.com/v3/apps/marketplace/
-	mediaTypeMarketplacePreview = "application/vnd.github.valkyrie-preview+json"
-
-	// https://developer.github.com/changes/2017-08-30-preview-nested-teams/
-	mediaTypeNestedTeamsPreview = "application/vnd.github.hellcat-preview+json"
-
-	// https://developer.github.com/changes/2017-11-09-repository-transfer-api-preview/
-	mediaTypeRepositoryTransferPreview = "application/vnd.github.nightshade-preview+json"
+	// https://developer.github.com/changes/2016-12-14-reviews-api/
+	mediaTypePullRequestReviewsPreview = "application/vnd.github.black-cat-preview+json"
 )
 
 // A Client manages communication with the GitHub API.
@@ -131,28 +119,28 @@ type Client struct {
 
 	rateMu     sync.Mutex
 	rateLimits [categories]Rate // Rate limits for the client as determined by the most recent API calls.
+	mostRecent rateLimitCategory
 
 	common service // Reuse a single struct instead of allocating one for each service on the heap.
 
 	// Services used for talking to different parts of the GitHub API.
 	Activity       *ActivityService
 	Admin          *AdminService
-	Apps           *AppsService
 	Authorizations *AuthorizationsService
 	Gists          *GistsService
 	Git            *GitService
 	Gitignores     *GitignoresService
+	Integrations   *IntegrationsService
 	Issues         *IssuesService
-	Licenses       *LicensesService
-	Marketplace    *MarketplaceService
-	Migrations     *MigrationService
 	Organizations  *OrganizationsService
 	Projects       *ProjectsService
 	PullRequests   *PullRequestsService
-	Reactions      *ReactionsService
 	Repositories   *RepositoriesService
 	Search         *SearchService
 	Users          *UsersService
+	Licenses       *LicensesService
+	Migrations     *MigrationService
+	Reactions      *ReactionsService
 }
 
 type service struct {
@@ -227,14 +215,13 @@ func NewClient(httpClient *http.Client) *Client {
 	c.common.client = c
 	c.Activity = (*ActivityService)(&c.common)
 	c.Admin = (*AdminService)(&c.common)
-	c.Apps = (*AppsService)(&c.common)
 	c.Authorizations = (*AuthorizationsService)(&c.common)
 	c.Gists = (*GistsService)(&c.common)
 	c.Git = (*GitService)(&c.common)
 	c.Gitignores = (*GitignoresService)(&c.common)
+	c.Integrations = (*IntegrationsService)(&c.common)
 	c.Issues = (*IssuesService)(&c.common)
 	c.Licenses = (*LicensesService)(&c.common)
-	c.Marketplace = &MarketplaceService{client: c}
 	c.Migrations = (*MigrationService)(&c.common)
 	c.Organizations = (*OrganizationsService)(&c.common)
 	c.Projects = (*ProjectsService)(&c.common)
@@ -246,57 +233,23 @@ func NewClient(httpClient *http.Client) *Client {
 	return c
 }
 
-// NewEnterpriseClient returns a new GitHub API client with provided
-// base URL and upload URL (often the same URL).
-// If either URL does not have a trailing slash, one is added automatically.
-// If a nil httpClient is provided, http.DefaultClient will be used.
-//
-// Note that NewEnterpriseClient is a convenience helper only;
-// its behavior is equivalent to using NewClient, followed by setting
-// the BaseURL and UploadURL fields.
-func NewEnterpriseClient(baseURL, uploadURL string, httpClient *http.Client) (*Client, error) {
-	baseEndpoint, err := url.Parse(baseURL)
-	if err != nil {
-		return nil, err
-	}
-	if !strings.HasSuffix(baseEndpoint.Path, "/") {
-		baseEndpoint.Path += "/"
-	}
-
-	uploadEndpoint, err := url.Parse(uploadURL)
-	if err != nil {
-		return nil, err
-	}
-	if !strings.HasSuffix(uploadEndpoint.Path, "/") {
-		uploadEndpoint.Path += "/"
-	}
-
-	c := NewClient(httpClient)
-	c.BaseURL = baseEndpoint
-	c.UploadURL = uploadEndpoint
-	return c, nil
-}
-
 // NewRequest creates an API request. A relative URL can be provided in urlStr,
 // in which case it is resolved relative to the BaseURL of the Client.
 // Relative URLs should always be specified without a preceding slash. If
 // specified, the value pointed to by body is JSON encoded and included as the
 // request body.
 func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
-	if !strings.HasSuffix(c.BaseURL.Path, "/") {
-		return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.BaseURL)
-	}
-	u, err := c.BaseURL.Parse(urlStr)
+	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}
 
+	u := c.BaseURL.ResolveReference(rel)
+
 	var buf io.ReadWriter
 	if body != nil {
 		buf = new(bytes.Buffer)
-		enc := json.NewEncoder(buf)
-		enc.SetEscapeHTML(false)
-		err := enc.Encode(body)
+		err := json.NewEncoder(buf).Encode(body)
 		if err != nil {
 			return nil, err
 		}
@@ -321,14 +274,12 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 // urlStr, in which case it is resolved relative to the UploadURL of the Client.
 // Relative URLs should always be specified without a preceding slash.
 func (c *Client) NewUploadRequest(urlStr string, reader io.Reader, size int64, mediaType string) (*http.Request, error) {
-	if !strings.HasSuffix(c.UploadURL.Path, "/") {
-		return nil, fmt.Errorf("UploadURL must have a trailing slash, but %q does not", c.UploadURL)
-	}
-	u, err := c.UploadURL.Parse(urlStr)
+	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}
 
+	u := c.UploadURL.ResolveReference(rel)
 	req, err := http.NewRequest("POST", u.String(), reader)
 	if err != nil {
 		return nil, err
@@ -364,7 +315,6 @@ type Response struct {
 }
 
 // newResponse creates a new Response for the provided http.Response.
-// r must not be nil.
 func newResponse(r *http.Response) *Response {
 	response := &Response{Response: r}
 	response.populatePageValues()
@@ -433,46 +383,41 @@ func parseRate(r *http.Response) Rate {
 	return rate
 }
 
+// Rate specifies the current rate limit for the client as determined by the
+// most recent API call. If the client is used in a multi-user application,
+// this rate may not always be up-to-date.
+//
+// Deprecated: Use the Response.Rate returned from most recent API call instead.
+// Call RateLimits() to check the current rate.
+func (c *Client) Rate() Rate {
+	c.rateMu.Lock()
+	rate := c.rateLimits[c.mostRecent]
+	c.rateMu.Unlock()
+	return rate
+}
+
 // Do sends an API request and returns the API response. The API response is
 // JSON decoded and stored in the value pointed to by v, or returned as an
 // error if an API error has occurred. If v implements the io.Writer
 // interface, the raw response body will be written to v, without attempting to
 // first decode it. If rate limit is exceeded and reset time is in the future,
 // Do returns *RateLimitError immediately without making a network API call.
-//
-// The provided ctx must be non-nil. If it is canceled or times out,
-// ctx.Err() will be returned.
-func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Response, error) {
-	req = withContext(ctx, req)
-
+func (c *Client) Do(req *http.Request, v interface{}) (*Response, error) {
 	rateLimitCategory := category(req.URL.Path)
 
 	// If we've hit rate limit, don't make further requests before Reset time.
 	if err := c.checkRateLimitBeforeDo(req, rateLimitCategory); err != nil {
-		return &Response{
-			Response: err.Response,
-			Rate:     err.Rate,
-		}, err
+		return nil, err
 	}
 
 	resp, err := c.client.Do(req)
 	if err != nil {
-		// If we got an error, and the context has been canceled,
-		// the context's error is probably more useful.
-		select {
-		case <-ctx.Done():
-			return nil, ctx.Err()
-		default:
-		}
-
-		// If the error type is *url.Error, sanitize its URL before returning.
 		if e, ok := err.(*url.Error); ok {
 			if url, err := url.Parse(e.URL); err == nil {
 				e.URL = sanitizeURL(url).String()
 				return nil, e
 			}
 		}
-
 		return nil, err
 	}
 
@@ -486,6 +431,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 
 	c.rateMu.Lock()
 	c.rateLimits[rateLimitCategory] = response.Rate
+	c.mostRecent = rateLimitCategory
 	c.rateMu.Unlock()
 
 	err = CheckResponse(resp)
@@ -513,7 +459,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 // current client state in order to quickly check if *RateLimitError can be immediately returned
 // from Client.Do, and if so, returns it so that Client.Do can skip making a network API call unnecessarily.
 // Otherwise it returns nil, and Client.Do should proceed normally.
-func (c *Client) checkRateLimitBeforeDo(req *http.Request, rateLimitCategory rateLimitCategory) *RateLimitError {
+func (c *Client) checkRateLimitBeforeDo(req *http.Request, rateLimitCategory rateLimitCategory) error {
 	c.rateMu.Lock()
 	rate := c.rateLimits[rateLimitCategory]
 	c.rateMu.Unlock()
@@ -580,9 +526,9 @@ type RateLimitError struct {
 }
 
 func (r *RateLimitError) Error() string {
-	return fmt.Sprintf("%v %v: %d %v %v",
+	return fmt.Sprintf("%v %v: %d %v; rate reset in %v",
 		r.Response.Request.Method, sanitizeURL(r.Response.Request.URL),
-		r.Response.StatusCode, r.Message, formatRateReset(r.Rate.Reset.Time.Sub(time.Now())))
+		r.Response.StatusCode, r.Message, r.Rate.Reset.Time.Sub(time.Now()))
 }
 
 // AcceptedError occurs when GitHub returns 202 Accepted response with an
@@ -784,8 +730,22 @@ func category(path string) rateLimitCategory {
 	}
 }
 
+// RateLimit returns the core rate limit for the current client.
+//
+// Deprecated: RateLimit is deprecated, use RateLimits instead.
+func (c *Client) RateLimit() (*Rate, *Response, error) {
+	limits, resp, err := c.RateLimits()
+	if err != nil {
+		return nil, resp, err
+	}
+	if limits == nil {
+		return nil, resp, errors.New("RateLimits returned nil limits and error; unable to extract Core rate limit")
+	}
+	return limits.Core, resp, nil
+}
+
 // RateLimits returns the rate limits for the current client.
-func (c *Client) RateLimits(ctx context.Context) (*RateLimits, *Response, error) {
+func (c *Client) RateLimits() (*RateLimits, *Response, error) {
 	req, err := c.NewRequest("GET", "rate_limit", nil)
 	if err != nil {
 		return nil, nil, err
@@ -794,7 +754,7 @@ func (c *Client) RateLimits(ctx context.Context) (*RateLimits, *Response, error)
 	response := new(struct {
 		Resources *RateLimits `json:"resources"`
 	})
-	resp, err := c.Do(ctx, req, response)
+	resp, err := c.Do(req, response)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -928,31 +888,6 @@ func cloneRequest(r *http.Request) *http.Request {
 		r2.Header[k] = append([]string(nil), s...)
 	}
 	return r2
-}
-
-// formatRateReset formats d to look like "[rate reset in 2s]" or
-// "[rate reset in 87m02s]" for the positive durations. And like "[rate limit was reset 87m02s ago]"
-// for the negative cases.
-func formatRateReset(d time.Duration) string {
-	isNegative := d < 0
-	if isNegative {
-		d *= -1
-	}
-	secondsTotal := int(0.5 + d.Seconds())
-	minutes := secondsTotal / 60
-	seconds := secondsTotal - minutes*60
-
-	var timeString string
-	if minutes > 0 {
-		timeString = fmt.Sprintf("%dm%02ds", minutes, seconds)
-	} else {
-		timeString = fmt.Sprintf("%ds", seconds)
-	}
-
-	if isNegative {
-		return fmt.Sprintf("[rate limit was reset %v ago]", timeString)
-	}
-	return fmt.Sprintf("[rate reset in %v]", timeString)
 }
 
 // Bool is a helper routine that allocates a new bool value

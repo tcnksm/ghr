@@ -5,10 +5,7 @@
 
 package github
 
-import (
-	"context"
-	"fmt"
-)
+import "fmt"
 
 // RepositoryListForksOptions specifies the optional parameters to the
 // RepositoriesService.ListForks method.
@@ -23,7 +20,7 @@ type RepositoryListForksOptions struct {
 // ListForks lists the forks of the specified repository.
 //
 // GitHub API docs: https://developer.github.com/v3/repos/forks/#list-forks
-func (s *RepositoriesService) ListForks(ctx context.Context, owner, repo string, opt *RepositoryListForksOptions) ([]*Repository, *Response, error) {
+func (s *RepositoriesService) ListForks(owner, repo string, opt *RepositoryListForksOptions) ([]*Repository, *Response, error) {
 	u := fmt.Sprintf("repos/%v/%v/forks", owner, repo)
 	u, err := addOptions(u, opt)
 	if err != nil {
@@ -35,11 +32,8 @@ func (s *RepositoriesService) ListForks(ctx context.Context, owner, repo string,
 		return nil, nil, err
 	}
 
-	// TODO: remove custom Accept header when topics API fully launches.
-	req.Header.Set("Accept", mediaTypeTopicsPreview)
-
 	var repos []*Repository
-	resp, err := s.client.Do(ctx, req, &repos)
+	resp, err := s.client.Do(req, &repos)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -63,7 +57,7 @@ type RepositoryCreateForkOptions struct {
 // in a successful request.
 //
 // GitHub API docs: https://developer.github.com/v3/repos/forks/#create-a-fork
-func (s *RepositoriesService) CreateFork(ctx context.Context, owner, repo string, opt *RepositoryCreateForkOptions) (*Repository, *Response, error) {
+func (s *RepositoriesService) CreateFork(owner, repo string, opt *RepositoryCreateForkOptions) (*Repository, *Response, error) {
 	u := fmt.Sprintf("repos/%v/%v/forks", owner, repo)
 	u, err := addOptions(u, opt)
 	if err != nil {
@@ -76,7 +70,7 @@ func (s *RepositoriesService) CreateFork(ctx context.Context, owner, repo string
 	}
 
 	fork := new(Repository)
-	resp, err := s.client.Do(ctx, req, fork)
+	resp, err := s.client.Do(req, fork)
 	if err != nil {
 		return nil, resp, err
 	}

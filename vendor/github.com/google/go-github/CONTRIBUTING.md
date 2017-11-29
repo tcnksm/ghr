@@ -42,11 +42,6 @@ again.
      are invaluable tools for seeing which parts of your code aren't being
      exercised by your tests.
 
-  1. Please run:
-     * `go generate github.com/google/go-github/...`
-     * `go test github.com/google/go-github/...`
-     * `go vet github.com/google/go-github/...`
-
   1. Do your best to have [well-formed commit messages][] for each change.
      This provides consistency throughout the project, and ensures that commit
      messages are able to be formatted properly by various git tools.
@@ -55,7 +50,7 @@ again.
 
 [forking]: https://help.github.com/articles/fork-a-repo
 [golint]: https://github.com/golang/lint
-[golint readme]: https://github.com/golang/lint/blob/master/README.md
+[golint readme]: https://github.com/golang/lint/blob/master/README
 [gocov]: https://github.com/axw/gocov
 [gocov-html]: https://github.com/matm/gocov-html
 [well-formed commit messages]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html

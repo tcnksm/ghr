@@ -6,7 +6,6 @@
 package github
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -24,7 +23,7 @@ func TestGitService_GetCommit(t *testing.T) {
 		fmt.Fprint(w, `{"sha":"s","message":"m","author":{"name":"n"}}`)
 	})
 
-	commit, _, err := client.Git.GetCommit(context.Background(), "o", "r", "s")
+	commit, _, err := client.Git.GetCommit("o", "r", "s")
 	if err != nil {
 		t.Errorf("Git.GetCommit returned error: %v", err)
 	}
@@ -36,7 +35,7 @@ func TestGitService_GetCommit(t *testing.T) {
 }
 
 func TestGitService_GetCommit_invalidOwner(t *testing.T) {
-	_, _, err := client.Git.GetCommit(context.Background(), "%", "%", "%")
+	_, _, err := client.Git.GetCommit("%", "%", "%")
 	testURLParseError(t, err)
 }
 
@@ -67,7 +66,7 @@ func TestGitService_CreateCommit(t *testing.T) {
 		fmt.Fprint(w, `{"sha":"s"}`)
 	})
 
-	commit, _, err := client.Git.CreateCommit(context.Background(), "o", "r", input)
+	commit, _, err := client.Git.CreateCommit("o", "r", input)
 	if err != nil {
 		t.Errorf("Git.CreateCommit returned error: %v", err)
 	}
@@ -79,6 +78,6 @@ func TestGitService_CreateCommit(t *testing.T) {
 }
 
 func TestGitService_CreateCommit_invalidOwner(t *testing.T) {
-	_, _, err := client.Git.CreateCommit(context.Background(), "%", "%", &Commit{})
+	_, _, err := client.Git.CreateCommit("%", "%", nil)
 	testURLParseError(t, err)
 }

@@ -6,7 +6,6 @@
 package github
 
 import (
-	"context"
 	"fmt"
 	"time"
 )
@@ -43,7 +42,7 @@ func (r RepoStatus) String() string {
 // reference. ref can be a SHA, a branch name, or a tag name.
 //
 // GitHub API docs: https://developer.github.com/v3/repos/statuses/#list-statuses-for-a-specific-ref
-func (s *RepositoriesService) ListStatuses(ctx context.Context, owner, repo, ref string, opt *ListOptions) ([]*RepoStatus, *Response, error) {
+func (s *RepositoriesService) ListStatuses(owner, repo, ref string, opt *ListOptions) ([]*RepoStatus, *Response, error) {
 	u := fmt.Sprintf("repos/%v/%v/commits/%v/statuses", owner, repo, ref)
 	u, err := addOptions(u, opt)
 	if err != nil {
@@ -56,7 +55,7 @@ func (s *RepositoriesService) ListStatuses(ctx context.Context, owner, repo, ref
 	}
 
 	var statuses []*RepoStatus
-	resp, err := s.client.Do(ctx, req, &statuses)
+	resp, err := s.client.Do(req, &statuses)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -68,7 +67,7 @@ func (s *RepositoriesService) ListStatuses(ctx context.Context, owner, repo, ref
 // reference. Ref can be a SHA, a branch name, or a tag name.
 //
 // GitHub API docs: https://developer.github.com/v3/repos/statuses/#create-a-status
-func (s *RepositoriesService) CreateStatus(ctx context.Context, owner, repo, ref string, status *RepoStatus) (*RepoStatus, *Response, error) {
+func (s *RepositoriesService) CreateStatus(owner, repo, ref string, status *RepoStatus) (*RepoStatus, *Response, error) {
 	u := fmt.Sprintf("repos/%v/%v/statuses/%v", owner, repo, ref)
 	req, err := s.client.NewRequest("POST", u, status)
 	if err != nil {
@@ -76,7 +75,7 @@ func (s *RepositoriesService) CreateStatus(ctx context.Context, owner, repo, ref
 	}
 
 	repoStatus := new(RepoStatus)
-	resp, err := s.client.Do(ctx, req, repoStatus)
+	resp, err := s.client.Do(req, repoStatus)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -107,7 +106,7 @@ func (s CombinedStatus) String() string {
 // reference. ref can be a SHA, a branch name, or a tag name.
 //
 // GitHub API docs: https://developer.github.com/v3/repos/statuses/#get-the-combined-status-for-a-specific-ref
-func (s *RepositoriesService) GetCombinedStatus(ctx context.Context, owner, repo, ref string, opt *ListOptions) (*CombinedStatus, *Response, error) {
+func (s *RepositoriesService) GetCombinedStatus(owner, repo, ref string, opt *ListOptions) (*CombinedStatus, *Response, error) {
 	u := fmt.Sprintf("repos/%v/%v/commits/%v/status", owner, repo, ref)
 	u, err := addOptions(u, opt)
 	if err != nil {
@@ -120,7 +119,7 @@ func (s *RepositoriesService) GetCombinedStatus(ctx context.Context, owner, repo
 	}
 
 	status := new(CombinedStatus)
-	resp, err := s.client.Do(ctx, req, status)
+	resp, err := s.client.Do(req, status)
 	if err != nil {
 		return nil, resp, err
 	}

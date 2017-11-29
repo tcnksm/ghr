@@ -8,10 +8,9 @@
   revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
-  branch = "master"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "a89ea1cdf79929726a9416663609269ada774da0"
+  revision = "82629e04595093a1cebd5e2aa8096ad87a3a81d1"
 
 [[projects]]
   branch = "master"
@@ -46,7 +45,8 @@
 [[projects]]
   name = "github.com/tcnksm/go-latest"
   packages = ["."]
-  revision = "79c2c6c7fa60f1bd7e1f204606aae7b9082f7304"
+  revision = "86500ab1363a867dafe16905b5b85293a0d838eb"
+  version = "0.1.1"
 
 [[projects]]
   branch = "master"
@@ -75,6 +75,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2f8ff5596adf98b4a85a7720ff2fd8574e179850cac1006586706e7947495b1c"
+  inputs-digest = "9d17c7f7a22ac0efc3b9bb3b46d6255e74a862bdb408624b888d18d6753c47c5"
   solver-name = "gps-cdcl"
   solver-version = 1

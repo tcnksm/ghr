@@ -5,10 +5,7 @@
 
 package github
 
-import (
-	"context"
-	"fmt"
-)
+import "fmt"
 
 // RepositoryInvitation represents an invitation to collaborate on a repo.
 type RepositoryInvitation struct {
@@ -28,8 +25,8 @@ type RepositoryInvitation struct {
 // ListInvitations lists all currently-open repository invitations.
 //
 // GitHub API docs: https://developer.github.com/v3/repos/invitations/#list-invitations-for-a-repository
-func (s *RepositoriesService) ListInvitations(ctx context.Context, owner, repo string, opt *ListOptions) ([]*RepositoryInvitation, *Response, error) {
-	u := fmt.Sprintf("repos/%v/%v/invitations", owner, repo)
+func (s *RepositoriesService) ListInvitations(repoID int, opt *ListOptions) ([]*RepositoryInvitation, *Response, error) {
+	u := fmt.Sprintf("repositories/%v/invitations", repoID)
 	u, err := addOptions(u, opt)
 	if err != nil {
 		return nil, nil, err
@@ -44,7 +41,7 @@ func (s *RepositoriesService) ListInvitations(ctx context.Context, owner, repo s
 	req.Header.Set("Accept", mediaTypeRepositoryInvitationsPreview)
 
 	invites := []*RepositoryInvitation{}
-	resp, err := s.client.Do(ctx, req, &invites)
+	resp, err := s.client.Do(req, &invites)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -55,8 +52,8 @@ func (s *RepositoriesService) ListInvitations(ctx context.Context, owner, repo s
 // DeleteInvitation deletes a repository invitation.
 //
 // GitHub API docs: https://developer.github.com/v3/repos/invitations/#delete-a-repository-invitation
-func (s *RepositoriesService) DeleteInvitation(ctx context.Context, owner, repo string, invitationID int) (*Response, error) {
-	u := fmt.Sprintf("repos/%v/%v/invitations/%v", owner, repo, invitationID)
+func (s *RepositoriesService) DeleteInvitation(repoID, invitationID int) (*Response, error) {
+	u := fmt.Sprintf("repositories/%v/invitations/%v", repoID, invitationID)
 	req, err := s.client.NewRequest("DELETE", u, nil)
 	if err != nil {
 		return nil, err
@@ -65,7 +62,7 @@ func (s *RepositoriesService) DeleteInvitation(ctx context.Context, owner, repo 
 	// TODO: remove custom Accept header when this API fully launches.
 	req.Header.Set("Accept", mediaTypeRepositoryInvitationsPreview)
 
-	return s.client.Do(ctx, req, nil)
+	return s.client.Do(req, nil)
 }
 
 // UpdateInvitation updates the permissions associated with a repository
@@ -75,11 +72,11 @@ func (s *RepositoriesService) DeleteInvitation(ctx context.Context, owner, repo 
 // on the repository. Possible values are: "read", "write", "admin".
 //
 // GitHub API docs: https://developer.github.com/v3/repos/invitations/#update-a-repository-invitation
-func (s *RepositoriesService) UpdateInvitation(ctx context.Context, owner, repo string, invitationID int, permissions string) (*RepositoryInvitation, *Response, error) {
+func (s *RepositoriesService) UpdateInvitation(repoID, invitationID int, permissions string) (*RepositoryInvitation, *Response, error) {
 	opts := &struct {
 		Permissions string `json:"permissions"`
 	}{Permissions: permissions}
-	u := fmt.Sprintf("repos/%v/%v/invitations/%v", owner, repo, invitationID)
+	u := fmt.Sprintf("repositories/%v/invitations/%v", repoID, invitationID)
 	req, err := s.client.NewRequest("PATCH", u, opts)
 	if err != nil {
 		return nil, nil, err
@@ -89,10 +86,6 @@ func (s *RepositoriesService) UpdateInvitation(ctx context.Context, owner, repo 
 	req.Header.Set("Accept", mediaTypeRepositoryInvitationsPreview)
 
 	invite := &RepositoryInvitation{}
-	resp, err := s.client.Do(ctx, req, invite)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return invite, resp, nil
+	resp, err := s.client.Do(req, invite)
+	return invite, resp, err
 }

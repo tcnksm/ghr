@@ -7,7 +7,6 @@ package github
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"net/url"
 )
@@ -40,7 +39,7 @@ type markdownRequest struct {
 // Markdown renders an arbitrary Markdown document.
 //
 // GitHub API docs: https://developer.github.com/v3/markdown/
-func (c *Client) Markdown(ctx context.Context, text string, opt *MarkdownOptions) (string, *Response, error) {
+func (c *Client) Markdown(text string, opt *MarkdownOptions) (string, *Response, error) {
 	request := &markdownRequest{Text: String(text)}
 	if opt != nil {
 		if opt.Mode != "" {
@@ -57,7 +56,7 @@ func (c *Client) Markdown(ctx context.Context, text string, opt *MarkdownOptions
 	}
 
 	buf := new(bytes.Buffer)
-	resp, err := c.Do(ctx, req, buf)
+	resp, err := c.Do(req, buf)
 	if err != nil {
 		return "", resp, err
 	}
@@ -68,74 +67,19 @@ func (c *Client) Markdown(ctx context.Context, text string, opt *MarkdownOptions
 // ListEmojis returns the emojis available to use on GitHub.
 //
 // GitHub API docs: https://developer.github.com/v3/emojis/
-func (c *Client) ListEmojis(ctx context.Context) (map[string]string, *Response, error) {
+func (c *Client) ListEmojis() (map[string]string, *Response, error) {
 	req, err := c.NewRequest("GET", "emojis", nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var emoji map[string]string
-	resp, err := c.Do(ctx, req, &emoji)
+	resp, err := c.Do(req, &emoji)
 	if err != nil {
 		return nil, resp, err
 	}
 
 	return emoji, resp, nil
-}
-
-// CodeOfConduct represents a code of conduct.
-type CodeOfConduct struct {
-	Name *string `json:"name,omitempty"`
-	Key  *string `json:"key,omitempty"`
-	URL  *string `json:"url,omitempty"`
-	Body *string `json:"body,omitempty"`
-}
-
-func (c *CodeOfConduct) String() string {
-	return Stringify(c)
-}
-
-// ListCodesOfConduct returns all codes of conduct.
-//
-// GitHub API docs: https://developer.github.com/v3/codes_of_conduct/#list-all-codes-of-conduct
-func (c *Client) ListCodesOfConduct(ctx context.Context) ([]*CodeOfConduct, *Response, error) {
-	req, err := c.NewRequest("GET", "codes_of_conduct", nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	// TODO: remove custom Accept header when this API fully launches.
-	req.Header.Set("Accept", mediaTypeCodesOfConductPreview)
-
-	var cs []*CodeOfConduct
-	resp, err := c.Do(ctx, req, &cs)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return cs, resp, nil
-}
-
-// GetCodeOfConduct returns an individual code of conduct.
-//
-// https://developer.github.com/v3/codes_of_conduct/#get-an-individual-code-of-conduct
-func (c *Client) GetCodeOfConduct(ctx context.Context, key string) (*CodeOfConduct, *Response, error) {
-	u := fmt.Sprintf("codes_of_conduct/%s", key)
-	req, err := c.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	// TODO: remove custom Accept header when this API fully launches.
-	req.Header.Set("Accept", mediaTypeCodesOfConductPreview)
-
-	coc := new(CodeOfConduct)
-	resp, err := c.Do(ctx, req, coc)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return coc, resp, nil
 }
 
 // APIMeta represents metadata about the GitHub API.
@@ -165,14 +109,14 @@ type APIMeta struct {
 // endpoint provides information about that installation.
 //
 // GitHub API docs: https://developer.github.com/v3/meta/
-func (c *Client) APIMeta(ctx context.Context) (*APIMeta, *Response, error) {
+func (c *Client) APIMeta() (*APIMeta, *Response, error) {
 	req, err := c.NewRequest("GET", "meta", nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	meta := new(APIMeta)
-	resp, err := c.Do(ctx, req, meta)
+	resp, err := c.Do(req, meta)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -182,7 +126,7 @@ func (c *Client) APIMeta(ctx context.Context) (*APIMeta, *Response, error) {
 
 // Octocat returns an ASCII art octocat with the specified message in a speech
 // bubble. If message is empty, a random zen phrase is used.
-func (c *Client) Octocat(ctx context.Context, message string) (string, *Response, error) {
+func (c *Client) Octocat(message string) (string, *Response, error) {
 	u := "octocat"
 	if message != "" {
 		u = fmt.Sprintf("%s?s=%s", u, url.QueryEscape(message))
@@ -194,7 +138,7 @@ func (c *Client) Octocat(ctx context.Context, message string) (string, *Response
 	}
 
 	buf := new(bytes.Buffer)
-	resp, err := c.Do(ctx, req, buf)
+	resp, err := c.Do(req, buf)
 	if err != nil {
 		return "", resp, err
 	}
@@ -205,14 +149,14 @@ func (c *Client) Octocat(ctx context.Context, message string) (string, *Response
 // Zen returns a random line from The Zen of GitHub.
 //
 // see also: http://warpspire.com/posts/taste/
-func (c *Client) Zen(ctx context.Context) (string, *Response, error) {
+func (c *Client) Zen() (string, *Response, error) {
 	req, err := c.NewRequest("GET", "zen", nil)
 	if err != nil {
 		return "", nil, err
 	}
 
 	buf := new(bytes.Buffer)
-	resp, err := c.Do(ctx, req, buf)
+	resp, err := c.Do(req, buf)
 	if err != nil {
 		return "", resp, err
 	}
@@ -236,7 +180,7 @@ func (s *ServiceHook) String() string {
 // ListServiceHooks lists all of the available service hooks.
 //
 // GitHub API docs: https://developer.github.com/webhooks/#services
-func (c *Client) ListServiceHooks(ctx context.Context) ([]*ServiceHook, *Response, error) {
+func (c *Client) ListServiceHooks() ([]*ServiceHook, *Response, error) {
 	u := "hooks"
 	req, err := c.NewRequest("GET", u, nil)
 	if err != nil {
@@ -244,7 +188,7 @@ func (c *Client) ListServiceHooks(ctx context.Context) ([]*ServiceHook, *Respons
 	}
 
 	var hooks []*ServiceHook
-	resp, err := c.Do(ctx, req, &hooks)
+	resp, err := c.Do(req, &hooks)
 	if err != nil {
 		return nil, resp, err
 	}

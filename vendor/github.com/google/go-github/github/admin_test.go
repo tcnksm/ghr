@@ -6,7 +6,6 @@
 package github
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -33,7 +32,7 @@ func TestAdminService_UpdateUserLDAPMapping(t *testing.T) {
 		fmt.Fprint(w, `{"id":1,"ldap_dn":"uid=asdf,ou=users,dc=github,dc=com"}`)
 	})
 
-	mapping, _, err := client.Admin.UpdateUserLDAPMapping(context.Background(), "u", input)
+	mapping, _, err := client.Admin.UpdateUserLDAPMapping("u", input)
 	if err != nil {
 		t.Errorf("Admin.UpdateUserLDAPMapping returned error: %v", err)
 	}
@@ -66,7 +65,7 @@ func TestAdminService_UpdateTeamLDAPMapping(t *testing.T) {
 		fmt.Fprint(w, `{"id":1,"ldap_dn":"cn=Enterprise Ops,ou=teams,dc=github,dc=com"}`)
 	})
 
-	mapping, _, err := client.Admin.UpdateTeamLDAPMapping(context.Background(), 1, input)
+	mapping, _, err := client.Admin.UpdateTeamLDAPMapping(1, input)
 	if err != nil {
 		t.Errorf("Admin.UpdateTeamLDAPMapping returned error: %v", err)
 	}

@@ -5,10 +5,9 @@
 
 // +build integration
 
-package integration
+package tests
 
 import (
-	"context"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -32,7 +31,7 @@ func init() {
 		print("!!! No OAuth token. Some tests won't run. !!!\n\n")
 		client = github.NewClient(nil)
 	} else {
-		tc := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(
+		tc := oauth2.NewClient(oauth2.NoContext, oauth2.StaticTokenSource(
 			&oauth2.Token{AccessToken: token},
 		))
 		client = github.NewClient(tc)
@@ -63,7 +62,7 @@ func createRandomTestRepository(owner string, autoinit bool) (*github.Repository
 	var repoName string
 	for {
 		repoName = fmt.Sprintf("test-%d", rand.Int())
-		_, resp, err := client.Repositories.Get(context.Background(), owner, repoName)
+		_, resp, err := client.Repositories.Get(owner, repoName)
 		if err != nil {
 			if resp.StatusCode == http.StatusNotFound {
 				// found a non-existent repo, perfect
@@ -75,7 +74,7 @@ func createRandomTestRepository(owner string, autoinit bool) (*github.Repository
 	}
 
 	// create the repository
-	repo, _, err := client.Repositories.Create(context.Background(), "", &github.Repository{Name: github.String(repoName), AutoInit: github.Bool(autoinit)})
+	repo, _, err := client.Repositories.Create("", &github.Repository{Name: github.String(repoName), AutoInit: github.Bool(autoinit)})
 	if err != nil {
 		return nil, err
 	}

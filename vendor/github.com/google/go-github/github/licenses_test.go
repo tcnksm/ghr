@@ -6,7 +6,6 @@
 package github
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -23,7 +22,7 @@ func TestLicensesService_List(t *testing.T) {
 		fmt.Fprint(w, `[{"key":"mit","name":"MIT","spdx_id":"MIT","url":"https://api.github.com/licenses/mit","featured":true}]`)
 	})
 
-	licenses, _, err := client.Licenses.List(context.Background())
+	licenses, _, err := client.Licenses.List()
 	if err != nil {
 		t.Errorf("Licenses.List returned error: %v", err)
 	}
@@ -50,7 +49,7 @@ func TestLicensesService_Get(t *testing.T) {
 		fmt.Fprint(w, `{"key":"mit","name":"MIT"}`)
 	})
 
-	license, _, err := client.Licenses.Get(context.Background(), "mit")
+	license, _, err := client.Licenses.Get("mit")
 	if err != nil {
 		t.Errorf("Licenses.Get returned error: %v", err)
 	}
@@ -62,6 +61,6 @@ func TestLicensesService_Get(t *testing.T) {
 }
 
 func TestLicensesService_Get_invalidTemplate(t *testing.T) {
-	_, _, err := client.Licenses.Get(context.Background(), "%")
+	_, _, err := client.Licenses.Get("%")
 	testURLParseError(t, err)
 }

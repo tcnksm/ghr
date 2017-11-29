@@ -6,7 +6,6 @@
 package github
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -25,7 +24,7 @@ func TestRepositoriesService_ListKeys(t *testing.T) {
 	})
 
 	opt := &ListOptions{Page: 2}
-	keys, _, err := client.Repositories.ListKeys(context.Background(), "o", "r", opt)
+	keys, _, err := client.Repositories.ListKeys("o", "r", opt)
 	if err != nil {
 		t.Errorf("Repositories.ListKeys returned error: %v", err)
 	}
@@ -37,7 +36,7 @@ func TestRepositoriesService_ListKeys(t *testing.T) {
 }
 
 func TestRepositoriesService_ListKeys_invalidOwner(t *testing.T) {
-	_, _, err := client.Repositories.ListKeys(context.Background(), "%", "%", nil)
+	_, _, err := client.Repositories.ListKeys("%", "%", nil)
 	testURLParseError(t, err)
 }
 
@@ -50,7 +49,7 @@ func TestRepositoriesService_GetKey(t *testing.T) {
 		fmt.Fprint(w, `{"id":1}`)
 	})
 
-	key, _, err := client.Repositories.GetKey(context.Background(), "o", "r", 1)
+	key, _, err := client.Repositories.GetKey("o", "r", 1)
 	if err != nil {
 		t.Errorf("Repositories.GetKey returned error: %v", err)
 	}
@@ -62,7 +61,7 @@ func TestRepositoriesService_GetKey(t *testing.T) {
 }
 
 func TestRepositoriesService_GetKey_invalidOwner(t *testing.T) {
-	_, _, err := client.Repositories.GetKey(context.Background(), "%", "%", 1)
+	_, _, err := client.Repositories.GetKey("%", "%", 1)
 	testURLParseError(t, err)
 }
 
@@ -84,7 +83,7 @@ func TestRepositoriesService_CreateKey(t *testing.T) {
 		fmt.Fprint(w, `{"id":1}`)
 	})
 
-	key, _, err := client.Repositories.CreateKey(context.Background(), "o", "r", input)
+	key, _, err := client.Repositories.CreateKey("o", "r", input)
 	if err != nil {
 		t.Errorf("Repositories.GetKey returned error: %v", err)
 	}
@@ -96,7 +95,7 @@ func TestRepositoriesService_CreateKey(t *testing.T) {
 }
 
 func TestRepositoriesService_CreateKey_invalidOwner(t *testing.T) {
-	_, _, err := client.Repositories.CreateKey(context.Background(), "%", "%", nil)
+	_, _, err := client.Repositories.CreateKey("%", "%", nil)
 	testURLParseError(t, err)
 }
 
@@ -118,7 +117,7 @@ func TestRepositoriesService_EditKey(t *testing.T) {
 		fmt.Fprint(w, `{"id":1}`)
 	})
 
-	key, _, err := client.Repositories.EditKey(context.Background(), "o", "r", 1, input)
+	key, _, err := client.Repositories.EditKey("o", "r", 1, input)
 	if err != nil {
 		t.Errorf("Repositories.EditKey returned error: %v", err)
 	}
@@ -130,7 +129,7 @@ func TestRepositoriesService_EditKey(t *testing.T) {
 }
 
 func TestRepositoriesService_EditKey_invalidOwner(t *testing.T) {
-	_, _, err := client.Repositories.EditKey(context.Background(), "%", "%", 1, nil)
+	_, _, err := client.Repositories.EditKey("%", "%", 1, nil)
 	testURLParseError(t, err)
 }
 
@@ -142,13 +141,13 @@ func TestRepositoriesService_DeleteKey(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	_, err := client.Repositories.DeleteKey(context.Background(), "o", "r", 1)
+	_, err := client.Repositories.DeleteKey("o", "r", 1)
 	if err != nil {
 		t.Errorf("Repositories.DeleteKey returned error: %v", err)
 	}
 }
 
 func TestRepositoriesService_DeleteKey_invalidOwner(t *testing.T) {
-	_, err := client.Repositories.DeleteKey(context.Background(), "%", "%", 1)
+	_, err := client.Repositories.DeleteKey("%", "%", 1)
 	testURLParseError(t, err)
 }

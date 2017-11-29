@@ -6,7 +6,6 @@
 package github_test
 
 import (
-	"context"
 	"fmt"
 	"log"
 
@@ -19,7 +18,7 @@ func ExampleClient_Markdown() {
 	input := "# heading #\n\nLink to issue #1"
 	opt := &github.MarkdownOptions{Mode: "gfm", Context: "google/go-github"}
 
-	output, _, err := client.Markdown(context.Background(), input, opt)
+	output, _, err := client.Markdown(input, opt)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -30,7 +29,7 @@ func ExampleClient_Markdown() {
 func ExampleRepositoriesService_GetReadme() {
 	client := github.NewClient(nil)
 
-	readme, _, err := client.Repositories.GetReadme(context.Background(), "google", "go-github", nil)
+	readme, _, err := client.Repositories.GetReadme("google", "go-github", nil)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -51,7 +50,7 @@ func ExampleRepositoriesService_List() {
 	user := "willnorris"
 	opt := &github.RepositoryListOptions{Type: "owner", Sort: "updated", Direction: "desc"}
 
-	repos, _, err := client.Repositories.List(context.Background(), user, opt)
+	repos, _, err := client.Repositories.List(user, opt)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -63,7 +62,7 @@ func ExampleUsersService_ListAll() {
 	client := github.NewClient(nil)
 	opts := &github.UserListOptions{}
 	for {
-		users, _, err := client.Users.ListAll(context.Background(), opts)
+		users, _, err := client.Users.ListAll(opts)
 		if err != nil {
 			log.Fatalf("error listing users: %v", err)
 		}

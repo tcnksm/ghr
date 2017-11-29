@@ -6,7 +6,6 @@
 package github
 
 import (
-	"context"
 	"fmt"
 
 	qs "github.com/google/go-querystring/query"
@@ -14,14 +13,6 @@ import (
 
 // SearchService provides access to the search related functions
 // in the GitHub API.
-//
-// Each method takes a query string defining the search keywords and any search qualifiers.
-// For example, when searching issues, the query "gopher is:issue language:go" will search
-// for issues containing the word "gopher" in Go repositories. The method call
-//   opts :=  &github.SearchOptions{Sort: "created", Order: "asc"}
-//   cl.Search.Issues(ctx, "gopher is:issue language:go", opts)
-// will search for such issues, sorting by creation date in ascending order
-// (i.e., oldest first).
 //
 // GitHub API docs: https://developer.github.com/v3/search/
 type SearchService service
@@ -58,9 +49,9 @@ type RepositoriesSearchResult struct {
 // Repositories searches repositories via various criteria.
 //
 // GitHub API docs: https://developer.github.com/v3/search/#search-repositories
-func (s *SearchService) Repositories(ctx context.Context, query string, opt *SearchOptions) (*RepositoriesSearchResult, *Response, error) {
+func (s *SearchService) Repositories(query string, opt *SearchOptions) (*RepositoriesSearchResult, *Response, error) {
 	result := new(RepositoriesSearchResult)
-	resp, err := s.search(ctx, "repositories", query, opt, result)
+	resp, err := s.search("repositories", query, opt, result)
 	return result, resp, err
 }
 
@@ -73,25 +64,25 @@ type CommitsSearchResult struct {
 
 // CommitResult represents a commit object as returned in commit search endpoint response.
 type CommitResult struct {
-	SHA         *string   `json:"sha,omitempty"`
-	Commit      *Commit   `json:"commit,omitempty"`
-	Author      *User     `json:"author,omitempty"`
-	Committer   *User     `json:"committer,omitempty"`
-	Parents     []*Commit `json:"parents,omitempty"`
-	HTMLURL     *string   `json:"html_url,omitempty"`
-	URL         *string   `json:"url,omitempty"`
-	CommentsURL *string   `json:"comments_url,omitempty"`
-
-	Repository *Repository `json:"repository,omitempty"`
-	Score      *float64    `json:"score,omitempty"`
+	Hash           *string     `json:"hash,omitempty"`
+	Message        *string     `json:"message,omitempty"`
+	AuthorID       *int        `json:"author_id,omitempty"`
+	AuthorName     *string     `json:"author_name,omitempty"`
+	AuthorEmail    *string     `json:"author_email,omitempty"`
+	AuthorDate     *Timestamp  `json:"author_date,omitempty"`
+	CommitterID    *int        `json:"committer_id,omitempty"`
+	CommitterName  *string     `json:"committer_name,omitempty"`
+	CommitterEmail *string     `json:"committer_email,omitempty"`
+	CommitterDate  *Timestamp  `json:"committer_date,omitempty"`
+	Repository     *Repository `json:"repository,omitempty"`
 }
 
 // Commits searches commits via various criteria.
 //
-// GitHub API docs: https://developer.github.com/v3/search/#search-commits
-func (s *SearchService) Commits(ctx context.Context, query string, opt *SearchOptions) (*CommitsSearchResult, *Response, error) {
+// GitHub API Docs: https://developer.github.com/v3/search/#search-commits
+func (s *SearchService) Commits(query string, opt *SearchOptions) (*CommitsSearchResult, *Response, error) {
 	result := new(CommitsSearchResult)
-	resp, err := s.search(ctx, "commits", query, opt, result)
+	resp, err := s.search("commits", query, opt, result)
 	return result, resp, err
 }
 
@@ -105,9 +96,9 @@ type IssuesSearchResult struct {
 // Issues searches issues via various criteria.
 //
 // GitHub API docs: https://developer.github.com/v3/search/#search-issues
-func (s *SearchService) Issues(ctx context.Context, query string, opt *SearchOptions) (*IssuesSearchResult, *Response, error) {
+func (s *SearchService) Issues(query string, opt *SearchOptions) (*IssuesSearchResult, *Response, error) {
 	result := new(IssuesSearchResult)
-	resp, err := s.search(ctx, "issues", query, opt, result)
+	resp, err := s.search("issues", query, opt, result)
 	return result, resp, err
 }
 
@@ -121,9 +112,9 @@ type UsersSearchResult struct {
 // Users searches users via various criteria.
 //
 // GitHub API docs: https://developer.github.com/v3/search/#search-users
-func (s *SearchService) Users(ctx context.Context, query string, opt *SearchOptions) (*UsersSearchResult, *Response, error) {
+func (s *SearchService) Users(query string, opt *SearchOptions) (*UsersSearchResult, *Response, error) {
 	result := new(UsersSearchResult)
-	resp, err := s.search(ctx, "users", query, opt, result)
+	resp, err := s.search("users", query, opt, result)
 	return result, resp, err
 }
 
@@ -170,20 +161,20 @@ func (c CodeResult) String() string {
 // Code searches code via various criteria.
 //
 // GitHub API docs: https://developer.github.com/v3/search/#search-code
-func (s *SearchService) Code(ctx context.Context, query string, opt *SearchOptions) (*CodeSearchResult, *Response, error) {
+func (s *SearchService) Code(query string, opt *SearchOptions) (*CodeSearchResult, *Response, error) {
 	result := new(CodeSearchResult)
-	resp, err := s.search(ctx, "code", query, opt, result)
+	resp, err := s.search("code", query, opt, result)
 	return result, resp, err
 }
 
 // Helper function that executes search queries against different
 // GitHub search types (repositories, commits, code, issues, users)
-func (s *SearchService) search(ctx context.Context, searchType string, query string, opt *SearchOptions, result interface{}) (*Response, error) {
+func (s *SearchService) search(searchType string, query string, opt *SearchOptions, result interface{}) (*Response, error) {
 	params, err := qs.Values(opt)
 	if err != nil {
 		return nil, err
 	}
-	params.Set("q", query)
+	params.Add("q", query)
 	u := fmt.Sprintf("search/%s?%s", searchType, params.Encode())
 
 	req, err := s.client.NewRequest("GET", u, nil)
@@ -196,15 +187,11 @@ func (s *SearchService) search(ctx context.Context, searchType string, query str
 		// Accept header for search commits preview endpoint
 		// TODO: remove custom Accept header when this API fully launches.
 		req.Header.Set("Accept", mediaTypeCommitSearchPreview)
-	case searchType == "repositories":
-		// Accept header for search repositories based on topics preview endpoint
-		// TODO: remove custom Accept header when this API fully launches.
-		req.Header.Set("Accept", mediaTypeTopicsPreview)
 	case opt != nil && opt.TextMatch:
 		// Accept header defaults to "application/vnd.github.v3+json"
 		// We change it here to fetch back text-match metadata
 		req.Header.Set("Accept", "application/vnd.github.v3.text-match+json")
 	}
 
-	return s.client.Do(ctx, req, result)
+	return s.client.Do(req, result)
 }

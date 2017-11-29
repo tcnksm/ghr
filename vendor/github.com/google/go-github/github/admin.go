@@ -5,10 +5,7 @@
 
 package github
 
-import (
-	"context"
-	"fmt"
-)
+import "fmt"
 
 // AdminService handles communication with the admin related methods of the
 // GitHub API. These API routes are normally only accessible for GitHub
@@ -65,7 +62,7 @@ func (m UserLDAPMapping) String() string {
 // UpdateUserLDAPMapping updates the mapping between a GitHub user and an LDAP user.
 //
 // GitHub API docs: https://developer.github.com/v3/enterprise/ldap/#update-ldap-mapping-for-a-user
-func (s *AdminService) UpdateUserLDAPMapping(ctx context.Context, user string, mapping *UserLDAPMapping) (*UserLDAPMapping, *Response, error) {
+func (s *AdminService) UpdateUserLDAPMapping(user string, mapping *UserLDAPMapping) (*UserLDAPMapping, *Response, error) {
 	u := fmt.Sprintf("admin/ldap/users/%v/mapping", user)
 	req, err := s.client.NewRequest("PATCH", u, mapping)
 	if err != nil {
@@ -73,7 +70,7 @@ func (s *AdminService) UpdateUserLDAPMapping(ctx context.Context, user string, m
 	}
 
 	m := new(UserLDAPMapping)
-	resp, err := s.client.Do(ctx, req, m)
+	resp, err := s.client.Do(req, m)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -84,7 +81,7 @@ func (s *AdminService) UpdateUserLDAPMapping(ctx context.Context, user string, m
 // UpdateTeamLDAPMapping updates the mapping between a GitHub team and an LDAP group.
 //
 // GitHub API docs: https://developer.github.com/v3/enterprise/ldap/#update-ldap-mapping-for-a-team
-func (s *AdminService) UpdateTeamLDAPMapping(ctx context.Context, team int, mapping *TeamLDAPMapping) (*TeamLDAPMapping, *Response, error) {
+func (s *AdminService) UpdateTeamLDAPMapping(team int, mapping *TeamLDAPMapping) (*TeamLDAPMapping, *Response, error) {
 	u := fmt.Sprintf("admin/ldap/teams/%v/mapping", team)
 	req, err := s.client.NewRequest("PATCH", u, mapping)
 	if err != nil {
@@ -92,7 +89,7 @@ func (s *AdminService) UpdateTeamLDAPMapping(ctx context.Context, team int, mapp
 	}
 
 	m := new(TeamLDAPMapping)
-	resp, err := s.client.Do(ctx, req, m)
+	resp, err := s.client.Do(req, m)
 	if err != nil {
 		return nil, resp, err
 	}

@@ -6,7 +6,6 @@
 package github
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -25,7 +24,7 @@ func TestIssuesService_ListLabels(t *testing.T) {
 	})
 
 	opt := &ListOptions{Page: 2}
-	labels, _, err := client.Issues.ListLabels(context.Background(), "o", "r", opt)
+	labels, _, err := client.Issues.ListLabels("o", "r", opt)
 	if err != nil {
 		t.Errorf("Issues.ListLabels returned error: %v", err)
 	}
@@ -37,7 +36,7 @@ func TestIssuesService_ListLabels(t *testing.T) {
 }
 
 func TestIssuesService_ListLabels_invalidOwner(t *testing.T) {
-	_, _, err := client.Issues.ListLabels(context.Background(), "%", "%", nil)
+	_, _, err := client.Issues.ListLabels("%", "%", nil)
 	testURLParseError(t, err)
 }
 
@@ -50,7 +49,7 @@ func TestIssuesService_GetLabel(t *testing.T) {
 		fmt.Fprint(w, `{"url":"u", "name": "n", "color": "c"}`)
 	})
 
-	label, _, err := client.Issues.GetLabel(context.Background(), "o", "r", "n")
+	label, _, err := client.Issues.GetLabel("o", "r", "n")
 	if err != nil {
 		t.Errorf("Issues.GetLabel returned error: %v", err)
 	}
@@ -62,7 +61,7 @@ func TestIssuesService_GetLabel(t *testing.T) {
 }
 
 func TestIssuesService_GetLabel_invalidOwner(t *testing.T) {
-	_, _, err := client.Issues.GetLabel(context.Background(), "%", "%", "%")
+	_, _, err := client.Issues.GetLabel("%", "%", "%")
 	testURLParseError(t, err)
 }
 
@@ -84,7 +83,7 @@ func TestIssuesService_CreateLabel(t *testing.T) {
 		fmt.Fprint(w, `{"url":"u"}`)
 	})
 
-	label, _, err := client.Issues.CreateLabel(context.Background(), "o", "r", input)
+	label, _, err := client.Issues.CreateLabel("o", "r", input)
 	if err != nil {
 		t.Errorf("Issues.CreateLabel returned error: %v", err)
 	}
@@ -96,7 +95,7 @@ func TestIssuesService_CreateLabel(t *testing.T) {
 }
 
 func TestIssuesService_CreateLabel_invalidOwner(t *testing.T) {
-	_, _, err := client.Issues.CreateLabel(context.Background(), "%", "%", nil)
+	_, _, err := client.Issues.CreateLabel("%", "%", nil)
 	testURLParseError(t, err)
 }
 
@@ -118,7 +117,7 @@ func TestIssuesService_EditLabel(t *testing.T) {
 		fmt.Fprint(w, `{"url":"u"}`)
 	})
 
-	label, _, err := client.Issues.EditLabel(context.Background(), "o", "r", "n", input)
+	label, _, err := client.Issues.EditLabel("o", "r", "n", input)
 	if err != nil {
 		t.Errorf("Issues.EditLabel returned error: %v", err)
 	}
@@ -130,7 +129,7 @@ func TestIssuesService_EditLabel(t *testing.T) {
 }
 
 func TestIssuesService_EditLabel_invalidOwner(t *testing.T) {
-	_, _, err := client.Issues.EditLabel(context.Background(), "%", "%", "%", nil)
+	_, _, err := client.Issues.EditLabel("%", "%", "%", nil)
 	testURLParseError(t, err)
 }
 
@@ -142,14 +141,14 @@ func TestIssuesService_DeleteLabel(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	_, err := client.Issues.DeleteLabel(context.Background(), "o", "r", "n")
+	_, err := client.Issues.DeleteLabel("o", "r", "n")
 	if err != nil {
 		t.Errorf("Issues.DeleteLabel returned error: %v", err)
 	}
 }
 
 func TestIssuesService_DeleteLabel_invalidOwner(t *testing.T) {
-	_, err := client.Issues.DeleteLabel(context.Background(), "%", "%", "%")
+	_, err := client.Issues.DeleteLabel("%", "%", "%")
 	testURLParseError(t, err)
 }
 
@@ -160,26 +159,23 @@ func TestIssuesService_ListLabelsByIssue(t *testing.T) {
 	mux.HandleFunc("/repos/o/r/issues/1/labels", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		testFormValues(t, r, values{"page": "2"})
-		fmt.Fprint(w, `[{"name":"a","id":1},{"name":"b","id":2}]`)
+		fmt.Fprint(w, `[{"name": "a"},{"name": "b"}]`)
 	})
 
 	opt := &ListOptions{Page: 2}
-	labels, _, err := client.Issues.ListLabelsByIssue(context.Background(), "o", "r", 1, opt)
+	labels, _, err := client.Issues.ListLabelsByIssue("o", "r", 1, opt)
 	if err != nil {
 		t.Errorf("Issues.ListLabelsByIssue returned error: %v", err)
 	}
 
-	want := []*Label{
-		{Name: String("a"), ID: Int(1)},
-		{Name: String("b"), ID: Int(2)},
-	}
+	want := []*Label{{Name: String("a")}, {Name: String("b")}}
 	if !reflect.DeepEqual(labels, want) {
 		t.Errorf("Issues.ListLabelsByIssue returned %+v, want %+v", labels, want)
 	}
 }
 
 func TestIssuesService_ListLabelsByIssue_invalidOwner(t *testing.T) {
-	_, _, err := client.Issues.ListLabelsByIssue(context.Background(), "%", "%", 1, nil)
+	_, _, err := client.Issues.ListLabelsByIssue("%", "%", 1, nil)
 	testURLParseError(t, err)
 }
 
@@ -201,7 +197,7 @@ func TestIssuesService_AddLabelsToIssue(t *testing.T) {
 		fmt.Fprint(w, `[{"url":"u"}]`)
 	})
 
-	labels, _, err := client.Issues.AddLabelsToIssue(context.Background(), "o", "r", 1, input)
+	labels, _, err := client.Issues.AddLabelsToIssue("o", "r", 1, input)
 	if err != nil {
 		t.Errorf("Issues.AddLabelsToIssue returned error: %v", err)
 	}
@@ -213,7 +209,7 @@ func TestIssuesService_AddLabelsToIssue(t *testing.T) {
 }
 
 func TestIssuesService_AddLabelsToIssue_invalidOwner(t *testing.T) {
-	_, _, err := client.Issues.AddLabelsToIssue(context.Background(), "%", "%", 1, nil)
+	_, _, err := client.Issues.AddLabelsToIssue("%", "%", 1, nil)
 	testURLParseError(t, err)
 }
 
@@ -225,14 +221,14 @@ func TestIssuesService_RemoveLabelForIssue(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	_, err := client.Issues.RemoveLabelForIssue(context.Background(), "o", "r", 1, "l")
+	_, err := client.Issues.RemoveLabelForIssue("o", "r", 1, "l")
 	if err != nil {
 		t.Errorf("Issues.RemoveLabelForIssue returned error: %v", err)
 	}
 }
 
 func TestIssuesService_RemoveLabelForIssue_invalidOwner(t *testing.T) {
-	_, err := client.Issues.RemoveLabelForIssue(context.Background(), "%", "%", 1, "%")
+	_, err := client.Issues.RemoveLabelForIssue("%", "%", 1, "%")
 	testURLParseError(t, err)
 }
 
@@ -254,7 +250,7 @@ func TestIssuesService_ReplaceLabelsForIssue(t *testing.T) {
 		fmt.Fprint(w, `[{"url":"u"}]`)
 	})
 
-	labels, _, err := client.Issues.ReplaceLabelsForIssue(context.Background(), "o", "r", 1, input)
+	labels, _, err := client.Issues.ReplaceLabelsForIssue("o", "r", 1, input)
 	if err != nil {
 		t.Errorf("Issues.ReplaceLabelsForIssue returned error: %v", err)
 	}
@@ -266,7 +262,7 @@ func TestIssuesService_ReplaceLabelsForIssue(t *testing.T) {
 }
 
 func TestIssuesService_ReplaceLabelsForIssue_invalidOwner(t *testing.T) {
-	_, _, err := client.Issues.ReplaceLabelsForIssue(context.Background(), "%", "%", 1, nil)
+	_, _, err := client.Issues.ReplaceLabelsForIssue("%", "%", 1, nil)
 	testURLParseError(t, err)
 }
 
@@ -278,14 +274,14 @@ func TestIssuesService_RemoveLabelsForIssue(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	_, err := client.Issues.RemoveLabelsForIssue(context.Background(), "o", "r", 1)
+	_, err := client.Issues.RemoveLabelsForIssue("o", "r", 1)
 	if err != nil {
 		t.Errorf("Issues.RemoveLabelsForIssue returned error: %v", err)
 	}
 }
 
 func TestIssuesService_RemoveLabelsForIssue_invalidOwner(t *testing.T) {
-	_, err := client.Issues.RemoveLabelsForIssue(context.Background(), "%", "%", 1)
+	_, err := client.Issues.RemoveLabelsForIssue("%", "%", 1)
 	testURLParseError(t, err)
 }
 
@@ -300,7 +296,7 @@ func TestIssuesService_ListLabelsForMilestone(t *testing.T) {
 	})
 
 	opt := &ListOptions{Page: 2}
-	labels, _, err := client.Issues.ListLabelsForMilestone(context.Background(), "o", "r", 1, opt)
+	labels, _, err := client.Issues.ListLabelsForMilestone("o", "r", 1, opt)
 	if err != nil {
 		t.Errorf("Issues.ListLabelsForMilestone returned error: %v", err)
 	}
@@ -312,6 +308,6 @@ func TestIssuesService_ListLabelsForMilestone(t *testing.T) {
 }
 
 func TestIssuesService_ListLabelsForMilestone_invalidOwner(t *testing.T) {
-	_, _, err := client.Issues.ListLabelsForMilestone(context.Background(), "%", "%", 1, nil)
+	_, _, err := client.Issues.ListLabelsForMilestone("%", "%", 1, nil)
 	testURLParseError(t, err)
 }

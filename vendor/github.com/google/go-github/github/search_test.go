@@ -6,7 +6,6 @@
 package github
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -32,7 +31,7 @@ func TestSearchService_Repositories(t *testing.T) {
 	})
 
 	opts := &SearchOptions{Sort: "forks", Order: "desc", ListOptions: ListOptions{Page: 2, PerPage: 2}}
-	result, _, err := client.Search.Repositories(context.Background(), "blah", opts)
+	result, _, err := client.Search.Repositories("blah", opts)
 	if err != nil {
 		t.Errorf("Search.Repositories returned error: %v", err)
 	}
@@ -59,11 +58,11 @@ func TestSearchService_Commits(t *testing.T) {
 			"order": "desc",
 		})
 
-		fmt.Fprint(w, `{"total_count": 4, "incomplete_results": false, "items": [{"sha":"random_hash1"},{"sha":"random_hash2"}]}`)
+		fmt.Fprint(w, `{"total_count": 4, "incomplete_results": false, "items": [{"hash":"random_hash1"},{"hash":"random_hash2"}]}`)
 	})
 
 	opts := &SearchOptions{Sort: "author-date", Order: "desc"}
-	result, _, err := client.Search.Commits(context.Background(), "blah", opts)
+	result, _, err := client.Search.Commits("blah", opts)
 	if err != nil {
 		t.Errorf("Search.Commits returned error: %v", err)
 	}
@@ -71,7 +70,7 @@ func TestSearchService_Commits(t *testing.T) {
 	want := &CommitsSearchResult{
 		Total:             Int(4),
 		IncompleteResults: Bool(false),
-		Commits:           []*CommitResult{{SHA: String("random_hash1")}, {SHA: String("random_hash2")}},
+		Commits:           []*CommitResult{{Hash: String("random_hash1")}, {Hash: String("random_hash2")}},
 	}
 	if !reflect.DeepEqual(result, want) {
 		t.Errorf("Search.Commits returned %+v, want %+v", result, want)
@@ -96,36 +95,7 @@ func TestSearchService_Issues(t *testing.T) {
 	})
 
 	opts := &SearchOptions{Sort: "forks", Order: "desc", ListOptions: ListOptions{Page: 2, PerPage: 2}}
-	result, _, err := client.Search.Issues(context.Background(), "blah", opts)
-	if err != nil {
-		t.Errorf("Search.Issues returned error: %v", err)
-	}
-
-	want := &IssuesSearchResult{
-		Total:             Int(4),
-		IncompleteResults: Bool(true),
-		Issues:            []Issue{{Number: Int(1)}, {Number: Int(2)}},
-	}
-	if !reflect.DeepEqual(result, want) {
-		t.Errorf("Search.Issues returned %+v, want %+v", result, want)
-	}
-}
-
-func TestSearchService_Issues_withQualifiers(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/search/issues", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "GET")
-		testFormValues(t, r, values{
-			"q": "gopher is:issue label:bug language:go",
-		})
-
-		fmt.Fprint(w, `{"total_count": 4, "incomplete_results": true, "items": [{"number":1},{"number":2}]}`)
-	})
-
-	opts := &SearchOptions{}
-	result, _, err := client.Search.Issues(context.Background(), "gopher is:issue label:bug language:go", opts)
+	result, _, err := client.Search.Issues("blah", opts)
 	if err != nil {
 		t.Errorf("Search.Issues returned error: %v", err)
 	}
@@ -158,7 +128,7 @@ func TestSearchService_Users(t *testing.T) {
 	})
 
 	opts := &SearchOptions{Sort: "forks", Order: "desc", ListOptions: ListOptions{Page: 2, PerPage: 2}}
-	result, _, err := client.Search.Users(context.Background(), "blah", opts)
+	result, _, err := client.Search.Users("blah", opts)
 	if err != nil {
 		t.Errorf("Search.Issues returned error: %v", err)
 	}
@@ -191,7 +161,7 @@ func TestSearchService_Code(t *testing.T) {
 	})
 
 	opts := &SearchOptions{Sort: "forks", Order: "desc", ListOptions: ListOptions{Page: 2, PerPage: 2}}
-	result, _, err := client.Search.Code(context.Background(), "blah", opts)
+	result, _, err := client.Search.Code("blah", opts)
 	if err != nil {
 		t.Errorf("Search.Code returned error: %v", err)
 	}
@@ -243,7 +213,7 @@ func TestSearchService_CodeTextMatch(t *testing.T) {
 	})
 
 	opts := &SearchOptions{Sort: "forks", Order: "desc", ListOptions: ListOptions{Page: 2, PerPage: 2}, TextMatch: true}
-	result, _, err := client.Search.Code(context.Background(), "blah", opts)
+	result, _, err := client.Search.Code("blah", opts)
 	if err != nil {
 		t.Errorf("Search.Code returned error: %v", err)
 	}

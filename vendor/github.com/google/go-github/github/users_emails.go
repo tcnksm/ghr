@@ -5,8 +5,6 @@
 
 package github
 
-import "context"
-
 // UserEmail represents user's email address
 type UserEmail struct {
 	Email    *string `json:"email,omitempty"`
@@ -17,7 +15,7 @@ type UserEmail struct {
 // ListEmails lists all email addresses for the authenticated user.
 //
 // GitHub API docs: https://developer.github.com/v3/users/emails/#list-email-addresses-for-a-user
-func (s *UsersService) ListEmails(ctx context.Context, opt *ListOptions) ([]*UserEmail, *Response, error) {
+func (s *UsersService) ListEmails(opt *ListOptions) ([]*UserEmail, *Response, error) {
 	u := "user/emails"
 	u, err := addOptions(u, opt)
 	if err != nil {
@@ -30,7 +28,7 @@ func (s *UsersService) ListEmails(ctx context.Context, opt *ListOptions) ([]*Use
 	}
 
 	var emails []*UserEmail
-	resp, err := s.client.Do(ctx, req, &emails)
+	resp, err := s.client.Do(req, &emails)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -41,7 +39,7 @@ func (s *UsersService) ListEmails(ctx context.Context, opt *ListOptions) ([]*Use
 // AddEmails adds email addresses of the authenticated user.
 //
 // GitHub API docs: https://developer.github.com/v3/users/emails/#add-email-addresses
-func (s *UsersService) AddEmails(ctx context.Context, emails []string) ([]*UserEmail, *Response, error) {
+func (s *UsersService) AddEmails(emails []string) ([]*UserEmail, *Response, error) {
 	u := "user/emails"
 	req, err := s.client.NewRequest("POST", u, emails)
 	if err != nil {
@@ -49,7 +47,7 @@ func (s *UsersService) AddEmails(ctx context.Context, emails []string) ([]*UserE
 	}
 
 	var e []*UserEmail
-	resp, err := s.client.Do(ctx, req, &e)
+	resp, err := s.client.Do(req, &e)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -60,12 +58,12 @@ func (s *UsersService) AddEmails(ctx context.Context, emails []string) ([]*UserE
 // DeleteEmails deletes email addresses from authenticated user.
 //
 // GitHub API docs: https://developer.github.com/v3/users/emails/#delete-email-addresses
-func (s *UsersService) DeleteEmails(ctx context.Context, emails []string) (*Response, error) {
+func (s *UsersService) DeleteEmails(emails []string) (*Response, error) {
 	u := "user/emails"
 	req, err := s.client.NewRequest("DELETE", u, emails)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.Do(ctx, req, nil)
+	return s.client.Do(req, nil)
 }

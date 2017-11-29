@@ -10,7 +10,6 @@ package main
 
 import (
 	"bufio"
-	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -35,15 +34,14 @@ func main() {
 	}
 
 	client := github.NewClient(tp.Client())
-	ctx := context.Background()
-	user, _, err := client.Users.Get(ctx, "")
+	user, _, err := client.Users.Get("")
 
 	// Is this a two-factor auth error? If so, prompt for OTP and try again.
-	if _, ok := err.(*github.TwoFactorAuthError); ok {
+	if _, ok := err.(*github.TwoFactorAuthError); err != nil && ok {
 		fmt.Print("\nGitHub OTP: ")
 		otp, _ := r.ReadString('\n')
 		tp.OTP = strings.TrimSpace(otp)
-		user, _, err = client.Users.Get(ctx, "")
+		user, _, err = client.Users.Get("")
 	}
 
 	if err != nil {
