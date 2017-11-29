@@ -24,7 +24,7 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 
 	// When draft release creation is requested,
 	// create it without any check (it can).
-	if req.Draft {
+	if *req.Draft {
 		fmt.Fprintln(g.outStream, "==> Create a draft release")
 		return g.GitHub.CreateRelease(ctx, req)
 	}
