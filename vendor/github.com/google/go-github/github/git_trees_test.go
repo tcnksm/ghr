@@ -6,6 +6,7 @@
 package github
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -27,7 +28,7 @@ func TestGitService_GetTree(t *testing.T) {
 			}`)
 	})
 
-	tree, _, err := client.Git.GetTree("o", "r", "s", true)
+	tree, _, err := client.Git.GetTree(context.Background(), "o", "r", "s", true)
 	if err != nil {
 		t.Errorf("Git.GetTree returned error: %v", err)
 	}
@@ -46,7 +47,7 @@ func TestGitService_GetTree(t *testing.T) {
 }
 
 func TestGitService_GetTree_invalidOwner(t *testing.T) {
-	_, _, err := client.Git.GetTree("%", "%", "%", false)
+	_, _, err := client.Git.GetTree(context.Background(), "%", "%", "%", false)
 	testURLParseError(t, err)
 }
 
@@ -93,7 +94,7 @@ func TestGitService_CreateTree(t *testing.T) {
 		}`)
 	})
 
-	tree, _, err := client.Git.CreateTree("o", "r", "b", input)
+	tree, _, err := client.Git.CreateTree(context.Background(), "o", "r", "b", input)
 	if err != nil {
 		t.Errorf("Git.CreateTree returned error: %v", err)
 	}
@@ -160,7 +161,7 @@ func TestGitService_CreateTree_Content(t *testing.T) {
 		}`)
 	})
 
-	tree, _, err := client.Git.CreateTree("o", "r", "b", input)
+	tree, _, err := client.Git.CreateTree(context.Background(), "o", "r", "b", input)
 	if err != nil {
 		t.Errorf("Git.CreateTree returned error: %v", err)
 	}
@@ -174,6 +175,7 @@ func TestGitService_CreateTree_Content(t *testing.T) {
 				Type: String("blob"),
 				Size: Int(12),
 				SHA:  String("aad8feacf6f8063150476a7b2bd9770f2794c08b"),
+				URL:  String("https://api.github.com/repos/o/r/git/blobs/aad8feacf6f8063150476a7b2bd9770f2794c08b"),
 			},
 		},
 	}
@@ -184,6 +186,6 @@ func TestGitService_CreateTree_Content(t *testing.T) {
 }
 
 func TestGitService_CreateTree_invalidOwner(t *testing.T) {
-	_, _, err := client.Git.CreateTree("%", "%", "", nil)
+	_, _, err := client.Git.CreateTree(context.Background(), "%", "%", "", nil)
 	testURLParseError(t, err)
 }

@@ -93,7 +93,7 @@ func Check(s Source, target string) (*CheckResponse, error) {
 	// Convert target to *version.Version
 	targetV, err := version.NewVersion(target)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse %s, %s", target, err.Error())
+		return nil, fmt.Errorf("failed to parse %s : %s", err.Error())
 	}
 
 	// Validate source

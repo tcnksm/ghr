@@ -6,6 +6,7 @@
 package github
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -18,6 +19,7 @@ func TestRepositoriesService_ListForks(t *testing.T) {
 
 	mux.HandleFunc("/repos/o/r/forks", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
+		testHeader(t, r, "Accept", mediaTypeTopicsPreview)
 		testFormValues(t, r, values{
 			"sort": "newest",
 			"page": "3",
@@ -29,7 +31,7 @@ func TestRepositoriesService_ListForks(t *testing.T) {
 		Sort:        "newest",
 		ListOptions: ListOptions{Page: 3},
 	}
-	repos, _, err := client.Repositories.ListForks("o", "r", opt)
+	repos, _, err := client.Repositories.ListForks(context.Background(), "o", "r", opt)
 	if err != nil {
 		t.Errorf("Repositories.ListForks returned error: %v", err)
 	}
@@ -41,7 +43,7 @@ func TestRepositoriesService_ListForks(t *testing.T) {
 }
 
 func TestRepositoriesService_ListForks_invalidOwner(t *testing.T) {
-	_, _, err := client.Repositories.ListForks("%", "r", nil)
+	_, _, err := client.Repositories.ListForks(context.Background(), "%", "r", nil)
 	testURLParseError(t, err)
 }
 
@@ -56,7 +58,7 @@ func TestRepositoriesService_CreateFork(t *testing.T) {
 	})
 
 	opt := &RepositoryCreateForkOptions{Organization: "o"}
-	repo, _, err := client.Repositories.CreateFork("o", "r", opt)
+	repo, _, err := client.Repositories.CreateFork(context.Background(), "o", "r", opt)
 	if err != nil {
 		t.Errorf("Repositories.CreateFork returned error: %v", err)
 	}
@@ -68,6 +70,6 @@ func TestRepositoriesService_CreateFork(t *testing.T) {
 }
 
 func TestRepositoriesService_CreateFork_invalidOwner(t *testing.T) {
-	_, _, err := client.Repositories.CreateFork("%", "r", nil)
+	_, _, err := client.Repositories.CreateFork(context.Background(), "%", "r", nil)
 	testURLParseError(t, err)
 }

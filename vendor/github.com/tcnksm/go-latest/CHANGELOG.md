@@ -1,6 +1,6 @@
-## 0.1.1 (2015-04-14)
+## 0.1.1 (Not release)
 
-Add `latest` command
+Initial release
 
 ### Added
 

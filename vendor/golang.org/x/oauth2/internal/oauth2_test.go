@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package internal contains support packages for oauth2 package.
 package internal
 
 import (
@@ -23,8 +22,8 @@ bar = hop
 ini = nin
 `,
 			map[string]map[string]string{
-				"":    map[string]string{"root": "toor"},
-				"foo": map[string]string{"bar": "hop", "ini": "nin"},
+				"":    {"root": "toor"},
+				"foo": {"bar": "hop", "ini": "nin"},
 			},
 		},
 		{
@@ -33,9 +32,9 @@ ini = nin
 empty=
 `,
 			map[string]map[string]string{
-				"":        map[string]string{},
-				"empty":   map[string]string{},
-				"section": map[string]string{"empty": ""},
+				"":        {},
+				"empty":   {},
+				"section": {"empty": ""},
 			},
 		},
 		{
@@ -45,7 +44,7 @@ empty=
 ;comment=true
 `,
 			map[string]map[string]string{
-				"": map[string]string{},
+				"": {},
 			},
 		},
 	}
