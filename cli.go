@@ -155,7 +155,7 @@ func (cli *CLI) Run(args []string) int {
 	parsedArgs := flags.Args()
 	if len(parsedArgs) != 2 {
 		PrintRedf(cli.errStream,
-			"Invalid argument: you must set TAG and PATH name.")
+			"Invalid argument: you must set TAG and PATH name.\n")
 		return ExitCodeBadArgs
 	}
 	tag, path := parsedArgs[0], parsedArgs[1]
@@ -240,7 +240,7 @@ func (cli *CLI) Run(args []string) int {
 	// Create a GitHub client
 	gitHubClient, err := NewGitHubClient(owner, repo, token, baseURLStr)
 	if err != nil {
-		PrintRedf(cli.errStream, "Failed to construct GitHub client: %s", err)
+		PrintRedf(cli.errStream, "Failed to construct GitHub client: %s\n", err)
 		return ExitCodeError
 	}
 
@@ -262,14 +262,14 @@ func (cli *CLI) Run(args []string) int {
 	ctx := context.TODO()
 	release, err := ghr.CreateRelease(ctx, req, recreate)
 	if err != nil {
-		PrintRedf(cli.errStream, "Failed to create GitHub release page: %s", err)
+		PrintRedf(cli.errStream, "Failed to create GitHub release page: %s\n", err)
 		return ExitCodeError
 	}
 
 	if replace {
 		err := ghr.DeleteAssets(ctx, *release.ID, localAssets, parallel)
 		if err != nil {
-			PrintRedf(cli.errStream, "Failed to delete existing assets: %s", err)
+			PrintRedf(cli.errStream, "Failed to delete existing assets: %s\n", err)
 			return ExitCodeError
 		}
 	}
@@ -277,13 +277,13 @@ func (cli *CLI) Run(args []string) int {
 	// FIXME(tcnksm): More ideal way to change this
 	// This is for Github enterprise
 	if err := ghr.GitHub.SetUploadURL(*release.UploadURL); err != nil {
-		fmt.Fprintf(cli.errStream, "Failed to set upload URL %s: %s", *release.UploadURL, err)
+		fmt.Fprintf(cli.errStream, "Failed to set upload URL %s: %s\n", *release.UploadURL, err)
 		return ExitCodeError
 	}
 
 	err = ghr.UploadAssets(ctx, *release.ID, localAssets, parallel)
 	if err != nil {
-		PrintRedf(cli.errStream, "Failed to upload one of assets: %s", err)
+		PrintRedf(cli.errStream, "Failed to upload one of assets: %s\n", err)
 		return ExitCodeError
 	}
 
