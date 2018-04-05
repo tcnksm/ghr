@@ -47,7 +47,7 @@ func NewGitHubClient(owner, repo, token string, urlStr string) (GitHub, error) {
 		return nil, errors.New("missing GitHub repository owner")
 	}
 
-	if len(owner) == 0 {
+	if len(repo) == 0 {
 		return nil, errors.New("missing GitHub repository name")
 	}
 
