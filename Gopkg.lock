@@ -27,6 +27,18 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/mattn/go-colorable"
+  packages = ["."]
+  revision = "efa589957cd060542a26d2dd7832fd6a6c6c3ade"
+
+[[projects]]
+  name = "github.com/mattn/go-isatty"
+  packages = ["."]
+  revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
+  version = "v0.0.3"
+
+[[projects]]
+  branch = "master"
   name = "github.com/mitchellh/colorstring"
   packages = ["."]
   revision = "8631ce90f28644f54aeedcb3e389a85174e067d1"
@@ -76,6 +88,12 @@
   revision = "1d60e4601c6fd243af51cc01ddf169918a5407ca"
 
 [[projects]]
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = ["unix"]
+  revision = "1d206c9fa8975fb4cf00df1dc8bf3283dc24ba0e"
+
+[[projects]]
   name = "google.golang.org/appengine"
   packages = [
     "internal",
@@ -92,6 +110,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4e9b5488fcd781bdab1afa7b47ec0ace1aa38f689933ceeb19367c8aa5c1de0f"
+  inputs-digest = "b1209cb1c8bd7c2cce10ad8edbb4acdf14272ccb2667976ffa9f657b28c0f685"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -31,6 +31,10 @@
 
 [[constraint]]
   branch = "master"
+  name = "github.com/mattn/go-colorable"
+
+[[constraint]]
+  branch = "master"
   name = "github.com/mitchellh/colorstring"
 
 [[constraint]]
