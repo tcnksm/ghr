@@ -1,8 +1,16 @@
 VERSION = $(shell grep 'Version string' version.go | sed -E 's/.*"(.+)"$$/\1/')
 COMMIT = $(shell git describe --always)
 PACKAGES = $(shell go list ./... | grep -v '/vendor/')
+EXTERNAL_TOOLS = github.com/Songmu/goxz/cmd/goxz
 
 default: test
+
+# install external tools for this project
+bootstrap:
+	@for tool in $(EXTERNAL_TOOLS) ; do \
+      echo "Installing $$tool" ; \
+      go get $$tool; \
+    done
 
 # build generate binary on './bin' directory.
 build:
