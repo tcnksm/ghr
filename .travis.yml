@@ -1,15 +1,13 @@
 language: go
-
+sudo: false
 go:
-  - 1.7.5
-
+  - 1.10.x
+env:
+  global:
+    - secure: "c7Owhq9NWblgnQLvmkssks3j4zNPCvgkkagVcuz3GmhcklVrZqY3H57FNepT3pkTYt+EJgqocBoohZodVFXsn917DcrMHETO6enDLUvmsJTTdxVFIU6ylr79NLTfNSJFY//gCe3WiMPw7bEePrAP1o2zMCvK21bZoHN6r48VHgY="
 os:
   - osx
-
-sudo: false
-
 install:
   - echo "skipping travis default"
-
 script:
   - make test-all

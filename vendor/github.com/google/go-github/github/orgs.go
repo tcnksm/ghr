@@ -6,6 +6,7 @@
 package github
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
@@ -19,7 +20,7 @@ type OrganizationsService service
 // Organization represents a GitHub organization account.
 type Organization struct {
 	Login             *string    `json:"login,omitempty"`
-	ID                *int       `json:"id,omitempty"`
+	ID                *int64     `json:"id,omitempty"`
 	AvatarURL         *string    `json:"avatar_url,omitempty"`
 	HTMLURL           *string    `json:"html_url,omitempty"`
 	Name              *string    `json:"name,omitempty"`
@@ -42,6 +43,7 @@ type Organization struct {
 	BillingEmail      *string    `json:"billing_email,omitempty"`
 	Type              *string    `json:"type,omitempty"`
 	Plan              *Plan      `json:"plan,omitempty"`
+	NodeID            *string    `json:"node_id,omitempty"`
 
 	// API URLs
 	URL              *string `json:"url,omitempty"`
@@ -85,7 +87,7 @@ type OrganizationsListOptions struct {
 // as the opts.Since parameter for the next call.
 //
 // GitHub API docs: https://developer.github.com/v3/orgs/#list-all-organizations
-func (s *OrganizationsService) ListAll(opt *OrganizationsListOptions) ([]*Organization, *Response, error) {
+func (s *OrganizationsService) ListAll(ctx context.Context, opt *OrganizationsListOptions) ([]*Organization, *Response, error) {
 	u, err := addOptions("organizations", opt)
 	if err != nil {
 		return nil, nil, err
@@ -96,8 +98,11 @@ func (s *OrganizationsService) ListAll(opt *OrganizationsListOptions) ([]*Organi
 		return nil, nil, err
 	}
 
+	// TODO: remove custom Accept header when this API fully launches.
+	req.Header.Set("Accept", mediaTypeGraphQLNodeIDPreview)
+
 	orgs := []*Organization{}
-	resp, err := s.client.Do(req, &orgs)
+	resp, err := s.client.Do(ctx, req, &orgs)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -108,7 +113,7 @@ func (s *OrganizationsService) ListAll(opt *OrganizationsListOptions) ([]*Organi
 // organizations for the authenticated user.
 //
 // GitHub API docs: https://developer.github.com/v3/orgs/#list-user-organizations
-func (s *OrganizationsService) List(user string, opt *ListOptions) ([]*Organization, *Response, error) {
+func (s *OrganizationsService) List(ctx context.Context, user string, opt *ListOptions) ([]*Organization, *Response, error) {
 	var u string
 	if user != "" {
 		u = fmt.Sprintf("users/%v/orgs", user)
@@ -125,8 +130,11 @@ func (s *OrganizationsService) List(user string, opt *ListOptions) ([]*Organizat
 		return nil, nil, err
 	}
 
+	// TODO: remove custom Accept header when this API fully launches.
+	req.Header.Set("Accept", mediaTypeGraphQLNodeIDPreview)
+
 	var orgs []*Organization
-	resp, err := s.client.Do(req, &orgs)
+	resp, err := s.client.Do(ctx, req, &orgs)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -137,15 +145,40 @@ func (s *OrganizationsService) List(user string, opt *ListOptions) ([]*Organizat
 // Get fetches an organization by name.
 //
 // GitHub API docs: https://developer.github.com/v3/orgs/#get-an-organization
-func (s *OrganizationsService) Get(org string) (*Organization, *Response, error) {
+func (s *OrganizationsService) Get(ctx context.Context, org string) (*Organization, *Response, error) {
 	u := fmt.Sprintf("orgs/%v", org)
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
+	// TODO: remove custom Accept header when this API fully launches.
+	req.Header.Set("Accept", mediaTypeGraphQLNodeIDPreview)
+
 	organization := new(Organization)
-	resp, err := s.client.Do(req, organization)
+	resp, err := s.client.Do(ctx, req, organization)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return organization, resp, nil
+}
+
+// GetByID fetches an organization.
+//
+// Note: GetByID uses the undocumented GitHub API endpoint /organizations/:id.
+func (s *OrganizationsService) GetByID(ctx context.Context, id int64) (*Organization, *Response, error) {
+	u := fmt.Sprintf("organizations/%d", id)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// TODO: remove custom Accept header when this API fully launches.
+	req.Header.Set("Accept", mediaTypeGraphQLNodeIDPreview)
+
+	organization := new(Organization)
+	resp, err := s.client.Do(ctx, req, organization)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -156,15 +189,18 @@ func (s *OrganizationsService) Get(org string) (*Organization, *Response, error)
 // Edit an organization.
 //
 // GitHub API docs: https://developer.github.com/v3/orgs/#edit-an-organization
-func (s *OrganizationsService) Edit(name string, org *Organization) (*Organization, *Response, error) {
+func (s *OrganizationsService) Edit(ctx context.Context, name string, org *Organization) (*Organization, *Response, error) {
 	u := fmt.Sprintf("orgs/%v", name)
 	req, err := s.client.NewRequest("PATCH", u, org)
 	if err != nil {
 		return nil, nil, err
 	}
 
+	// TODO: remove custom Accept header when this API fully launches.
+	req.Header.Set("Accept", mediaTypeGraphQLNodeIDPreview)
+
 	o := new(Organization)
-	resp, err := s.client.Do(req, o)
+	resp, err := s.client.Do(ctx, req, o)
 	if err != nil {
 		return nil, resp, err
 	}

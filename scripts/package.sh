@@ -4,30 +4,15 @@ set -e
 DIR=$(cd $(dirname ${0})/.. && pwd)
 cd ${DIR}
 
+make bootstrap
+
 VERSION=$(grep "const Version " version.go | sed -E 's/.*"(.+)"$/\1/')
-REPO="ghr"
+COMMIT=$(git describe --always)
 
-# Run Compile
-./scripts/compile.sh
+-d pkg && rm -rf ./pkg
 
-if [ -d pkg ];then
-    rm -rf ./pkg/dist
-fi 
-
-# Package all binary as .zip
-mkdir -p ./pkg/dist/${VERSION}
-for PLATFORM in $(find ./pkg -mindepth 1 -maxdepth 1 -type d); do
-    PLATFORM_NAME=$(basename ${PLATFORM})
-    ARCHIVE_NAME=${REPO}_${VERSION}_${PLATFORM_NAME}
-
-    if [ $PLATFORM_NAME = "dist" ]; then
-        continue
-    fi
-
-    pushd ${PLATFORM}
-    zip ${DIR}/pkg/dist/${VERSION}/${ARCHIVE_NAME}.zip ./*
-    popd
-done
+goxz -pv=${VERSION} -build-ldflags="-X main.GitCommit=${COMMIT}" \
+    -arch=386,amd64 -d=./pkg/dist/${VERSION}
 
 # Generate shasum
 pushd ./pkg/dist/${VERSION}
