@@ -292,7 +292,7 @@ func (cli *CLI) Run(args []string) int {
 			Draft: github.Bool(false),
 		})
 		if err != nil {
-			PrintRedf(cli.errStream, "Failed to publish release: %s", err)
+			PrintRedf(cli.errStream, "Failed to publish release: %s\n", err)
 			return ExitCodeError
 		}
 	}
