@@ -14,10 +14,13 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// ErrReleaseNotFound contains the error for when a release is not found
 var (
-	RelaseNotFound = errors.New("release is not found")
+	ErrReleaseNotFound = errors.New("release is not found")
 )
 
+// GitHub contains the functions necessary for interacting with GitHub release
+// objects
 type GitHub interface {
 	CreateRelease(ctx context.Context, req *github.RepositoryRelease) (*github.RepositoryRelease, error)
 	GetRelease(ctx context.Context, tag string) (*github.RepositoryRelease, error)
@@ -32,11 +35,13 @@ type GitHub interface {
 	SetUploadURL(urlStr string) error
 }
 
+// GitHubClient is the client for interacting with the GitHub API
 type GitHubClient struct {
 	Owner, Repo string
 	*github.Client
 }
 
+// NewGitHubClient creates and initializes a new GitHubClient
 func NewGitHubClient(owner, repo, token string, urlStr string) (GitHub, error) {
 	if len(owner) == 0 {
 		return nil, errors.New("missing GitHub repository owner")
@@ -74,6 +79,7 @@ func NewGitHubClient(owner, repo, token string, urlStr string) (GitHub, error) {
 	}, nil
 }
 
+// SetUploadURL constructs the upload URL for a release
 func (c *GitHubClient) SetUploadURL(urlStr string) error {
 	i := strings.Index(urlStr, "repos/")
 	parsedURL, err := url.ParseRequestURI(urlStr[:i])
@@ -85,6 +91,7 @@ func (c *GitHubClient) SetUploadURL(urlStr string) error {
 	return nil
 }
 
+// CreateRelease creates a new release object in the GitHub API
 func (c *GitHubClient) CreateRelease(ctx context.Context, req *github.RepositoryRelease) (*github.RepositoryRelease, error) {
 
 	release, res, err := c.Repositories.CreateRelease(context.TODO(), c.Owner, c.Repo, req)
@@ -99,8 +106,9 @@ func (c *GitHubClient) CreateRelease(ctx context.Context, req *github.Repository
 	return release, nil
 }
 
+// GetRelease queries the GitHub API for a specified release object
 func (c *GitHubClient) GetRelease(ctx context.Context, tag string) (*github.RepositoryRelease, error) {
-	// Check Release is already exist or not
+	// Check Release whether already exists or not
 	release, res, err := c.Repositories.GetReleaseByTag(context.TODO(), c.Owner, c.Repo, tag)
 	if err != nil {
 		if res == nil {
@@ -113,7 +121,7 @@ func (c *GitHubClient) GetRelease(ctx context.Context, tag string) (*github.Repo
 				"get release tag: invalid status: %s", res.Status)
 		}
 
-		return nil, RelaseNotFound
+		return nil, ErrReleaseNotFound
 	}
 
 	return release, nil
@@ -132,6 +140,7 @@ func (c *GitHubClient) EditRelease(ctx context.Context, releaseID int64, req *gi
 	return release, nil
 }
 
+// DeleteRelease deletes a release object within the GitHub API
 func (c *GitHubClient) DeleteRelease(ctx context.Context, releaseID int64) error {
 	res, err := c.Repositories.DeleteRelease(context.TODO(), c.Owner, c.Repo, releaseID)
 	if err != nil {
@@ -145,6 +154,7 @@ func (c *GitHubClient) DeleteRelease(ctx context.Context, releaseID int64) error
 	return nil
 }
 
+// DeleteTag deletes a tag from the GitHub API
 func (c *GitHubClient) DeleteTag(ctx context.Context, tag string) error {
 	ref := fmt.Sprintf("tags/%s", tag)
 	res, err := c.Git.DeleteRef(context.TODO(), c.Owner, c.Repo, ref)
@@ -159,6 +169,7 @@ func (c *GitHubClient) DeleteTag(ctx context.Context, tag string) error {
 	return nil
 }
 
+// UploadAsset uploads specified assets to a given release object
 func (c *GitHubClient) UploadAsset(ctx context.Context, releaseID int64, filename string) (*github.ReleaseAsset, error) {
 
 	filename, err := filepath.Abs(filename)
@@ -194,6 +205,7 @@ func (c *GitHubClient) UploadAsset(ctx context.Context, releaseID int64, filenam
 	}
 }
 
+// DeleteAsset deletes assets from a given release object
 func (c *GitHubClient) DeleteAsset(ctx context.Context, assetID int64) error {
 	res, err := c.Repositories.DeleteReleaseAsset(context.TODO(), c.Owner, c.Repo, assetID)
 	if err != nil {
@@ -207,6 +219,7 @@ func (c *GitHubClient) DeleteAsset(ctx context.Context, assetID int64) error {
 	return nil
 }
 
+// ListAssets lists assets associated with a given release
 func (c *GitHubClient) ListAssets(ctx context.Context, releaseID int64) ([]*github.ReleaseAsset, error) {
 	result := []*github.ReleaseAsset{}
 	page := 1

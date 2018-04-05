@@ -12,12 +12,14 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+// GHR contains the top level GitHub object
 type GHR struct {
 	GitHub GitHub
 
 	outStream io.Writer
 }
 
+// CreateRelease creates (or recreates) a new package release
 func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, recreate bool) (*github.RepositoryRelease, error) {
 
 	// When draft release creation is requested,
@@ -36,7 +38,7 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 	// If release is not found, then create a new release.
 	release, err := g.GitHub.GetRelease(ctx, *req.TagName)
 	if err != nil {
-		if err != RelaseNotFound {
+		if err != ErrReleaseNotFound {
 			return nil, errors.Wrap(err, "failed to get release")
 		}
 		Debugf("Release (with tag %s) not found: create a new one",
@@ -73,6 +75,8 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 	return g.GitHub.CreateRelease(ctx, req)
 }
 
+// DeleteRelease removes an existing release, if it exists. If it does not exist,
+// DeleteRelease returns an error
 func (g *GHR) DeleteRelease(ctx context.Context, ID int64, tag string) error {
 
 	err := g.GitHub.DeleteRelease(ctx, ID)
@@ -92,6 +96,7 @@ func (g *GHR) DeleteRelease(ctx context.Context, ID int64, tag string) error {
 	return nil
 }
 
+// UploadAssets uploads the designated assets in parallel (determined by parallelism setting)
 func (g *GHR) UploadAssets(ctx context.Context, releaseID int64, localAssets []string, parallel int) error {
 	start := time.Now()
 	defer func() {
@@ -125,6 +130,7 @@ func (g *GHR) UploadAssets(ctx context.Context, releaseID int64, localAssets []s
 	return nil
 }
 
+// DeleteAssets removes uploaded assets for a given release
 func (g *GHR) DeleteAssets(ctx context.Context, releaseID int64, localAssets []string, parallel int) error {
 	start := time.Now()
 	defer func() {
