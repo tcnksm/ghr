@@ -68,7 +68,7 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 	return g.GitHub.CreateRelease(ctx, req)
 }
 
-func (g *GHR) DeleteRelease(ctx context.Context, ID int, tag string) error {
+func (g *GHR) DeleteRelease(ctx context.Context, ID int64, tag string) error {
 
 	err := g.GitHub.DeleteRelease(ctx, ID)
 	if err != nil {
@@ -87,7 +87,7 @@ func (g *GHR) DeleteRelease(ctx context.Context, ID int, tag string) error {
 	return nil
 }
 
-func (g *GHR) UploadAssets(ctx context.Context, releaseID int, localAssets []string, parallel int) error {
+func (g *GHR) UploadAssets(ctx context.Context, releaseID int64, localAssets []string, parallel int) error {
 	start := time.Now()
 	defer func() {
 		Debugf("UploadAssets: time: %d ms", int(time.Since(start).Seconds()*1000))
@@ -120,7 +120,7 @@ func (g *GHR) UploadAssets(ctx context.Context, releaseID int, localAssets []str
 	return nil
 }
 
-func (g *GHR) DeleteAssets(ctx context.Context, releaseID int, localAssets []string, parallel int) error {
+func (g *GHR) DeleteAssets(ctx context.Context, releaseID int64, localAssets []string, parallel int) error {
 	start := time.Now()
 	defer func() {
 		Debugf("DeleteAssets: time: %d ms", int(time.Since(start).Seconds()*1000))

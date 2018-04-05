@@ -21,12 +21,12 @@ var (
 type GitHub interface {
 	CreateRelease(ctx context.Context, req *github.RepositoryRelease) (*github.RepositoryRelease, error)
 	GetRelease(ctx context.Context, tag string) (*github.RepositoryRelease, error)
-	DeleteRelease(ctx context.Context, releaseID int) error
+	DeleteRelease(ctx context.Context, releaseID int64) error
 	DeleteTag(ctx context.Context, tag string) error
 
-	UploadAsset(ctx context.Context, releaseID int, filename string) (*github.ReleaseAsset, error)
-	DeleteAsset(ctx context.Context, assetID int) error
-	ListAssets(ctx context.Context, releaseID int) ([]*github.ReleaseAsset, error)
+	UploadAsset(ctx context.Context, releaseID int64, filename string) (*github.ReleaseAsset, error)
+	DeleteAsset(ctx context.Context, assetID int64) error
+	ListAssets(ctx context.Context, releaseID int64) ([]*github.ReleaseAsset, error)
 
 	SetUploadURL(urlStr string) error
 }
@@ -86,7 +86,7 @@ func (c *GitHubClient) SetUploadURL(urlStr string) error {
 
 func (c *GitHubClient) CreateRelease(ctx context.Context, req *github.RepositoryRelease) (*github.RepositoryRelease, error) {
 
-	release, res, err := c.Repositories.CreateRelease(c.Owner, c.Repo, req)
+	release, res, err := c.Repositories.CreateRelease(context.TODO(), c.Owner, c.Repo, req)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create a release")
 	}
@@ -100,7 +100,7 @@ func (c *GitHubClient) CreateRelease(ctx context.Context, req *github.Repository
 
 func (c *GitHubClient) GetRelease(ctx context.Context, tag string) (*github.RepositoryRelease, error) {
 	// Check Release is already exist or not
-	release, res, err := c.Repositories.GetReleaseByTag(c.Owner, c.Repo, tag)
+	release, res, err := c.Repositories.GetReleaseByTag(context.TODO(), c.Owner, c.Repo, tag)
 	if err != nil {
 		if res == nil {
 			return nil, errors.Wrapf(err, "failed to get release tag: %s", tag)
@@ -118,8 +118,8 @@ func (c *GitHubClient) GetRelease(ctx context.Context, tag string) (*github.Repo
 	return release, nil
 }
 
-func (c *GitHubClient) DeleteRelease(ctx context.Context, releaseID int) error {
-	res, err := c.Repositories.DeleteRelease(c.Owner, c.Repo, releaseID)
+func (c *GitHubClient) DeleteRelease(ctx context.Context, releaseID int64) error {
+	res, err := c.Repositories.DeleteRelease(context.TODO(), c.Owner, c.Repo, releaseID)
 	if err != nil {
 		return errors.Wrap(err, "failed to delete release")
 	}
@@ -133,7 +133,7 @@ func (c *GitHubClient) DeleteRelease(ctx context.Context, releaseID int) error {
 
 func (c *GitHubClient) DeleteTag(ctx context.Context, tag string) error {
 	ref := fmt.Sprintf("tags/%s", tag)
-	res, err := c.Git.DeleteRef(c.Owner, c.Repo, ref)
+	res, err := c.Git.DeleteRef(context.TODO(), c.Owner, c.Repo, ref)
 	if err != nil {
 		return errors.Wrapf(err, "failed to delete tag: %s", ref)
 	}
@@ -145,7 +145,7 @@ func (c *GitHubClient) DeleteTag(ctx context.Context, tag string) error {
 	return nil
 }
 
-func (c *GitHubClient) UploadAsset(ctx context.Context, releaseID int, filename string) (*github.ReleaseAsset, error) {
+func (c *GitHubClient) UploadAsset(ctx context.Context, releaseID int64, filename string) (*github.ReleaseAsset, error) {
 
 	filename, err := filepath.Abs(filename)
 	if err != nil {
@@ -162,7 +162,7 @@ func (c *GitHubClient) UploadAsset(ctx context.Context, releaseID int, filename 
 		Name: filepath.Base(filename),
 	}
 
-	asset, res, err := c.Repositories.UploadReleaseAsset(c.Owner, c.Repo, releaseID, opts, f)
+	asset, res, err := c.Repositories.UploadReleaseAsset(context.TODO(), c.Owner, c.Repo, releaseID, opts, f)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to upload release asset: %s", filename)
 	}
@@ -180,8 +180,8 @@ func (c *GitHubClient) UploadAsset(ctx context.Context, releaseID int, filename 
 	}
 }
 
-func (c *GitHubClient) DeleteAsset(ctx context.Context, assetID int) error {
-	res, err := c.Repositories.DeleteReleaseAsset(c.Owner, c.Repo, assetID)
+func (c *GitHubClient) DeleteAsset(ctx context.Context, assetID int64) error {
+	res, err := c.Repositories.DeleteReleaseAsset(context.TODO(), c.Owner, c.Repo, assetID)
 	if err != nil {
 		return errors.Wrap(err, "failed to delete release asset")
 	}
@@ -193,12 +193,12 @@ func (c *GitHubClient) DeleteAsset(ctx context.Context, assetID int) error {
 	return nil
 }
 
-func (c *GitHubClient) ListAssets(ctx context.Context, releaseID int) ([]*github.ReleaseAsset, error) {
+func (c *GitHubClient) ListAssets(ctx context.Context, releaseID int64) ([]*github.ReleaseAsset, error) {
 	result := []*github.ReleaseAsset{}
 	page := 1
 
 	for {
-		assets, res, err := c.Repositories.ListReleaseAssets(c.Owner, c.Repo, releaseID, &github.ListOptions{Page: page})
+		assets, res, err := c.Repositories.ListReleaseAssets(context.TODO(), c.Owner, c.Repo, releaseID, &github.ListOptions{Page: page})
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to list assets")
 		}
