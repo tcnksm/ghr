@@ -1,7 +1,9 @@
 package latest
 
 import (
+	"context"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/google/go-github/github"
@@ -89,7 +91,11 @@ func DeleteFrontV() FixVersionStrFunc {
 }
 
 func (g *GithubTag) newClient() *github.Client {
-	return github.NewClient(nil)
+	client := github.NewClient(nil)
+	if g.URL != "" {
+		client.BaseURL, _ = url.Parse(g.URL)
+	}
+	return client
 }
 
 func (g *GithubTag) Validate() error {
@@ -102,6 +108,12 @@ func (g *GithubTag) Validate() error {
 		return fmt.Errorf("GitHub owner name must be set")
 	}
 
+	if g.URL != "" {
+		if _, err := url.Parse(g.URL); err != nil {
+			return fmt.Errorf("GitHub API Url invalid: %s", err)
+		}
+	}
+
 	return nil
 }
 
@@ -111,7 +123,7 @@ func (g *GithubTag) Fetch() (*FetchResponse, error) {
 
 	// Create a client
 	client := g.newClient()
-	tags, resp, err := client.Repositories.ListTags(g.Owner, g.Repository, nil)
+	tags, resp, err := client.Repositories.ListTags(context.Background(), g.Owner, g.Repository, nil)
 	if err != nil {
 		return fr, err
 	}
