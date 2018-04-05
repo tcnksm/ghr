@@ -287,6 +287,16 @@ func (cli *CLI) Run(args []string) int {
 		return ExitCodeError
 	}
 
+	if !draft {
+		_, err := ghr.GitHub.EditRelease(ctx, *release.ID, &github.RepositoryRelease{
+			Draft: github.Bool(false),
+		})
+		if err != nil {
+			PrintRedf(cli.errStream, "Failed to publish release: %s\n", err)
+			return ExitCodeError
+		}
+	}
+
 	return ExitCodeOK
 }
 

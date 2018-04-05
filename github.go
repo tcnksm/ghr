@@ -21,6 +21,7 @@ var (
 type GitHub interface {
 	CreateRelease(ctx context.Context, req *github.RepositoryRelease) (*github.RepositoryRelease, error)
 	GetRelease(ctx context.Context, tag string) (*github.RepositoryRelease, error)
+	EditRelease(ctx context.Context, releaseID int64, req *github.RepositoryRelease) (*github.RepositoryRelease, error)
 	DeleteRelease(ctx context.Context, releaseID int64) error
 	DeleteTag(ctx context.Context, tag string) error
 
@@ -113,6 +114,19 @@ func (c *GitHubClient) GetRelease(ctx context.Context, tag string) (*github.Repo
 		}
 
 		return nil, RelaseNotFound
+	}
+
+	return release, nil
+}
+
+func (c *GitHubClient) EditRelease(ctx context.Context, releaseID int64, req *github.RepositoryRelease) (*github.RepositoryRelease, error) {
+  release, res, err := c.Repositories.EditRelease(context.TODO(), c.Owner, c.Repo, releaseID, req)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to edit release: %d", releaseID)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("edit release: invalid status: %s", res.Status)
 	}
 
 	return release, nil

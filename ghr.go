@@ -27,6 +27,11 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 		return g.GitHub.CreateRelease(ctx, req)
 	}
 
+	// Always create release as draft first. After uploading assets, turn off
+	// draft unless the `-draft` flag is explicitly specified.
+	// It is to prevent users from seeing empty release.
+	req.Draft = github.Bool(true)
+
 	// Check release exists.
 	// If release is not found, then create a new release.
 	release, err := g.GitHub.GetRelease(ctx, *req.TagName)
