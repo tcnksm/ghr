@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	TestOwner = "tcnksm"
+	TestOwner = "ghtools"
 	TestRepo  = "github-api-test"
 )
 
