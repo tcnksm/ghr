@@ -1,28 +1,28 @@
 VERSION = $(shell grep 'Version string' version.go | sed -E 's/.*"(.+)"$$/\1/')
 COMMIT = $(shell git describe --always)
 PACKAGES = $(shell go list ./... | grep -v '/vendor/')
-EXTERNAL_TOOLS = github.com/mitchellh/gox	
+EXTERNAL_TOOLS = github.com/Songmu/goxz/cmd/goxz
 
 default: test
 
 # install external tools for this project
 bootstrap:
 	@for tool in $(EXTERNAL_TOOLS) ; do \
-		echo "Installing $$tool" ; \
-    	go get $$tool; \
-	done
+      echo "Installing $$tool" ; \
+      go get $$tool; \
+    done
 
 # build generate binary on './bin' directory.
-build: 
+build:
 	go build -ldflags "-X main.GitCommit=$(COMMIT)" -o bin/ghr
 
 # install installs binary on $GOPATH/bin directory.
-install: 
+install:
 	go install -ldflags "-X main.GitCommit=$(COMMIT)"
 
 # package runs compile.sh to run gox and zip them.
 # Artifacts will be generated in './pkg' directory
-package: 
+package:
 	@sh -c "'$(CURDIR)/scripts/package.sh'"
 
 brew: package
@@ -34,7 +34,7 @@ upload: build
 
 test-all: vet lint test
 
-test: 
+test:
 	go test -v -parallel=4 ${PACKAGES}
 
 test-race:
@@ -45,12 +45,12 @@ vet:
 
 lint:
 	@go get github.com/golang/lint/golint
-	go list ./... | grep -v vendor | xargs -n1 golint 
+	go list ./... | grep -v vendor | xargs -n1 golint
 
 cover:
-	@go get golang.org/x/tools/cmd/cover		
+	@go get golang.org/x/tools/cmd/cover
 	go test -coverprofile=cover.out
 	go tool cover -html cover.out
 	rm cover.out
 
-.PHONY: bootstrap build install package brew test test-race test-all vet lint cover  
+.PHONY: build install package brew test test-race test-all vet lint cover

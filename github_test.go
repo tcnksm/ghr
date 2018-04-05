@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	TestOwner = "tcnksm"
+	TestOwner = "ghtools"
 	TestRepo  = "github-api-test"
 )
 
@@ -126,7 +126,7 @@ func TestGitHubClient_Upload(t *testing.T) {
 	}
 
 	rc, url, err := githubClient.Repositories.DownloadReleaseAsset(
-		githubClient.Owner, githubClient.Repo, *asset.ID)
+		context.TODO(), githubClient.Owner, githubClient.Repo, *asset.ID)
 	if err != nil {
 		t.Fatal("DownloadReleaseAsset failed:", err)
 	}
