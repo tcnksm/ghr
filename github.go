@@ -147,10 +147,7 @@ func (c *GitHubClient) EditRelease(ctx context.Context, releaseID int64, req *gi
 		}
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
-	return release, nil
+	return release, err
 }
 
 // DeleteRelease deletes a release object within the GitHub API
@@ -200,22 +197,30 @@ func (c *GitHubClient) UploadAsset(ctx context.Context, releaseID int64, filenam
 		Name: filepath.Base(filename),
 	}
 
-	asset, res, err := c.Repositories.UploadReleaseAsset(context.TODO(), c.Owner, c.Repo, releaseID, opts, f)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to upload release asset: %s", filename)
-	}
+	var asset *github.ReleaseAsset
+	err = retry.Retry(3, 3*time.Second, func() error {
+		var (
+			res *github.Response
+			err error
+		)
+		asset, res, err = c.Repositories.UploadReleaseAsset(context.TODO(), c.Owner, c.Repo, releaseID, opts, f)
+		if err != nil {
+			return errors.Wrapf(err, "failed to upload release asset: %s", filename)
+		}
 
-	switch res.StatusCode {
-	case http.StatusCreated:
-		return asset, nil
-	case 422:
-		return nil, errors.Errorf(
-			"upload release asset: invalid status code: %s",
-			"422 (this is probably because the asset already uploaded)")
-	default:
-		return nil, errors.Errorf(
-			"upload release asset: invalid status code: %s", res.Status)
-	}
+		switch res.StatusCode {
+		case http.StatusCreated:
+			return nil
+		case 422:
+			return errors.Errorf(
+				"upload release asset: invalid status code: %s",
+				"422 (this is probably because the asset already uploaded)")
+		default:
+			return errors.Errorf(
+				"upload release asset: invalid status code: %s", res.Status)
+		}
+	})
+	return asset, err
 }
 
 // DeleteAsset deletes assets from a given release object
