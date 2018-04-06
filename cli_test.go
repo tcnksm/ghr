@@ -114,7 +114,7 @@ func TestRun_versionFlag(t *testing.T) {
 		t.Fatalf("%q exits %d, want %d", command, got, want)
 	}
 
-	want := fmt.Sprintf("ghr version %s", Version)
+	want := fmt.Sprintf("ghr version v%s", Version)
 	got := outStream.String()
 	if !strings.Contains(got, want) {
 		t.Fatalf("%q output %q, want = %q", command, got, want)

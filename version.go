@@ -12,7 +12,7 @@ import (
 const Name = "ghr"
 
 // Version is application version
-const Version string = "v0.5.4"
+const Version string = "0.5.4"
 
 // GitCommit describes latest commit hash.
 // This is automatically extracted by git describe --always.
@@ -23,7 +23,7 @@ var GitCommit string
 // update warning.
 func OutputVersion() string {
 	var buf bytes.Buffer
-	fmt.Fprintf(&buf, "%s version %s", Name, Version)
+	fmt.Fprintf(&buf, "%s version v%s", Name, Version)
 	if len(GitCommit) != 0 {
 		fmt.Fprintf(&buf, " (%s)", GitCommit)
 	}
@@ -32,14 +32,12 @@ func OutputVersion() string {
 	// Check latest version is release or not.
 	verCheckCh := make(chan *latest.CheckResponse)
 	go func() {
-		fixFunc := latest.DeleteFrontV()
 		githubTag := &latest.GithubTag{
 			Owner:             "tcnksm",
 			Repository:        "ghr",
-			FixVersionStrFunc: fixFunc,
 		}
 
-		res, err := latest.Check(githubTag, fixFunc(Version))
+		res, err := latest.Check(githubTag, Version)
 		if err != nil {
 			// Don't return error
 			Debugf("[ERROR] Check lastet version is failed: %s", err)
