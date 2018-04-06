@@ -8,7 +8,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
+	"github.com/Songmu/retry"
 	"github.com/google/go-github/github"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
@@ -128,15 +130,26 @@ func (c *GitHubClient) GetRelease(ctx context.Context, tag string) (*github.Repo
 }
 
 func (c *GitHubClient) EditRelease(ctx context.Context, releaseID int64, req *github.RepositoryRelease) (*github.RepositoryRelease, error) {
-	release, res, err := c.Repositories.EditRelease(context.TODO(), c.Owner, c.Repo, releaseID, req)
+	var release *github.RepositoryRelease
+
+	err := retry.Retry(3, 3*time.Second, func() error {
+		var (
+			res *github.Response
+			err error
+		)
+		release, res, err = c.Repositories.EditRelease(context.TODO(), c.Owner, c.Repo, releaseID, req)
+		if err != nil {
+			return errors.Wrapf(err, "failed to edit release: %d", releaseID)
+		}
+
+		if res.StatusCode != http.StatusOK {
+			return errors.Errorf("edit release: invalid status: %s", res.Status)
+		}
+		return nil
+	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to edit release: %d", releaseID)
+		return nil, err
 	}
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("edit release: invalid status: %s", res.Status)
-	}
-
 	return release, nil
 }
 
