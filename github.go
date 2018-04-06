@@ -8,7 +8,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
+	"github.com/Songmu/retry"
 	"github.com/google/go-github/github"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
@@ -128,16 +130,24 @@ func (c *GitHubClient) GetRelease(ctx context.Context, tag string) (*github.Repo
 }
 
 func (c *GitHubClient) EditRelease(ctx context.Context, releaseID int64, req *github.RepositoryRelease) (*github.RepositoryRelease, error) {
-	release, res, err := c.Repositories.EditRelease(context.TODO(), c.Owner, c.Repo, releaseID, req)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to edit release: %d", releaseID)
-	}
+	var release *github.RepositoryRelease
 
-	if res.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("edit release: invalid status: %s", res.Status)
-	}
+	err := retry.Retry(3, 3*time.Second, func() error {
+		var (
+			res *github.Response
+			err error
+		)
+		release, res, err = c.Repositories.EditRelease(context.TODO(), c.Owner, c.Repo, releaseID, req)
+		if err != nil {
+			return errors.Wrapf(err, "failed to edit release: %d", releaseID)
+		}
 
-	return release, nil
+		if res.StatusCode != http.StatusOK {
+			return errors.Errorf("edit release: invalid status: %s", res.Status)
+		}
+		return nil
+	})
+	return release, err
 }
 
 // DeleteRelease deletes a release object within the GitHub API
@@ -187,22 +197,30 @@ func (c *GitHubClient) UploadAsset(ctx context.Context, releaseID int64, filenam
 		Name: filepath.Base(filename),
 	}
 
-	asset, res, err := c.Repositories.UploadReleaseAsset(context.TODO(), c.Owner, c.Repo, releaseID, opts, f)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to upload release asset: %s", filename)
-	}
+	var asset *github.ReleaseAsset
+	err = retry.Retry(3, 3*time.Second, func() error {
+		var (
+			res *github.Response
+			err error
+		)
+		asset, res, err = c.Repositories.UploadReleaseAsset(context.TODO(), c.Owner, c.Repo, releaseID, opts, f)
+		if err != nil {
+			return errors.Wrapf(err, "failed to upload release asset: %s", filename)
+		}
 
-	switch res.StatusCode {
-	case http.StatusCreated:
-		return asset, nil
-	case 422:
-		return nil, errors.Errorf(
-			"upload release asset: invalid status code: %s",
-			"422 (this is probably because the asset already uploaded)")
-	default:
-		return nil, errors.Errorf(
-			"upload release asset: invalid status code: %s", res.Status)
-	}
+		switch res.StatusCode {
+		case http.StatusCreated:
+			return nil
+		case 422:
+			return errors.Errorf(
+				"upload release asset: invalid status code: %s",
+				"422 (this is probably because the asset already uploaded)")
+		default:
+			return errors.Errorf(
+				"upload release asset: invalid status code: %s", res.Status)
+		}
+	})
+	return asset, err
 }
 
 // DeleteAsset deletes assets from a given release object

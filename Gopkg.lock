@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/Songmu/retry"
+  packages = ["."]
+  revision = "3d913ef13826a2183b18cbfb88925a7735bf3635"
+
+[[projects]]
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   revision = "925541529c1fa6821df4e44ce2723319eb2be768"
@@ -110,6 +116,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b1209cb1c8bd7c2cce10ad8edbb4acdf14272ccb2667976ffa9f657b28c0f685"
+  inputs-digest = "94a8c40147bb7e3c9f9d484b02bad659c82d8fe9af98de3ebbffb3554fdfa8bf"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -43,6 +43,10 @@
 
 [[constraint]]
   branch = "master"
+  name = "github.com/Songmu/retry"
+
+[[constraint]]
+  branch = "master"
   name = "github.com/tcnksm/go-gitconfig"
 
 [[constraint]]
