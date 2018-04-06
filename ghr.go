@@ -64,7 +64,6 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 		return release, nil
 	}
 
-
 	// When recreate is requested, delete existing release and create a
 	// new release.
 	fmt.Fprintln(g.outStream, "==> Recreate a release")

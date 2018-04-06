@@ -128,7 +128,7 @@ func (c *GitHubClient) GetRelease(ctx context.Context, tag string) (*github.Repo
 }
 
 func (c *GitHubClient) EditRelease(ctx context.Context, releaseID int64, req *github.RepositoryRelease) (*github.RepositoryRelease, error) {
-  release, res, err := c.Repositories.EditRelease(context.TODO(), c.Owner, c.Repo, releaseID, req)
+	release, res, err := c.Repositories.EditRelease(context.TODO(), c.Owner, c.Repo, releaseID, req)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to edit release: %d", releaseID)
 	}
