@@ -54,7 +54,7 @@ vet:
 
 lint:
 	@go get github.com/golang/lint/golint
-	go list ./... | grep -v vendor | xargs -n1 golint
+	go list ./... | grep -v vendor | xargs -n1 golint -set_exit_status
 
 cover:
 	@go get golang.org/x/tools/cmd/cover
