@@ -47,7 +47,7 @@ const (
 const (
 	defaultCheckTimeout = 2 * time.Second
 	defaultBaseURL      = "https://api.github.com/"
-	DefaultParallel     = -1
+	defaultParallel     = -1
 )
 
 // Debugf prints debug output when EnvDebug is set
@@ -119,8 +119,8 @@ func (cli *CLI) Run(args []string) int {
 	flags.BoolVar(&draft, "draft", false, "")
 	flags.BoolVar(&prerelease, "prerelease", false, "")
 
-	flags.IntVar(&parallel, "parallel", DefaultParallel, "")
-	flags.IntVar(&parallel, "p", DefaultParallel, "")
+	flags.IntVar(&parallel, "parallel", defaultParallel, "")
+	flags.IntVar(&parallel, "p", defaultParallel, "")
 
 	flags.BoolVar(&recreate, "delete", false, "")
 	flags.BoolVar(&recreate, "recreate", false, "")
