@@ -27,7 +27,6 @@ const (
 
 	// EnvDebug is an environment var to handle debug mode
 	EnvDebug      = "GHR_DEBUG"
-	EnvStackTrace = "GHR_TRACE"
 )
 
 // Exit codes are set to a value that represnet an exit code for a paticular error.
