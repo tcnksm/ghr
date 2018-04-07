@@ -4,17 +4,12 @@ set -e
 DIR=$(cd $(dirname ${0})/.. && pwd)
 cd ${DIR}
 
-make bootstrap
-
-VERSION=$(grep "const Version " version.go | sed -E 's/.*"(.+)"$/\1/')
-COMMIT=$(git describe --always)
-
 -d pkg && rm -rf ./pkg
+make crossbuild
 
-goxz -pv=${VERSION} -build-ldflags="-X main.GitCommit=${COMMIT}" \
-    -arch=386,amd64 -d=./pkg/dist/${VERSION}
+VERSION=$(gobump show -r)
 
 # Generate shasum
-pushd ./pkg/dist/${VERSION}
-shasum -a 256 * > ./${VERSION}_SHASUMS
+pushd ./pkg/dist/v${VERSION}
+shasum -a 256 * > ./v${VERSION}_SHASUMS
 popd

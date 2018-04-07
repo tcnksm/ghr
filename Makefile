@@ -1,7 +1,9 @@
-VERSION = $(shell grep 'Version string' version.go | sed -E 's/.*"(.+)"$$/\1/')
+VERSION := $(shell gobump show -r)
 COMMIT = $(shell git describe --always)
 PACKAGES = $(shell go list ./... | grep -v '/vendor/')
-EXTERNAL_TOOLS = github.com/Songmu/goxz/cmd/goxz
+EXTERNAL_TOOLS = \
+    github.com/Songmu/goxz/cmd/goxz \
+    github.com/motemen/gobump
 
 default: test
 
@@ -16,21 +18,28 @@ bootstrap:
 build:
 	go build -ldflags "-X main.GitCommit=$(COMMIT)" -o bin/ghr
 
+bump: bootstrap
+	@sh -c "'$(CURDIR)/scripts/bump.sh'"
+
+crossbuild: bootstrap
+	goxz -pv=v${VERSION} -build-ldflags="-X main.GitCommit=${COMMIT}" \
+        -arch=386,amd64 -d=./pkg/dist/v${VERSION}
+
 # install installs binary on $GOPATH/bin directory.
 install:
 	go install -ldflags "-X main.GitCommit=$(COMMIT)"
 
 # package runs compile.sh to run gox and zip them.
 # Artifacts will be generated in './pkg' directory
-package:
+package: bootstrap
 	@sh -c "'$(CURDIR)/scripts/package.sh'"
 
 brew: package
-	go run release/main.go $(VERSION) pkg/dist/$(VERSION)/ghr_$(VERSION)_darwin_amd64.zip > ../homebrew-ghr/ghr.rb
+	go run release/main.go v$(VERSION) pkg/dist/v$(VERSION)/ghr_v$(VERSION)_darwin_amd64.zip > ../homebrew-ghr/ghr.rb
 
-upload: build
+upload: build bootstrap
 	bin/ghr -v
-	bin/ghr $(VERSION) pkg/dist/$(VERSION)
+	bin/ghr -u tcnksm v$(VERSION) pkg/dist/v$(VERSION)
 
 test-all: vet lint test
 
@@ -45,7 +54,7 @@ vet:
 
 lint:
 	@go get github.com/golang/lint/golint
-	go list ./... | grep -v vendor | xargs -n1 golint
+	go list ./... | grep -v vendor | xargs -n1 golint -set_exit_status
 
 cover:
 	@go get golang.org/x/tools/cmd/cover
@@ -53,4 +62,6 @@ cover:
 	go tool cover -html cover.out
 	rm cover.out
 
-.PHONY: build install package brew test test-race test-all vet lint cover
+release: bump package upload
+
+.PHONY: bootstrap bump crossbuild build install package brew test test-race test-all vet lint cover release

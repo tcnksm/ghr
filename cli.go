@@ -27,7 +27,6 @@ const (
 
 	// EnvDebug is an environment var to handle debug mode
 	EnvDebug      = "GHR_DEBUG"
-	EnvStackTrace = "GHR_TRACE"
 )
 
 // Exit codes are set to a value that represnet an exit code for a paticular error.
@@ -48,7 +47,7 @@ const (
 const (
 	defaultCheckTimeout = 2 * time.Second
 	defaultBaseURL      = "https://api.github.com/"
-	DefaultParallel     = -1
+	defaultParallel     = -1
 )
 
 // Debugf prints debug output when EnvDebug is set
@@ -58,7 +57,7 @@ func Debugf(format string, args ...interface{}) {
 	}
 }
 
-// PrintErrorf prints red error message to console.
+// PrintRedf prints red error message to console.
 func PrintRedf(w io.Writer, format string, args ...interface{}) {
 	format = fmt.Sprintf("[red]%s[reset]", format)
 	fmt.Fprint(w,
@@ -120,8 +119,8 @@ func (cli *CLI) Run(args []string) int {
 	flags.BoolVar(&draft, "draft", false, "")
 	flags.BoolVar(&prerelease, "prerelease", false, "")
 
-	flags.IntVar(&parallel, "parallel", DefaultParallel, "")
-	flags.IntVar(&parallel, "p", DefaultParallel, "")
+	flags.IntVar(&parallel, "parallel", defaultParallel, "")
+	flags.IntVar(&parallel, "p", defaultParallel, "")
 
 	flags.BoolVar(&recreate, "delete", false, "")
 	flags.BoolVar(&recreate, "recreate", false, "")
