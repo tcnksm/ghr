@@ -12,7 +12,7 @@ import (
 const Name = "ghr"
 
 // Version is application version
-const Version string = "0.5.4"
+const Version string = "0.9.0"
 
 // GitCommit describes latest commit hash.
 // This is automatically extracted by git describe --always.
@@ -33,8 +33,8 @@ func OutputVersion() string {
 	verCheckCh := make(chan *latest.CheckResponse)
 	go func() {
 		githubTag := &latest.GithubTag{
-			Owner:             "tcnksm",
-			Repository:        "ghr",
+			Owner:      "tcnksm",
+			Repository: "ghr",
 		}
 
 		res, err := latest.Check(githubTag, Version)
