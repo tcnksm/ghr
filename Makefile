@@ -36,7 +36,7 @@ brew: package
 
 upload: build bootstrap
 	bin/ghr -v
-	bin/ghr v$(VERSION) pkg/dist/v$(VERSION)
+	bin/ghr -u tcnksm v$(VERSION) pkg/dist/v$(VERSION)
 
 test-all: vet lint test
 
