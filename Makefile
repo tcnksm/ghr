@@ -18,6 +18,9 @@ bootstrap:
 build:
 	go build -ldflags "-X main.GitCommit=$(COMMIT)" -o bin/ghr
 
+bump: bootstrap
+	@sh -c "'$(CURDIR)/scripts/bump.sh'"
+
 crossbuild: bootstrap
 	goxz -pv=v${VERSION} -build-ldflags="-X main.GitCommit=${COMMIT}" \
         -arch=386,amd64 -d=./pkg/dist/v${VERSION}
