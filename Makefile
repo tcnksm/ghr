@@ -62,4 +62,6 @@ cover:
 	go tool cover -html cover.out
 	rm cover.out
 
-.PHONY: build install package brew test test-race test-all vet lint cover
+release: bump package upload
+
+.PHONY: bootstrap bump crossbuild build install package brew test test-race test-all vet lint cover release
