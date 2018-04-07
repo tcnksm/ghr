@@ -4,7 +4,7 @@ set -e
 DIR=$(cd $(dirname ${0})/.. && pwd)
 cd ${DIR}
 
--d pkg && rm -rf ./pkg
+test -d pkg && rm -rf ./pkg
 make crossbuild
 
 VERSION=$(gobump show -r)

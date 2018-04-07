@@ -1,4 +1,4 @@
-VERSION := $(shell gobump show -r)
+VERSION = $(shell gobump show -r)
 COMMIT = $(shell git describe --always)
 PACKAGES = $(shell go list ./... | grep -v '/vendor/')
 EXTERNAL_TOOLS = \
