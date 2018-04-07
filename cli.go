@@ -58,7 +58,7 @@ func Debugf(format string, args ...interface{}) {
 	}
 }
 
-// PrintErrorf prints red error message to console.
+// PrintRedf prints red error message to console.
 func PrintRedf(w io.Writer, format string, args ...interface{}) {
 	format = fmt.Sprintf("[red]%s[reset]", format)
 	fmt.Fprint(w,
