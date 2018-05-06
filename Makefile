@@ -3,7 +3,8 @@ COMMIT = $(shell git describe --always)
 PACKAGES = $(shell go list ./... | grep -v '/vendor/')
 EXTERNAL_TOOLS = \
     github.com/Songmu/goxz/cmd/goxz \
-    github.com/motemen/gobump
+    github.com/motemen/gobump \
+    github.com/Songmu/ghch/cmd/ghch
 
 default: test
 
