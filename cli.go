@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"regexp"
 	"runtime"
 	"time"
 
@@ -26,7 +27,7 @@ const (
 	EnvGitHubAPI = "GITHUB_API"
 
 	// EnvDebug is an environment var to handle debug mode
-	EnvDebug      = "GHR_DEBUG"
+	EnvDebug = "GHR_DEBUG"
 )
 
 // Exit codes are set to a value that represnet an exit code for a paticular error.
@@ -163,20 +164,25 @@ func (cli *CLI) Run(args []string) int {
 	// If it's not provided via command line flag, read it from .gitconfig
 	// (github user or git user).
 	if len(owner) == 0 {
-		var err error
-		owner, err = gitconfig.GithubUser()
-		if err != nil {
-			owner, err = gitconfig.Username()
+		origin, err := gitconfig.OriginURL()
+		if err == nil {
+			owner = retrieveOwnerName(origin)
 		}
+		if len(owner) == 0 {
+			owner, err = gitconfig.GithubUser()
+			if err != nil {
+				owner, err = gitconfig.Username()
+			}
 
-		if err != nil {
-			PrintRedf(cli.errStream,
-				"Failed to set up ghr: repository owner name not found\n")
-			fmt.Fprintf(cli.errStream,
-				"Please set it via `-u` option.\n\n"+
-					"You can set default owner name in `github.username` or `user.name`\n"+
-					"in `~/.gitconfig` file\n")
-			return ExitCodeOwnerNotFound
+			if err != nil {
+				PrintRedf(cli.errStream,
+					"Failed to set up ghr: repository owner name not found\n")
+				fmt.Fprintf(cli.errStream,
+					"Please set it via `-u` option.\n\n"+
+						"You can set default owner name in `github.username` or `user.name`\n"+
+						"in `~/.gitconfig` file\n")
+				return ExitCodeOwnerNotFound
+			}
 		}
 	}
 	Debugf("Owner: %s", owner)
@@ -193,7 +199,7 @@ func (cli *CLI) Run(args []string) int {
 				"ghr reads it from `.git/config` file. Change directory to \n"+
 					"repository root directory or setup git repository.\n"+
 					"Or set it via `-r` option.\n")
-			return ExitCodeOwnerNotFound
+			return ExitCodeRepoNotFound
 		}
 	}
 	Debugf("Repository: %s", repo)
@@ -297,6 +303,16 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	return ExitCodeOK
+}
+
+var ownerNameReg = regexp.MustCompile(`([-a-zA-Z0-9]+)/[^/]+$`)
+
+func retrieveOwnerName(repoURL string) string {
+	matched := ownerNameReg.FindStringSubmatch(repoURL)
+	if len(matched) < 2 {
+		return ""
+	}
+	return matched[1]
 }
 
 // maskString is used to mask a string which should not be displayed
