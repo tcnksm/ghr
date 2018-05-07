@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.10.0](https://github.com/tcnksm/ghr/compare/v0.9.0...v0.10.0) (2018-05-08)
+
+* [incompatible] retrieve owner from origin url first [#87](https://github.com/tcnksm/ghr/pull/87) ([Songmu](https://github.com/Songmu))
+* update deps [#88](https://github.com/tcnksm/ghr/pull/88) ([Songmu](https://github.com/Songmu))
+
 ## [v0.9.0](https://github.com/tcnksm/ghr/compare/v0.5.4...v0.9.0) (2018-04-07)
 
 * introduce motemen/gobump and adjust releng scripts [#85](https://github.com/tcnksm/ghr/pull/85) ([Songmu](https://github.com/Songmu))
