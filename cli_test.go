@@ -120,3 +120,23 @@ func TestRun_versionFlag(t *testing.T) {
 		t.Fatalf("%q output %q, want = %q", command, got, want)
 	}
 }
+
+func TestRetrieveOwnerName(t *testing.T) {
+	testCases := []struct {
+		in, expected string
+	}{
+		{"git@github.com:tcnksm/ghr.git", "tcnksm"},
+		{"https://github.com/motemen/ghq.git", "motemen"},
+		{"git://github.com/Songmu/ghg.git", "Songmu"},
+		{"hoge", ""},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.in, func(t *testing.T) {
+			out := retrieveOwnerName(tc.in)
+			if out != tc.expected {
+				t.Errorf("out: %s, expected: %s", out, tc.expected)
+			}
+		})
+	}
+}
