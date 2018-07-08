@@ -58,7 +58,7 @@ func NewGitHubClient(owner, repo, token, urlStr string) (GitHub, error) {
 	}
 
 	if len(urlStr) == 0 {
-		return nil, errors.New("missgig GitHub API URL")
+		return nil, errors.New("missing GitHub API URL")
 	}
 
 	baseURL, err := url.ParseRequestURI(urlStr)
@@ -86,7 +86,7 @@ func (c *GitHubClient) SetUploadURL(urlStr string) error {
 	i := strings.Index(urlStr, "repos/")
 	parsedURL, err := url.ParseRequestURI(urlStr[:i])
 	if err != nil {
-		return errors.Wrap(err, "faield to parse upload URL")
+		return errors.Wrap(err, "failed to parse upload URL")
 	}
 
 	c.UploadURL = parsedURL
