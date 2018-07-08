@@ -69,7 +69,7 @@ func NewGitHubClient(owner, repo, token, urlStr string) (GitHub, error) {
 	ts := oauth2.StaticTokenSource(&oauth2.Token{
 		AccessToken: token,
 	})
-	tc := oauth2.NewClient(oauth2.NoContext, ts)
+	tc := oauth2.NewClient(context.TODO(), ts)
 
 	client := github.NewClient(tc)
 	client.BaseURL = baseURL
