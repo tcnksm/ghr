@@ -1,6 +1,5 @@
 VERSION = $(shell gobump show -r)
 COMMIT = $(shell git describe --always)
-PACKAGES = $(shell go list ./... | grep -v '/vendor/')
 EXTERNAL_TOOLS = \
     github.com/Songmu/goxz/cmd/goxz \
     github.com/motemen/gobump \
@@ -45,13 +44,13 @@ upload: build bootstrap
 test-all: vet lint test
 
 test:
-	go test -v -parallel=4 ${PACKAGES}
+	go test -v -parallel=4 ./...
 
 test-race:
-	go test -v -race ${PACKAGES}
+	go test -v -race ./...
 
 vet:
-	go vet ${PACKAGES}
+	go vet ./...
 
 lint:
 	@go get github.com/golang/lint/golint
