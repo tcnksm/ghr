@@ -17,7 +17,7 @@
   branch = "master"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "eafdb6578137f78fe186e486a4bc633e1434cc89"
+  revision = "60f2773bd99aa86164bc80bf370be6ba63b47dea"
 
 [[projects]]
   branch = "master"
@@ -76,7 +76,7 @@
     "html",
     "html/atom"
   ]
-  revision = "640f4622ab692b87c2f3a94265e6f579fe38263d"
+  revision = "32a936f46389aa10549d60bd7833e54b01685d09"
 
 [[projects]]
   branch = "master"
@@ -85,7 +85,7 @@
     ".",
     "internal"
   ]
-  revision = "cdc340f7c179dbbfa4afd43b7614e8fcadde4269"
+  revision = "ef147856a6ddbb60760db74283d2424e98c87bff"
 
 [[projects]]
   branch = "master"
@@ -97,7 +97,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "6f686a352de66814cdd080d970febae7767857a3"
+  revision = "3c6ecd8f22c6f40fbeec94c000a069d7d87c7624"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -110,8 +110,8 @@
     "internal/urlfetch",
     "urlfetch"
   ]
-  revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
-  version = "v1.0.0"
+  revision = "b1f26356af11148e710935ed1ac8a7f5702c7612"
+  version = "v1.1.0"
 
 [solve-meta]
   analyzer-name = "dep"
