@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.10.1](https://github.com/tcnksm/ghr/compare/v0.10.0...v0.10.1) (2018-07-08)
+
+* Small fixes GitHub [#92](https://github.com/tcnksm/ghr/pull/92) ([shuheiktgw](https://github.com/shuheiktgw))
+* Remove redundant string declaration [#91](https://github.com/tcnksm/ghr/pull/91) ([shuheiktgw](https://github.com/shuheiktgw))
+
 ## [v0.10.0](https://github.com/tcnksm/ghr/compare/v0.9.0...v0.10.0) (2018-05-08)
 
 * [incompatible] retrieve owner from origin url first [#87](https://github.com/tcnksm/ghr/pull/87) ([Songmu](https://github.com/Songmu))
