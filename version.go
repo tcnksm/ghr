@@ -40,7 +40,7 @@ func OutputVersion() string {
 		res, err := latest.Check(githubTag, Version)
 		if err != nil {
 			// Don't return error
-			Debugf("[ERROR] Check lastet version is failed: %s", err)
+			Debugf("[ERROR] Check latest version is failed: %s", err)
 			return
 		}
 		verCheckCh <- res
