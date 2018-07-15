@@ -23,7 +23,7 @@ func LocalAssets(path string) ([]string, error) {
 		return []string{path}, nil
 	}
 
-	// Glob all files in the fiven path
+	// Glob all files in the given path
 	files, err := filepath.Glob(filepath.Join(path, "*"))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to glob files")

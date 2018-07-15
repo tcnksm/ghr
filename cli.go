@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	// EnvGitHubToken is an environment var containting the GitHub API token
+	// EnvGitHubToken is an environment var containing the GitHub API token
 	EnvGitHubToken = "GITHUB_TOKEN"
 
 	// EnvGitHubAPI is an environment var containing the GitHub API base endpoint.
@@ -30,7 +30,7 @@ const (
 	EnvDebug = "GHR_DEBUG"
 )
 
-// Exit codes are set to a value that represnet an exit code for a paticular error.
+// Exit codes are set to a value that represent an exit code for a particular error.
 const (
 	ExitCodeOK int = 0
 
@@ -42,7 +42,7 @@ const (
 	ExitCodeTokenNotFound
 	ExitCodeOwnerNotFound
 	ExitCodeRepoNotFound
-	ExitCodeRleaseError
+	ExitCodeReleaseError
 )
 
 const (
@@ -344,7 +344,7 @@ environment variable.
 
 Options:
 
-  -username, -u      Github repository onwer name. By default, ghr
+  -username, -u      Github repository owner name. By default, ghr
                      extracts it from global gitconfig value.
 
   -repository, -r    GitHub repository name. By default, ghr extracts
