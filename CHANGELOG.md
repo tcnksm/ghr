@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.10.2](https://github.com/tcnksm/ghr/compare/v0.10.1...v0.10.2) (2018-07-27)
+
+* Fix typos in the project [#94](https://github.com/tcnksm/ghr/pull/94) ([shuheiktgw](https://github.com/shuheiktgw))
+* update deps [#93](https://github.com/tcnksm/ghr/pull/93) ([Songmu](https://github.com/Songmu))
+
 ## [v0.10.1](https://github.com/tcnksm/ghr/compare/v0.10.0...v0.10.1) (2018-07-08)
 
 * Small fixes GitHub [#92](https://github.com/tcnksm/ghr/pull/92) ([shuheiktgw](https://github.com/shuheiktgw))
