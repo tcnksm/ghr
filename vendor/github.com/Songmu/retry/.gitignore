@@ -1,5 +1,4 @@
 .*
 !.gitignore
 !.travis.yml
-!.goxc.json
 dist/

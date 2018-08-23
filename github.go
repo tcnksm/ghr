@@ -204,6 +204,7 @@ func (c *GitHubClient) UploadAsset(ctx context.Context, releaseID int64, filenam
 		if err != nil {
 			return errors.Wrap(err, "failed to open file")
 		}
+		defer f.Close()
 
 		asset, res, err = c.Repositories.UploadReleaseAsset(context.TODO(), c.Owner, c.Repo, releaseID, opts, f)
 		if err != nil {

@@ -1,32 +1,39 @@
-BUILD_OS_TARGETS = "linux darwin freebsd windows"
+VERSION = $(shell cd cmd/retry && gobump show -r)
+ifdef update
+  u=-u
+endif
 
 test: deps
 	go test ./...
 
 deps:
-	go get -d -v -t ./...
-	go get github.com/golang/lint/golint
-	go get golang.org/x/tools/cmd/cover
-	go get github.com/axw/gocov/gocov
-	go get github.com/mattn/goveralls
+	go get ${u} -d -v -t ./...
 
-LINT_RET = .golint.txt
-lint: deps
+devel-deps: deps
+	go get ${u} github.com/golang/lint/golint \
+        github.com/mattn/goveralls            \
+        github.com/motemen/gobump/cmd/gobump  \
+        github.com/Songmu/goxz/cmd/goxz       \
+        github.com/Songmu/ghch/cmd/ghch       \
+        github.com/tcnksm/ghr
+
+lint: devel-deps
 	go vet ./...
-	rm -f $(LINT_RET)
-	for os in "$(BUILD_OS_TARGETS)"; do \
-		if [ $$os != "windows" ]; then \
-			GOOS=$$os golint ./... | tee -a $(LINT_RET); \
-		else \
-			GOOS=$$os golint --min_confidence=0.9 ./... | tee -a $(LINT_RET); \
-		fi \
-	done
-	test ! -s $(LINT_RET)
+	golint -set_exit_status ./...
 
-cover: deps
+cover: devel-deps
 	goveralls
 
-release:
+bump:
 	_tools/releng
 
-.PHONY: test deps lint cover
+crossbuild: devel-deps
+	$(eval ver = $(shell cd cmd/retry && gobump show -r))
+	goxz -pv=v$(ver) -d=./dist/v$(ver) ./cmd/retry
+
+upload:
+	ghr v$(VERSION) dist/v$(VERSION)
+
+release: bump crossbuild upload
+
+.PHONY: test deps devel-deps lint cover bump crossbuild upload release
