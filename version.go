@@ -12,7 +12,7 @@ import (
 const Name = "ghr"
 
 // Version is application version
-const Version string = "0.10.2"
+const Version string = "0.11.0"
 
 // GitCommit describes latest commit hash.
 // This is automatically extracted by git describe --always.
