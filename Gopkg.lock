@@ -3,103 +3,134 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:d40ca6c51710b4293070f85036e243f5e7283d7ddddb2308aa00f14b8c1369b6"
   name = "github.com/Songmu/retry"
   packages = ["."]
-  revision = "3d913ef13826a2183b18cbfb88925a7735bf3635"
+  pruneopts = "UT"
+  revision = "d7e964d5c8b61a8b9e8f3b017b9d805a2106ac01"
 
 [[projects]]
+  digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
-  version = "v1.1.0"
+  pruneopts = "UT"
+  revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:4be3c01ef56542da4f1268c52a8b88bae5309ec3dade7755e250bc933e13ac70"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "60f2773bd99aa86164bc80bf370be6ba63b47dea"
+  pruneopts = "UT"
+  revision = "d7732128a00e8e95e8fe896017da18ee20b2180d"
 
 [[projects]]
   branch = "master"
+  digest = "1:a63cff6b5d8b95638bfe300385d93b2a6d9d687734b863da8e09dc834510a690"
   name = "github.com/google/go-querystring"
   packages = ["query"]
+  pruneopts = "UT"
   revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
 
 [[projects]]
   branch = "master"
+  digest = "1:32c0e96a63bd093eccf37db757fb314be5996f34de93969321c2cbef893a7bd6"
   name = "github.com/hashicorp/go-version"
   packages = ["."]
-  revision = "23480c0665776210b5fbbac6eaaee40e3e6a96b7"
+  pruneopts = "UT"
+  revision = "270f2f71b1ee587f3b609f00f422b76a6b28f348"
 
 [[projects]]
   branch = "master"
+  digest = "1:0f96ec4151a24d7bfd4298fc13cc320a000e31b4e5431cf88e3ffc961db846fd"
   name = "github.com/mattn/go-colorable"
   packages = ["."]
+  pruneopts = "UT"
   revision = "efa589957cd060542a26d2dd7832fd6a6c6c3ade"
 
 [[projects]]
+  digest = "1:d4d17353dbd05cb52a2a52b7fe1771883b682806f68db442b436294926bbfafb"
   name = "github.com/mattn/go-isatty"
   packages = ["."]
+  pruneopts = "UT"
   revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
   version = "v0.0.3"
 
 [[projects]]
   branch = "master"
+  digest = "1:ded79ae4dc43f8382f782459c8082f8910e5002fc04a492e98c7a72734ae0dc5"
   name = "github.com/mitchellh/colorstring"
   packages = ["."]
+  pruneopts = "UT"
   revision = "8631ce90f28644f54aeedcb3e389a85174e067d1"
 
 [[projects]]
   branch = "master"
+  digest = "1:3891cc78541df6e4596b3e73978eb062d32967084069270ec881b959be5155ae"
   name = "github.com/pkg/errors"
   packages = ["."]
+  pruneopts = "UT"
   revision = "816c9085562cd7ee03e7f8188a1cfd942858cded"
 
 [[projects]]
   branch = "master"
+  digest = "1:9103234d8f125b20a2c1a59c412138cef1455e725d50e812d9300485b0d24173"
   name = "github.com/tcnksm/go-gitconfig"
   packages = ["."]
+  pruneopts = "UT"
   revision = "6411ba19847f20afe47f603328d97aaeca6def6f"
 
 [[projects]]
   branch = "master"
+  digest = "1:eefc695042e6873e2e031a81bde1afcc7e12fe3849b9a7b77f5be1bccd9ede44"
   name = "github.com/tcnksm/go-latest"
   packages = ["."]
+  pruneopts = "UT"
   revision = "e3007ae9052ed85144087e7392e4c3fbc07962fa"
 
 [[projects]]
   branch = "master"
+  digest = "1:48a8174555708534442b69eec9e911f685954a9c282f777fe17964254f892b5f"
   name = "golang.org/x/net"
   packages = [
     "context",
     "context/ctxhttp",
     "html",
-    "html/atom"
+    "html/atom",
   ]
-  revision = "32a936f46389aa10549d60bd7833e54b01685d09"
+  pruneopts = "UT"
+  revision = "922f4815f713f213882e8ef45e0d315b164d705c"
 
 [[projects]]
   branch = "master"
+  digest = "1:363b547c971a2b07474c598b6e9ebcb238d556d8a27f37b3895ad20cd50e7281"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
-    "internal"
+    "internal",
   ]
-  revision = "ef147856a6ddbb60760db74283d2424e98c87bff"
+  pruneopts = "UT"
+  revision = "d2e6202438beef2727060aa7cabdd924d92ebfd9"
 
 [[projects]]
   branch = "master"
+  digest = "1:39ebcc2b11457b703ae9ee2e8cca0f68df21969c6102cb3b705f76cca0ea0239"
   name = "golang.org/x/sync"
   packages = ["errgroup"]
+  pruneopts = "UT"
   revision = "1d60e4601c6fd243af51cc01ddf169918a5407ca"
 
 [[projects]]
   branch = "master"
+  digest = "1:a3f00ac457c955fe86a41e1495e8f4c54cb5399d609374c5cc26aa7d72e542c8"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "3c6ecd8f22c6f40fbeec94c000a069d7d87c7624"
+  pruneopts = "UT"
+  revision = "3b58ed4ad3395d483fc92d5d14123ce2c3581fec"
 
 [[projects]]
+  digest = "1:328b5e4f197d928c444a51a75385f4b978915c0e75521f0ad6a3db976c97a7d3"
   name = "google.golang.org/appengine"
   packages = [
     "internal",
@@ -108,14 +139,25 @@
     "internal/log",
     "internal/remote_api",
     "internal/urlfetch",
-    "urlfetch"
+    "urlfetch",
   ]
+  pruneopts = "UT"
   revision = "b1f26356af11148e710935ed1ac8a7f5702c7612"
   version = "v1.1.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "94a8c40147bb7e3c9f9d484b02bad659c82d8fe9af98de3ebbffb3554fdfa8bf"
+  input-imports = [
+    "github.com/Songmu/retry",
+    "github.com/google/go-github/github",
+    "github.com/mattn/go-colorable",
+    "github.com/mitchellh/colorstring",
+    "github.com/pkg/errors",
+    "github.com/tcnksm/go-gitconfig",
+    "github.com/tcnksm/go-latest",
+    "golang.org/x/oauth2",
+    "golang.org/x/sync/errgroup",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
