@@ -81,6 +81,7 @@ func (cli *CLI) Run(args []string) int {
 		token string
 
 		commitish  string
+		name       string
 		body       string
 		draft      bool
 		prerelease bool
@@ -113,6 +114,9 @@ func (cli *CLI) Run(args []string) int {
 
 	flags.StringVar(&commitish, "commitish", "", "")
 	flags.StringVar(&commitish, "c", "", "")
+
+	flags.StringVar(&name, "name", token, "")
+	flags.StringVar(&name, "n", token, "")
 
 	flags.StringVar(&body, "body", "", "")
 	flags.StringVar(&body, "b", "", "")
@@ -254,9 +258,11 @@ func (cli *CLI) Run(args []string) int {
 		outStream: cli.outStream,
 	}
 
+	Debugf("Name: %s", name)
+
 	// Prepare create release request
 	req := &github.RepositoryRelease{
-		Name:            github.String(tag),
+		Name:            github.String(name),
 		TagName:         github.String(tag),
 		Prerelease:      github.Bool(prerelease),
 		Draft:           github.Bool(draft),
@@ -349,6 +355,8 @@ Options:
 
   -repository, -r    GitHub repository name. By default, ghr extracts
                      repository name from current directory's .git/config.
+
+  -name, -n          GitHub release title. By default the tag is used.
 
   -token, -t         GitHub API Token. By default, ghr reads it from
                      'GITHUB_TOKEN' env var.
