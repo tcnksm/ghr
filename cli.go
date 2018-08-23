@@ -115,8 +115,8 @@ func (cli *CLI) Run(args []string) int {
 	flags.StringVar(&commitish, "commitish", "", "")
 	flags.StringVar(&commitish, "c", "", "")
 
-	flags.StringVar(&name, "name", token, "")
-	flags.StringVar(&name, "n", token, "")
+	flags.StringVar(&name, "name", "", "")
+	flags.StringVar(&name, "n", "", "")
 
 	flags.StringVar(&body, "body", "", "")
 	flags.StringVar(&body, "b", "", "")
