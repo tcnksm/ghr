@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.12.0](https://github.com/tcnksm/ghr/compare/v0.11.0...v0.12.0) (2018-08-25)
+
+* update README.md [#103](https://github.com/tcnksm/ghr/pull/103) ([Songmu](https://github.com/Songmu))
+* Update README with current options [#95](https://github.com/tcnksm/ghr/pull/95) ([scorphus](https://github.com/scorphus))
+* Add go 1.11 to .travis.yml [#102](https://github.com/tcnksm/ghr/pull/102) ([shuheiktgw](https://github.com/shuheiktgw))
+* Add new option to skip execution of ghr if a release with a specified tag already exists [#101](https://github.com/tcnksm/ghr/pull/101) ([shuheiktgw](https://github.com/shuheiktgw))
+
 ## [v0.11.0](https://github.com/tcnksm/ghr/compare/v0.10.2...v0.11.0) (2018-08-23)
 
 * Ready for releasing and do trivial fixed [#100](https://github.com/tcnksm/ghr/pull/100) ([Songmu](https://github.com/Songmu))
