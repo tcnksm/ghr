@@ -97,14 +97,7 @@ $ ghr \
 
 ## Install
 
-If you are OSX user, you can use [Homebrew](http://brew.sh/):
-
-```bash
-$ brew tap tcnksm/ghr
-$ brew install ghr
-```
-
-If you are in another platform, you can download binary from [release page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory.
+You can download binary from [release page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory.
 
 Or you can use `go get` (you need to use go1.7 or later),
 
