@@ -85,6 +85,7 @@ $ ghr \
     -u USERNAME \     # Set Github username
     -r REPO \         # Set repository name
     -c COMMIT \       # Set target commitish, branch or commit SHA
+    -n TITLE \        # Set release title
     -b BODY \         # Set text describing the contents of the release
     -p NUM \          # Set amount of parallelism (Default is number of CPU)
     -delete \         # Delete release and its git tag in advance if it exists (same as -recreate)
@@ -97,14 +98,7 @@ $ ghr \
 
 ## Install
 
-If you are OSX user, you can use [Homebrew](http://brew.sh/):
-
-```bash
-$ brew tap tcnksm/ghr
-$ brew install ghr
-```
-
-If you are in another platform, you can download binary from [release page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory.
+You can download binary from [release page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory.
 
 Or you can use `go get` (you need to use go1.7 or later),
 
@@ -125,8 +119,6 @@ $ go get -u github.com/tcnksm/ghr
 1. Run test suite with the `make test` command and confirm that it passes
 1. Run `gofmt -s`
 1. Create new Pull Request
-
-
 
 ## Author
 
