@@ -87,7 +87,8 @@ $ ghr \
     -c COMMIT \       # Set target commitish, branch or commit SHA
     -b BODY \         # Set text describing the contents of the release
     -p NUM \          # Set amount of parallelism (Default is number of CPU)
-    -delete \         # Delete release and its git tag in advance if it exists
+    -delete \         # Delete release and its git tag in advance if it exists (same as -recreate)
+    -replace          # Replace artifacts if it is already uploaded
     -draft \          # Release as draft (Unpublish)
     -soft \           # Stop uploading if the same tag already exists
     -prerelease \     # Crate prerelease
