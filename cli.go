@@ -90,6 +90,7 @@ func (cli *CLI) Run(args []string) int {
 
 		recreate bool
 		replace  bool
+		soft     bool
 
 		stat    bool
 		version bool
@@ -131,6 +132,8 @@ func (cli *CLI) Run(args []string) int {
 	flags.BoolVar(&recreate, "recreate", false, "")
 
 	flags.BoolVar(&replace, "replace", false, "")
+
+	flags.BoolVar(&soft, "soft", false, "")
 
 	flags.BoolVar(&version, "version", false, "")
 	flags.BoolVar(&version, "v", false, "")
@@ -271,6 +274,21 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	ctx := context.TODO()
+
+	if soft {
+		_, err := ghr.GitHub.GetRelease(ctx, *req.TagName)
+
+		if err == nil {
+			fmt.Fprintf(cli.outStream, "ghr aboted since tag `%s` already exists\n", *req.TagName)
+			return ExitCodeOK
+		}
+
+		if err != nil && err != ErrReleaseNotFound {
+			PrintRedf(cli.errStream, "Failed to get GitHub release: %s\n", err)
+			return ExitCodeError
+		}
+	}
+
 	release, err := ghr.CreateRelease(ctx, req, recreate)
 	if err != nil {
 		PrintRedf(cli.errStream, "Failed to create GitHub release page: %s\n", err)
@@ -372,4 +390,6 @@ Options:
                      thinks it's same when local artifact base name
                      and uploaded file name are same.
 
+  -soft              Stop uploading if the repository already has release
+                     with the specified tag.
 `
