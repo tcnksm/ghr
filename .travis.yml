@@ -2,6 +2,7 @@ language: go
 sudo: false
 go:
   - 1.10.x
+  - 1.11.x
 env:
   global:
     - secure: "c7Owhq9NWblgnQLvmkssks3j4zNPCvgkkagVcuz3GmhcklVrZqY3H57FNepT3pkTYt+EJgqocBoohZodVFXsn917DcrMHETO6enDLUvmsJTTdxVFIU6ylr79NLTfNSJFY//gCe3WiMPw7bEePrAP1o2zMCvK21bZoHN6r48VHgY="
