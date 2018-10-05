@@ -54,7 +54,7 @@ Note that environmental variable takes priority over gitconfig value.
 
 ### GitHub Enterprise
 
-You can use `ghr` for GitHub Enterprise. Change API endpoint via the enviromental variable.
+You can use `ghr` for GitHub Enterprise. Change API endpoint via the environmental variable.
 
 ```bash
 $ export GITHUB_API=http://github.company.com/api/v3/
