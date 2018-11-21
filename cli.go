@@ -368,28 +368,33 @@ environment variable.
 
 Options:
 
-  -username, -u      Github repository owner name. By default, ghr
-                     extracts it from global gitconfig value.
+-username, -u
+	Github repository owner name. By default, ghr extracts it from global
+	gitconfig value.
 
-  -repository, -r    GitHub repository name. By default, ghr extracts
-                     repository name from current directory's .git/config.
+-repository, -r
+	GitHub repository name. By default, ghr extracts repository name from
+	current directory's .git/config.
 
-  -name, -n          GitHub release title. By default the tag is used.
+-name, -n
+	GitHub release title. By default the tag is used.
 
-  -token, -t         GitHub API Token. By default, ghr reads it from
-                     'GITHUB_TOKEN' env var.
+-token, -t
+	GitHub API Token. By default, ghr reads it from 'GITHUB_TOKEN' env var.
 
-  -parallel=-1       Parallelization factor. This option limits amount
-                     of parallelism of uploading. By default, ghr uses
-                     number of logic CPU.
+-parallel=-1
+	Parallelization factor. This option limits amount of parallelism of
+	uploading. By default, ghr uses number of logic CPU.
 
-  -recreate          Recreate release if it already exists. If want to
-                     upload to same release and replace use '-replace'.
+-recreate
+	Recreate release if it already exists. If want to upload to same release
+	and replace use '-replace'.
 
-  -replace           Replace artifacts if it is already uploaded. ghr
-                     thinks it's same when local artifact base name
-                     and uploaded file name are same.
+-replace
+	Replace artifacts if it is already uploaded. ghr thinks it's same when
+	local artifact base name and uploaded file name are same.
 
-  -soft              Stop uploading if the repository already has release
-                     with the specified tag.
+-soft
+	Stop uploading if the repository already has release with the specified
+	tag.
 `
