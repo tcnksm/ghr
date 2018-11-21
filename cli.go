@@ -368,7 +368,7 @@ environment variable.
 
 Options:
 
--username, -u
+-username, -owner, -u
 	Github repository owner name. By default, ghr extracts it from global
 	gitconfig value.
 
@@ -376,17 +376,29 @@ Options:
 	GitHub repository name. By default, ghr extracts repository name from
 	current directory's .git/config.
 
+-token, -t
+	GitHub API Token. By default, ghr reads it from 'GITHUB_TOKEN' env var.
+
+-commitish, -c
+	Set target commitish, branch or commit SHA
+
 -name, -n
 	GitHub release title. By default the tag is used.
 
--token, -t
-	GitHub API Token. By default, ghr reads it from 'GITHUB_TOKEN' env var.
+-body, -b
+	Set text describing the contents of the release
+
+-draft
+	Release as draft (Unpublish)
+
+-prerelease
+	Crate prerelease
 
 -parallel=-1
 	Parallelization factor. This option limits amount of parallelism of
 	uploading. By default, ghr uses number of logic CPU.
 
--recreate
+-delete, -recreate
 	Recreate release if it already exists. If want to upload to same release
 	and replace use '-replace'.
 
@@ -397,4 +409,10 @@ Options:
 -soft
 	Stop uploading if the repository already has release with the specified
 	tag.
+
+-version, -v
+	Print ghr version and exit
+
+-debug
+	Enable debug output
 `
