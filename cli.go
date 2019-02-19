@@ -392,7 +392,7 @@ Options:
 	Release as draft (Unpublish)
 
 -prerelease
-	Crate prerelease
+	Create prerelease
 
 -parallel=-1
 	Parallelization factor. This option limits amount of parallelism of
