@@ -92,7 +92,7 @@ $ ghr \
     -replace          # Replace artifacts if it is already uploaded
     -draft \          # Release as draft (Unpublish)
     -soft \           # Stop uploading if the same tag already exists
-    -prerelease \     # Crate prerelease
+    -prerelease \     # Create prerelease
     TAG PATH
 ```
 
