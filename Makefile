@@ -1,5 +1,6 @@
 VERSION = $(shell godzil show-version)
 COMMIT = $(shell git rev-parse --short HEAD)
+BUILD_LDFLAGS = "-s -w -X main.GitCommit=$(COMMIT)"
 EXTERNAL_TOOLS = \
     golang.org/x/lint/golint            \
     github.com/Songmu/godzil/cmd/godzil \
@@ -33,7 +34,7 @@ devel-deps: deps
 # build generate binary on './bin' directory.
 .PHONY: build
 build:
-	go build -ldflags "-X main.GitCommit=$(COMMIT)" -o bin/ghr
+	go build -ldflags=$(BUILD_LDFLAGS) -o bin/ghr
 
 .PHONY: bump
 bump: devel-deps
@@ -44,14 +45,14 @@ CREDITS: go.sum devel-deps
 
 .PHONY: crossbuild
 crossbuild: CREDITS
-	goxz -pv=v${VERSION} -build-ldflags="-X main.GitCommit=${COMMIT}" \
+	goxz -pv=v${VERSION} -build-ldflags=$(BUILD_LDFLAGS) \
         -arch=386,amd64 -d=./pkg/dist/v${VERSION}
 	cd pkg/dist/v${VERSION} && shasum -a 256 * > ./v${VERSION}_SHASUMS
 
 # install installs binary on $GOPATH/bin directory.
 .PHONY: install
 install:
-	go install -ldflags "-X main.GitCommit=$(COMMIT)"
+	go install -ldflags=$(BUILD_LDFLAGS)
 
 .PHONY: upload
 upload: build devel-deps
