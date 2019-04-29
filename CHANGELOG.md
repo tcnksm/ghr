@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.12.1](https://github.com/tcnksm/ghr/compare/v0.12.0...v0.12.1) (2019-04-30)
+
+* introduce go modules [#112](https://github.com/tcnksm/ghr/pull/112) ([Songmu](https://github.com/Songmu))
+* Fix typo in readme and help command [#110](https://github.com/tcnksm/ghr/pull/110) ([chrishelgert](https://github.com/chrishelgert))
+* Reformat help text to make it more man-like and matching flag set [#106](https://github.com/tcnksm/ghr/pull/106) ([realloc](https://github.com/realloc))
+* Fix a typo in README [#104](https://github.com/tcnksm/ghr/pull/104) ([felixonmars](https://github.com/felixonmars))
+
 ## [v0.12.0](https://github.com/tcnksm/ghr/compare/v0.11.0...v0.12.0) (2018-08-25)
 
 * update README.md [#103](https://github.com/tcnksm/ghr/pull/103) ([Songmu](https://github.com/Songmu))
