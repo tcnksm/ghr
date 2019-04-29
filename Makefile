@@ -51,10 +51,6 @@ crossbuild: CREDITS
 install:
 	go install -ldflags "-X main.GitCommit=$(COMMIT)"
 
-.PHONY: brew
-brew: crossbuild
-	go run release/main.go v$(VERSION) pkg/dist/v$(VERSION)/ghr_v$(VERSION)_darwin_amd64.zip > ../homebrew-ghr/ghr.rb
-
 .PHONY: upload
 upload: build devel-deps
 	bin/ghr -v
