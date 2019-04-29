@@ -19,6 +19,7 @@ default: test
 .PHONY: deps
 deps:
 	go get ${u} -d
+	go mod tidy
 
 # install external tools for this project
 .PHONY: devel-deps
@@ -60,7 +61,7 @@ upload: build devel-deps
 test-all: lint test
 
 .PHONY: test
-test:
+test: deps
 	go test -v -parallel=4 ./...
 
 .PHONY: test-race
@@ -68,7 +69,7 @@ test-race:
 	go test -v -race ./...
 
 .PHONY: lint
-lint:
+lint: devel-deps
 	go vet ./...
 	golint -set_exit_status ./...
 
