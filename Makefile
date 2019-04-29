@@ -3,6 +3,7 @@ COMMIT = $(shell git rev-parse --short HEAD)
 EXTERNAL_TOOLS = \
     golang.org/x/lint/golint            \
     github.com/Songmu/godzil/cmd/godzil \
+    github.com/Songmu/ghch/cmd/ghch     \
     github.com/mattn/goveralls                \
     github.com/Songmu/gocredits/cmd/gocredits \
     golang.org/x/tools/cmd/cover
@@ -55,7 +56,7 @@ install:
 .PHONY: upload
 upload: build devel-deps
 	bin/ghr -v
-	bin/ghr v$(VERSION) pkg/dist/v$(VERSION)
+	bin/ghr -body="$$(ghch --latest -F markdown)" v$(VERSION) pkg/dist/v$(VERSION)
 
 .PHONY: test-all
 test-all: lint test
