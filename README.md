@@ -98,7 +98,13 @@ $ ghr \
 
 ## Install
 
-You can download binary from [release page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory.
+If you are OSX user, you can use [Homebrew](http://brew.sh/):
+
+```bash
+$ brew install ghr
+```
+
+If you are in another platform, you can download binary from [release page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory.
 
 Or you can use `go get` (you need to use go1.7 or later),
 
@@ -113,12 +119,12 @@ $ go get -u github.com/tcnksm/ghr
 ## Contribution
 
 1. Fork ([https://github.com/tcnksm/ghr/fork](https://github.com/tcnksm/ghr/fork))
-1. Create a feature branch
-1. Commit your changes
-1. Rebase your local changes against the master branch
-1. Run test suite with the `make test` command and confirm that it passes
-1. Run `gofmt -s`
-1. Create new Pull Request
+2. Create a feature branch
+3. Commit your changes
+4. Rebase your local changes against the master branch
+5. Run test suite with the `make test` command and confirm that it passes
+6. Run `gofmt -s`
+7. Create new Pull Request
 
 ## Author
 
