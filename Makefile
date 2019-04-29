@@ -37,24 +37,22 @@ build:
 bump: devel-deps
 	godzil release
 
+CREDITS: go.sum devel-deps
+	gocredits -w
+
 .PHONY: crossbuild
-crossbuild: devel-deps
+crossbuild: CREDITS
 	goxz -pv=v${VERSION} -build-ldflags="-X main.GitCommit=${COMMIT}" \
         -arch=386,amd64 -d=./pkg/dist/v${VERSION}
+	cd pkg/dist/v${VERSION} && shasum -a 256 * > ./v${VERSION}_SHASUMS
 
 # install installs binary on $GOPATH/bin directory.
 .PHONY: install
 install:
 	go install -ldflags "-X main.GitCommit=$(COMMIT)"
 
-# package runs compile.sh to run gox and zip them.
-# Artifacts will be generated in './pkg' directory
-.PHONY: package
-package: devel-deps
-	@sh -c "'$(CURDIR)/scripts/package.sh'"
-
 .PHONY: brew
-brew: package
+brew: crossbuild
 	go run release/main.go v$(VERSION) pkg/dist/v$(VERSION)/ghr_v$(VERSION)_darwin_amd64.zip > ../homebrew-ghr/ghr.rb
 
 .PHONY: upload
@@ -85,4 +83,4 @@ cover:
 	rm cover.out
 
 .PHONY: release
-release: bump package upload
+release: bump crossbuild upload
