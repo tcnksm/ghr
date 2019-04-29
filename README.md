@@ -113,12 +113,12 @@ $ go get -u github.com/tcnksm/ghr
 ## Contribution
 
 1. Fork ([https://github.com/tcnksm/ghr/fork](https://github.com/tcnksm/ghr/fork))
-1. Create a feature branch
-1. Commit your changes
-1. Rebase your local changes against the master branch
-1. Run test suite with the `make test` command and confirm that it passes
-1. Run `gofmt -s`
-1. Create new Pull Request
+2. Create a feature branch
+3. Commit your changes
+4. Rebase your local changes against the master branch
+5. Run test suite with the `make test` command and confirm that it passes
+6. Run `gofmt -s`
+7. Create new Pull Request
 
 ## Author
 
