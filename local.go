@@ -41,6 +41,11 @@ func LocalAssets(path string) ([]string, error) {
 			continue
 		}
 
+		// Exclude hidden file
+		if filepath.Base(f)[0] == '.' {
+			continue
+		}
+
 		assets = append(assets, f)
 	}
 
