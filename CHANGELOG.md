@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.12.2](https://github.com/tcnksm/ghr/compare/v0.12.1...v0.12.2) (2019-07-08)
+
+* exclude hidden file [#113](https://github.com/tcnksm/ghr/pull/113) ([karupanerura](https://github.com/karupanerura))
+
 ## [v0.12.1](https://github.com/tcnksm/ghr/compare/v0.12.0...v0.12.1) (2019-04-30)
 
 * introduce go modules [#112](https://github.com/tcnksm/ghr/pull/112) ([Songmu](https://github.com/Songmu))
