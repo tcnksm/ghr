@@ -112,6 +112,12 @@ Or you can use `go get` (you need to use go1.7 or later),
 $ go get -u github.com/tcnksm/ghr
 ```
 
+You can also run the [docker](https://www.docker.com/) container:
+
+```bash
+$ docker pull tcnksm/ghr
+```
+
 ## VS.
 
 - [aktau/github-release](https://github.com/aktau/github-release) - `github-release` can also create and edit releases and upload artifacts. It has many options. `ghr` is a simple alternative. And `ghr` will parallelize upload artifacts.
