@@ -83,3 +83,9 @@ cover:
 
 .PHONY: release
 release: bump crossbuild upload
+
+# build a docker container
+.PHONY: container
+container:
+	docker build -t tcnksm/ghr:$(VERSION) .
+	docker tag tcnksm/ghr:$(VERSION) tcnksm/ghr:$(COMMIT)
