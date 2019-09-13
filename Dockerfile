@@ -3,8 +3,7 @@ FROM golang:1.13 as builder
 WORKDIR /app
 COPY . /app
 RUN cd /app \
-    && CGO_ENABLED=0 GOOS=linux make build \
-    && cp -a bin/ghr /go/bin/ghr
+    && CGO_ENABLED=0 GOOS=linux make build
 
 # Project Image Stage
 FROM scratch
