@@ -279,7 +279,7 @@ func (cli *CLI) Run(args []string) int {
 		_, err := ghr.GitHub.GetRelease(ctx, *req.TagName)
 
 		if err == nil {
-			fmt.Fprintf(cli.outStream, "ghr aboted since tag `%s` already exists\n", *req.TagName)
+			fmt.Fprintf(cli.outStream, "ghr aborted since tag `%s` already exists\n", *req.TagName)
 			return ExitCodeOK
 		}
 
