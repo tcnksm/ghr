@@ -5,3 +5,4 @@ ghr
 .envrc
 *.test
 pkg
+constants.go

@@ -116,15 +116,17 @@ $ go get -u github.com/tcnksm/ghr
 
 - [aktau/github-release](https://github.com/aktau/github-release) - `github-release` can also create and edit releases and upload artifacts. It has many options. `ghr` is a simple alternative. And `ghr` will parallelize upload artifacts.
 
-## Contribution
+## Contribute
 
 1. Fork ([https://github.com/tcnksm/ghr/fork](https://github.com/tcnksm/ghr/fork))
-2. Create a feature branch
-3. Commit your changes
-4. Rebase your local changes against the master branch
-5. Run test suite with the `make test` command and confirm that it passes
-6. Run `gofmt -s`
-7. Create new Pull Request
+2. Run `cp constants.go.example constants.go`
+3. Edit `constants.go` with your test repo and your Github acccount
+4. Create a feature branch
+5. Commit your changes
+6. Rebase your local changes against the master branch
+7. Run test suite with the `make test` command and confirm that it passes
+8. Run `gofmt -s`
+9. Create new Pull Request
 
 ## Author
 

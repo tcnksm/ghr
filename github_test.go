@@ -13,11 +13,6 @@ import (
 	"github.com/google/go-github/github"
 )
 
-const (
-	TestOwner = "ghtools"
-	TestRepo  = "github-api-test"
-)
-
 func testGithubClient(t *testing.T) GitHub {
 	token := os.Getenv(EnvGitHubToken)
 	client, err := NewGitHubClient(TestOwner, TestRepo, token, defaultBaseURL)

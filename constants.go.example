@@ -1,0 +1,6 @@
+package main
+
+const (
+	TestOwner = "ghtools"
+	TestRepo  = "github-api-test"
+)
