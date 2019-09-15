@@ -8,6 +8,7 @@ os:
   - linux
   - osx
 script:
+  - cp constants.go.example constants.go
   - make test-all
 after_script:
   - goveralls
