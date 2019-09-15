@@ -1,6 +1,9 @@
 package main
 
 const (
+	// TestOwner is the github account of your github token.
 	TestOwner = "ghtools"
+	// TestRepo is a repository which is used to upload, recreate and delete
+	// releases during testing. You will need sufficient privileges.
 	TestRepo  = "github-api-test"
 )
