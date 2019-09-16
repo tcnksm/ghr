@@ -160,12 +160,18 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	parsedArgs := flags.Args()
-	if len(parsedArgs) != 2 {
+	Debugf("parsed args : %s", parsedArgs)
+	var tag, path string
+	switch len(parsedArgs) {
+	case 1:
+		tag, path = parsedArgs[0], ""
+	case 2:
+		tag, path = parsedArgs[0], parsedArgs[1]
+	default:
 		PrintRedf(cli.errStream,
-			"Invalid argument: you must set TAG and PATH name.\n")
+			"Invalid number of arguments: you must set a git TAG and optionally a PATH.\n")
 		return ExitCodeBadArgs
 	}
-	tag, path := parsedArgs[0], parsedArgs[1]
 
 	// Extract github repository owner username.
 	// If it's not provided via command line flag, read it from .gitconfig
@@ -349,12 +355,12 @@ func maskString(s string) string {
 	return s[:5] + "**** (masked)"
 }
 
-var helpText = `Usage: ghr [options...] TAG PATH
+var helpText = `Usage: ghr [options...] TAG [PATH]
 
 ghr is a tool to create Release on Github and upload your
 artifacts to it. ghr parallelizes upload of multiple artifacts.
 
-You must specify tag (e.g., v1.0.0) and PATH to local artifacts.
+You must specify TAG (e.g., v1.0.0) and an optional PATH to local artifacts.
 If PATH is directory, ghr globs all files in the directory and
 upload it. If PATH is a file then, upload only it.
 
