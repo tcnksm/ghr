@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.13.0](https://github.com/tcnksm/ghr/compare/v0.12.2...v0.13.0) (2019-09-16)
+
+* Show the exact `gofmt` command in README [#117](https://github.com/tcnksm/ghr/pull/117) ([roschaefer](https://github.com/roschaefer))
+* just release without files [#118](https://github.com/tcnksm/ghr/pull/118) ([roschaefer](https://github.com/roschaefer))
+* Fix typo [#114](https://github.com/tcnksm/ghr/pull/114) ([roschaefer](https://github.com/roschaefer))
+
 ## [v0.12.2](https://github.com/tcnksm/ghr/compare/v0.12.1...v0.12.2) (2019-07-08)
 
 * exclude hidden file [#113](https://github.com/tcnksm/ghr/pull/113) ([karupanerura](https://github.com/karupanerura))

@@ -16,3 +16,14 @@ func TestLocalAssets(t *testing.T) {
 		t.Fatalf("localAssets number = %d, want %d", got, want)
 	}
 }
+
+func TestLocalEmptyAssets(t *testing.T) {
+	localAssets, err := LocalAssets("")
+	if err != nil {
+		t.Fatal("LocalAssets failed:", err)
+	}
+
+	if got, want := len(localAssets), 0; got != want {
+		t.Fatalf("localAssets number = %d, want %d", got, want)
+	}
+}

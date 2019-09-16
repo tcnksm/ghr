@@ -22,23 +22,23 @@ You can see release page [here](https://github.com/tcnksm/ghr-demo/releases/tag/
 
 ## Usage
 
-To use `ghr` is simple. After setting GitHub API token (see more on [GitHub API Token](#github-api-token) section), change GitHub repository root directory and run the following command,
+Using `ghr` is simple. After setting GitHub API token (see more on [GitHub API Token](#github-api-token) section), change into your repository root directory and run the following command:
 
 ```bash
-$ ghr [option] TAG PATH
+$ ghr [option] TAG [PATH]
 ```
 
-You must provide `TAG` (git tag) and `PATH` to artifacts you want to upload. You can specify a file or a directory. If you provide a directory, all files in that directory uploaded.
+You must provide `TAG` (git tag) and optionally a `PATH` to artifacts you want to upload. You can specify a file or a directory. If you provide a directory, all files in that directory will be uploaded.
 
-`ghr` assumes that you are in the GitHub repository root when executed. This is because normally the artifacts you want to upload to a GitHub Release page is in that repository or generated there. With this assumption, `ghr` *implicitly* reads repository URL from `.git/config` file. But You can change this kind of information via option, see [Options](#options) section.
+`ghr` assumes that you are in a git repository when executed. This is because normally the artifacts you want to upload to a GitHub Release page are in that repository or generated there. With this assumption, `ghr` *implicitly* reads repository URL from `.git/config` file. But you can change this kind of information, see [Options](#options) section.
 
 ### GitHub API Token
 
-To use `ghr`, you need to get a GitHub token with an account which has enough permissions to to create releases. To get token, first, visit GitHub account settings page, then go to Applications for the user. Here you can create a token in the Personal access tokens section. For a private repository you need `repo` scope and for a public repository you need `public_repo` scope.
+To use `ghr`, you need to get a GitHub token with an account which has enough permissions to create releases. To get a token, visit GitHub account settings page, then go to Applications for the user. Here you can create a token in the Personal access tokens section. For a private repository you need `repo` scope and for a public repository you need `public_repo` scope.
 
 When using `ghr`, you can set it via `GITHUB_TOKEN` env var, `-token` command line option or `github.token` property in `.gitconfig` file.
 
-For instance, to set it via environmental variable:
+For instance, to set it via environment variable:
 
 ```bash
 $ export GITHUB_TOKEN="....."
@@ -50,11 +50,11 @@ Or set it in `github.token` in gitconfig:
 $ git config --global github.token "....."
 ```
 
-Note that environmental variable takes priority over gitconfig value.
+Note that environment variable take precedence over gitconfig value.
 
 ### GitHub Enterprise
 
-You can use `ghr` for GitHub Enterprise. Change API endpoint via the environmental variable.
+You can use `ghr` for GitHub Enterprise. Change API endpoint via the environment variable.
 
 ```bash
 $ export GITHUB_API=http://github.company.com/api/v3/
@@ -62,7 +62,7 @@ $ export GITHUB_API=http://github.company.com/api/v3/
 
 ## Example
 
-To upload all package in `pkg` directory with tag `v0.1.0`
+To upload all files in `pkg/` directory with tag `v0.1.0`
 
 ```bash
 $ ghr v0.1.0 pkg/
@@ -104,7 +104,7 @@ If you are OSX user, you can use [Homebrew](http://brew.sh/):
 $ brew install ghr
 ```
 
-If you are in another platform, you can download binary from [release page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory.
+If you are on another platform, you can download a binary from our [release page](https://github.com/tcnksm/ghr/releases) and place it in `$PATH` directory.
 
 Or you can use `go get` (you need to use go1.7 or later),
 
@@ -125,7 +125,7 @@ $ go get -u github.com/tcnksm/ghr
 5. Commit your changes
 6. Rebase your local changes against the master branch
 7. Run test suite with the `make test` command and confirm that it passes
-8. Run `gofmt -s`
+8. Run `gofmt -s -w .`
 9. Create new Pull Request
 
 ## Author

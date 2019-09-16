@@ -9,6 +9,10 @@ import (
 
 // LocalAssets contains the local objects to be uploaded
 func LocalAssets(path string) ([]string, error) {
+	if path == "" {
+		return make([]string, 0, 0), nil
+	}
+
 	path, err := filepath.Abs(path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get abs path")
@@ -27,10 +31,6 @@ func LocalAssets(path string) ([]string, error) {
 	files, err := filepath.Glob(filepath.Join(path, "*"))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to glob files")
-	}
-
-	if len(files) == 0 {
-		return nil, errors.New("no local assets are found")
 	}
 
 	assets := make([]string, 0, len(files))
