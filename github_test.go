@@ -40,6 +40,13 @@ func TestMain(m *testing.M) {
 
 func testGithubClient(t *testing.T) GitHub {
 	token := os.Getenv(EnvGitHubToken)
+	if token == "" {
+		if os.Getenv("CI") != "" {
+			t.Skipf("The %s environment value is not configured. skip it.", EnvGitHubToken)
+		} else {
+			t.Fatalf("The %s environment value is not configured. To skip it, set CI=true", EnvGitHubToken)
+		}
+	}
 	client, err := NewGitHubClient(TestOwner, TestRepo, token, defaultBaseURL)
 	if err != nil {
 		t.Fatal("NewGitHubClient failed:", err)

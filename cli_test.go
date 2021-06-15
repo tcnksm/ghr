@@ -10,6 +10,8 @@ import (
 )
 
 func TestRun(t *testing.T) {
+	client := testGithubClient(t)
+
 	t.Parallel()
 
 	outStream, errStream := new(bytes.Buffer), new(bytes.Buffer)
@@ -24,7 +26,6 @@ func TestRun(t *testing.T) {
 		t.Fatalf("%q exits %d, want %d\n\n%s", command, got, want, errStream.String())
 	}
 
-	client := testGithubClient(t)
 	release, err := client.GetRelease(context.TODO(), tag)
 	if err != nil {
 		t.Fatalf("GetRelease failed: %s\n\n%s", err, outStream.String())
@@ -59,6 +60,8 @@ func TestRun(t *testing.T) {
 }
 
 func TestRun_recreate(t *testing.T) {
+	client := testGithubClient(t)
+
 	outStream, errStream := new(bytes.Buffer), new(bytes.Buffer)
 	cli := &CLI{outStream: outStream, errStream: errStream}
 
@@ -82,7 +85,6 @@ func TestRun_recreate(t *testing.T) {
 		t.Fatalf("%q exits %d, want %d\n\n%s", command, got, want, errStream.String())
 	}
 
-	client := testGithubClient(t)
 	release, err := client.GetRelease(context.TODO(), tag)
 	if err != nil {
 		t.Fatalf("GetRelease failed: %s\n\n%s", err, outStream.String())

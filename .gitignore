@@ -1,7 +1,9 @@
 .*
 !.gitignore
+!.github/
 !.travis.yml
 ghr
 .envrc
 *.test
 pkg
+/cover.out
