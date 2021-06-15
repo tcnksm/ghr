@@ -26,13 +26,11 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	owner := os.Getenv(EnvRepoOwner)
-	if owner != "" {
+	if owner := os.Getenv(EnvRepoOwner); owner != "" {
 		TestOwner = owner
 	}
 
-	repo := os.Getenv(EnvRepoName)
-	if repo != "" {
+	if repo := os.Getenv(EnvRepoName); repo != "" {
 		TestRepo = repo
 	}
 
