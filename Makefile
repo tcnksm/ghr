@@ -28,7 +28,7 @@ deps:
 devel-deps: deps
 	@for tool in $(EXTERNAL_TOOLS) ; do \
       echo "Installing $$tool" ; \
-      GO111MODULE=off go get $$tool; \
+      go install $$tool@latest; \
     done
 
 # build generate binary on './bin' directory.
