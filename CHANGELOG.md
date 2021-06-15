@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.14.0](https://github.com/tcnksm/ghr/compare/v0.13.0...v0.14.0) (2021-06-15)
+
+* udpate deps [#134](https://github.com/tcnksm/ghr/pull/134) ([Songmu](https://github.com/Songmu))
+* fix lint warnings [#133](https://github.com/tcnksm/ghr/pull/133) ([shogo82148](https://github.com/shogo82148))
+* Migrate to GitHub Actions [#132](https://github.com/tcnksm/ghr/pull/132) ([shogo82148](https://github.com/shogo82148))
+* Allow use of ENV Varaibles to run tests which upload to github [#130](https://github.com/tcnksm/ghr/pull/130) ([JehandadK](https://github.com/JehandadK))
+
 ## [v0.13.0](https://github.com/tcnksm/ghr/compare/v0.12.2...v0.13.0) (2019-09-16)
 
 * Show the exact `gofmt` command in README [#117](https://github.com/tcnksm/ghr/pull/117) ([roschaefer](https://github.com/roschaefer))
