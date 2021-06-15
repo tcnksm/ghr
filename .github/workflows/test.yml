@@ -36,6 +36,8 @@ jobs:
 
       - name: Test
         run: make cover
+        env:
+          GITHUB_TOKEN: ${{ secrets.GHTOOLS_GITHUB_TOKEN }}
 
       - name: Send coverage
         uses: shogo82148/actions-goveralls@v1
