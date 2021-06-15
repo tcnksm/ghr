@@ -6,3 +6,4 @@ ghr
 .envrc
 *.test
 pkg
+/cover.out
