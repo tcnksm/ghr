@@ -122,7 +122,7 @@ func TestGitHubClient_Upload(t *testing.T) {
 
 	githubClient, ok := client.(*GitHubClient)
 	if !ok {
-		t.Fatal("Faield to asset to GithubClient")
+		t.Fatal("Failed to asset to GithubClient")
 	}
 
 	rc, url, err := githubClient.Repositories.DownloadReleaseAsset(
