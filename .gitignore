@@ -1,5 +1,6 @@
 .*
 !.gitignore
+!.github/
 !.travis.yml
 ghr
 .envrc
