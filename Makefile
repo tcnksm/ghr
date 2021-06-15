@@ -46,7 +46,7 @@ CREDITS: go.sum devel-deps
 .PHONY: crossbuild
 crossbuild: CREDITS
 	goxz -pv=v${VERSION} -build-ldflags=$(BUILD_LDFLAGS) \
-        -arch=386,amd64 -d=./pkg/dist/v${VERSION}
+        -arch=amd64 -d=./pkg/dist/v${VERSION}
 	cd pkg/dist/v${VERSION} && shasum -a 256 * > ./v${VERSION}_SHASUMS
 
 # install installs binary on $GOPATH/bin directory.
