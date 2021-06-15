@@ -122,7 +122,7 @@ $ go get -u github.com/tcnksm/ghr
 2. Create a feature branch
 3. Commit your changes
 4. Rebase your local changes against the master branch
-5. Run test suite with the `make test` command and confirm that it passes
+5. Run test suite with the `make test` command and confirm that it passes using correct variables e.g. `GITHUB_TOKEN=$GITHUB_TOKEN TEST_REPO_OWNER=tcnksm TEST_REPO_NAME=ghr make test`
 6. Run `gofmt -s -w .`
 7. Create new Pull Request
 

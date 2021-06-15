@@ -14,9 +14,29 @@ import (
 )
 
 const (
+	// EnvRepoOwner is an environment var for the repository owner on which the github release test is performed
+	EnvRepoOwner = "TEST_REPO_OWNER"
+	// EnvRepoName is an environment var for the name of repository on which the github release test is performed
+	EnvRepoName = "TEST_REPO_NAME"
+)
+
+var (
 	TestOwner = "ghtools"
 	TestRepo  = "github-api-test"
 )
+
+func TestMain(m *testing.M) {
+	if owner := os.Getenv(EnvRepoOwner); owner != "" {
+		TestOwner = owner
+	}
+
+	if repo := os.Getenv(EnvRepoName); repo != "" {
+		TestRepo = repo
+	}
+
+	code := m.Run()
+	os.Exit(code)
+}
 
 func testGithubClient(t *testing.T) GitHub {
 	token := os.Getenv(EnvGitHubToken)
