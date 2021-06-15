@@ -155,7 +155,7 @@ func (cli *CLI) Run(args []string) int {
 
 	// Show version and check latest version release
 	if version {
-		fmt.Fprintf(cli.outStream, OutputVersion())
+		fmt.Fprint(cli.outStream, OutputVersion())
 		return ExitCodeOK
 	}
 

@@ -10,7 +10,7 @@ import (
 // LocalAssets contains the local objects to be uploaded
 func LocalAssets(path string) ([]string, error) {
 	if path == "" {
-		return make([]string, 0, 0), nil
+		return []string{}, nil
 	}
 
 	path, err := filepath.Abs(path)
