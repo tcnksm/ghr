@@ -426,4 +426,7 @@ Options:
 
 -debug
 	Enable debug output
+
+-generatenotes
+	Generate the body of the release automatically based on .github/release.yml
 `
