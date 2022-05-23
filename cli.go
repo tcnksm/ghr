@@ -13,7 +13,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v39/github"
 	"github.com/mitchellh/colorstring"
 	"github.com/tcnksm/go-gitconfig"
 )
@@ -95,6 +95,8 @@ func (cli *CLI) Run(args []string) int {
 		stat    bool
 		version bool
 		debug   bool
+
+		generatenotes bool
 	)
 
 	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
@@ -139,6 +141,8 @@ func (cli *CLI) Run(args []string) int {
 	flags.BoolVar(&version, "v", false, "")
 
 	flags.BoolVar(&debug, "debug", false, "")
+
+	flags.BoolVar(&generatenotes, "generatenotes", false, "")
 
 	// Deprecated
 	flags.BoolVar(&stat, "stat", false, "")
@@ -271,12 +275,13 @@ func (cli *CLI) Run(args []string) int {
 
 	// Prepare create release request
 	req := &github.RepositoryRelease{
-		Name:            github.String(name),
-		TagName:         github.String(tag),
-		Prerelease:      github.Bool(prerelease),
-		Draft:           github.Bool(draft),
-		TargetCommitish: github.String(commitish),
-		Body:            github.String(body),
+		Name:                 github.String(name),
+		TagName:              github.String(tag),
+		Prerelease:           github.Bool(prerelease),
+		Draft:                github.Bool(draft),
+		TargetCommitish:      github.String(commitish),
+		Body:                 github.String(body),
+		GenerateReleaseNotes: github.Bool(generatenotes),
 	}
 
 	ctx := context.TODO()

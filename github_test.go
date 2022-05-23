@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v39/github"
 )
 
 const (
@@ -153,7 +153,7 @@ func TestGitHubClient_Upload(t *testing.T) {
 	}
 
 	rc, url, err := githubClient.Repositories.DownloadReleaseAsset(
-		context.TODO(), githubClient.Owner, githubClient.Repo, *asset.ID)
+		context.TODO(), githubClient.Owner, githubClient.Repo, *asset.ID, http.DefaultClient)
 	if err != nil {
 		t.Fatal("DownloadReleaseAsset failed:", err)
 	}

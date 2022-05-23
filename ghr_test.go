@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v39/github"
 )
 
 func TestGHR_CreateRelease(t *testing.T) {

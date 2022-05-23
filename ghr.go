@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v39/github"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
