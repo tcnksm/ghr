@@ -1,4 +1,4 @@
-module github.com/neilgierman/ghr
+module github.com/tcnksm/ghr
 
 go 1.16
 
