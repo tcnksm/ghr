@@ -93,6 +93,7 @@ $ ghr \
     -draft \          # Release as draft (Unpublish)
     -soft \           # Stop uploading if the same tag already exists
     -prerelease \     # Create prerelease
+    -generatenotes \  # Generate Release Notes automatically (See below)
     TAG PATH
 ```
 
@@ -115,6 +116,12 @@ $ go get -u github.com/tcnksm/ghr
 ## VS.
 
 - [aktau/github-release](https://github.com/aktau/github-release) - `github-release` can also create and edit releases and upload artifacts. It has many options. `ghr` is a simple alternative. And `ghr` will parallelize upload artifacts.
+
+## Generate Release Notes
+
+GitHub added the ability to automatically generate the body of a Release based on a format specified in
+`.github/release.yml` in Oct 2021. You can read more about that format [here](https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes#configuring-automatically-generated-release-notes).
+ghr now has the `-generatenotes` flag to enable that content to be programmatically added instead of manually suppling the body.
 
 ## Contribution
 
