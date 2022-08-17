@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.15.0](https://github.com/tcnksm/ghr/compare/v0.14.0...v0.15.0) (2022-08-17)
+
+* Allow to use Generate Release Notes function of GitHub [#138](https://github.com/tcnksm/ghr/pull/138) ([neilgierman](https://github.com/neilgierman))
+
 ## [v0.14.0](https://github.com/tcnksm/ghr/compare/v0.13.0...v0.14.0) (2021-06-15)
 
 * udpate deps [#134](https://github.com/tcnksm/ghr/pull/134) ([Songmu](https://github.com/Songmu))
