@@ -13,7 +13,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/google/go-github/v39/github"
+	"github.com/google/go-github/v47/github"
 	"github.com/mitchellh/colorstring"
 	"github.com/tcnksm/go-gitconfig"
 )
