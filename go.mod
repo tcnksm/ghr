@@ -1,4 +1,4 @@
-module github.com/tcnksm/ghr
+module github.com/cxflowtestuser/ghr
 
 go 1.16
 
