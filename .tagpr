@@ -33,3 +33,4 @@
 	vPrefix = true
 	releaseBranch = master
 	versionFile = version.go
+	release = draft
