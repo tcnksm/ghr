@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.16.0](https://github.com/tcnksm/ghr/compare/v0.15.0...v0.16.0) - 2022-09-26
+- introduce modern releng stack by @Songmu in https://github.com/tcnksm/ghr/pull/141
+- Go 1.19 and update deps by @Songmu in https://github.com/tcnksm/ghr/pull/143
+- update go-github to v47 by @Songmu in https://github.com/tcnksm/ghr/pull/144
+- add freebsd and arm64 to built artifacts by @Songmu in https://github.com/tcnksm/ghr/pull/145
+- find a draft release before creating new one by @Songmu in https://github.com/tcnksm/ghr/pull/146
+
 ## [v0.15.0](https://github.com/tcnksm/ghr/compare/v0.14.0...v0.15.0) (2022-08-17)
 
 * Allow to use Generate Release Notes function of GitHub [#138](https://github.com/tcnksm/ghr/pull/138) ([neilgierman](https://github.com/neilgierman))
