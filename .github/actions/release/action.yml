@@ -12,8 +12,7 @@ runs:
     with:
       go-version: 1.x
   - name: release
-    run: |
-      make crossbuild upload
+    run: make release
     shell: bash
     env:
       GITHUB_TOKEN: ${{ inputs.token }}

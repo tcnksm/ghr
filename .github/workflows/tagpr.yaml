@@ -20,6 +20,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - uses: ./.github/actions/release
       with:
-        tag: ${{ steps.tagpr.outputs.tag }}
         token: ${{ secrets.GITHUB_TOKEN }}
       if: "steps.tagpr.outputs.tag != ''"
