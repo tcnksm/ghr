@@ -15,6 +15,7 @@ import (
 
 	"github.com/google/go-github/v47/github"
 	"github.com/mitchellh/colorstring"
+	"github.com/pkg/errors"
 	"github.com/tcnksm/go-gitconfig"
 )
 
@@ -294,16 +295,23 @@ func (cli *CLI) Run(args []string) int {
 			return ExitCodeOK
 		}
 
-		if err != nil && err != ErrReleaseNotFound {
+		if !errors.Is(err, ErrReleaseNotFound) {
 			PrintRedf(cli.errStream, "Failed to get GitHub release: %s\n", err)
 			return ExitCodeError
 		}
 	}
 
-	release, err := ghr.CreateRelease(ctx, req, recreate)
+	release, err := ghr.GitHub.GetDraftRelease(ctx, tag)
 	if err != nil {
-		PrintRedf(cli.errStream, "Failed to create GitHub release page: %s\n", err)
+		PrintRedf(cli.errStream, "Failed to get draft release: %s\n", err)
 		return ExitCodeError
+	}
+	if release == nil {
+		release, err = ghr.CreateRelease(ctx, req, recreate)
+		if err != nil {
+			PrintRedf(cli.errStream, "Failed to create GitHub release page: %s\n", err)
+			return ExitCodeError
+		}
 	}
 
 	if replace {
