@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"path/filepath"
 	"time"
 
 	"github.com/google/go-github/v47/github"
-	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -39,7 +39,7 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 	release, err := g.GitHub.GetRelease(ctx, *req.TagName)
 	if err != nil {
 		if !errors.Is(err, ErrReleaseNotFound) {
-			return nil, errors.Wrap(err, "failed to get release")
+			return nil, fmt.Errorf("failed to get release: %w", err)
 		}
 		Debugf("Release (with tag %s) not found: create a new one",
 			*req.TagName)
@@ -115,15 +115,14 @@ func (g *GHR) UploadAssets(ctx context.Context, releaseID int64, localAssets []s
 			fmt.Fprintf(g.outStream, "--> Uploading: %15s\n", filepath.Base(localAsset))
 			_, err := g.GitHub.UploadAsset(ctx, releaseID, localAsset)
 			if err != nil {
-				return errors.Wrapf(err,
-					"failed to upload asset: %s", localAsset)
+				return fmt.Errorf("failed to upload asset: %s %w", localAsset, err)
 			}
 			return nil
 		})
 	}
 
 	if err := eg.Wait(); err != nil {
-		return errors.Wrap(err, "one of the goroutines failed")
+		return fmt.Errorf("one of the goroutines failed: %w", err)
 	}
 
 	return nil
@@ -140,7 +139,7 @@ func (g *GHR) DeleteAssets(ctx context.Context, releaseID int64, localAssets []s
 
 	assets, err := g.GitHub.ListAssets(ctx, releaseID)
 	if err != nil {
-		return errors.Wrap(err, "failed to list assets")
+		return fmt.Errorf("failed to list assets: %w", err)
 	}
 
 	semaphore := make(chan struct{}, parallel)
@@ -159,8 +158,7 @@ func (g *GHR) DeleteAssets(ctx context.Context, releaseID int64, localAssets []s
 
 					fmt.Fprintf(g.outStream, "--> Deleting: %15s\n", *asset.Name)
 					if err := g.GitHub.DeleteAsset(ctx, *asset.ID); err != nil {
-						return errors.Wrapf(err,
-							"failed to delete asset: %s", *asset.Name)
+						return fmt.Errorf("failed to delete asset: %s %w", *asset.Name, err)
 					}
 					return nil
 				})
@@ -169,7 +167,7 @@ func (g *GHR) DeleteAssets(ctx context.Context, releaseID int64, localAssets []s
 	}
 
 	if err := eg.Wait(); err != nil {
-		return errors.Wrap(err, "one of the goroutines failed")
+		return fmt.Errorf("one of the goroutines failed: %w", err)
 	}
 
 	return nil

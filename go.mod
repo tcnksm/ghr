@@ -7,7 +7,6 @@ require (
 	github.com/google/go-github/v47 v47.1.0
 	github.com/mattn/go-colorable v0.1.13
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db
-	github.com/pkg/errors v0.9.1
 	github.com/tcnksm/go-gitconfig v0.1.2
 	github.com/tcnksm/go-latest v0.0.0-20170313132115-e3007ae9052e
 	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1

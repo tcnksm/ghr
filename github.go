@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/Songmu/retry"
 	"github.com/google/go-github/v47/github"
-	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 )
 
@@ -64,7 +64,7 @@ func NewGitHubClient(owner, repo, token, urlStr string) (GitHub, error) {
 
 	baseURL, err := url.ParseRequestURI(urlStr)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse Github API URL")
+		return nil, fmt.Errorf("failed to parse Github API URL: %w", err)
 	}
 
 	ts := oauth2.StaticTokenSource(&oauth2.Token{
@@ -87,7 +87,7 @@ func (c *GitHubClient) SetUploadURL(urlStr string) error {
 	i := strings.Index(urlStr, "repos/")
 	parsedURL, err := url.ParseRequestURI(urlStr[:i])
 	if err != nil {
-		return errors.Wrap(err, "failed to parse upload URL")
+		return fmt.Errorf("failed to parse upload URL: %w", err)
 	}
 
 	c.UploadURL = parsedURL
@@ -99,11 +99,11 @@ func (c *GitHubClient) CreateRelease(ctx context.Context, req *github.Repository
 
 	release, res, err := c.Repositories.CreateRelease(context.TODO(), c.Owner, c.Repo, req)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create a release")
+		return nil, fmt.Errorf("failed to create a release: %w", err)
 	}
 
 	if res.StatusCode != http.StatusCreated {
-		return nil, errors.Errorf("create release: invalid status: %s", res.Status)
+		return nil, fmt.Errorf("create release: invalid status: %s", res.Status)
 	}
 
 	return release, nil
@@ -115,13 +115,12 @@ func (c *GitHubClient) GetRelease(ctx context.Context, tag string) (*github.Repo
 	release, res, err := c.Repositories.GetReleaseByTag(context.TODO(), c.Owner, c.Repo, tag)
 	if err != nil {
 		if res == nil {
-			return nil, errors.Wrapf(err, "failed to get release tag: %s", tag)
+			return nil, fmt.Errorf("failed to get release tag: %s %w", tag, err)
 		}
 
 		// TODO(tcnksm): Handle invalid token
 		if res.StatusCode != http.StatusNotFound {
-			return nil, errors.Wrapf(err,
-				"get release tag: invalid status: %s", res.Status)
+			return nil, fmt.Errorf("get release tag: invalid status: %s %w", res.Status, err)
 		}
 
 		return nil, ErrReleaseNotFound
@@ -139,12 +138,11 @@ func (c *GitHubClient) GetDraftRelease(ctx context.Context, tag string) (*github
 		})
 		if err != nil {
 			if res == nil {
-				return nil, errors.Wrapf(err, "failed to get releases while getting draft release for: %s", tag)
+				return nil, fmt.Errorf("failed to get releases while getting draft release for: %s %w", tag, err)
 			}
 			// TODO(tcnksm): Handle invalid token
 			if res.StatusCode != http.StatusNotFound {
-				return nil, errors.Wrapf(err,
-					"get release tag: invalid status: %s", res.Status)
+				return nil, fmt.Errorf("get release tag: invalid status: %s %w", res.Status, err)
 			}
 			return nil, ErrReleaseNotFound
 		}
@@ -171,11 +169,11 @@ func (c *GitHubClient) EditRelease(ctx context.Context, releaseID int64, req *gi
 		)
 		release, res, err = c.Repositories.EditRelease(context.TODO(), c.Owner, c.Repo, releaseID, req)
 		if err != nil {
-			return errors.Wrapf(err, "failed to edit release: %d", releaseID)
+			return fmt.Errorf("failed to edit release: %d %w", releaseID, err)
 		}
 
 		if res.StatusCode != http.StatusOK {
-			return errors.Errorf("edit release: invalid status: %s", res.Status)
+			return fmt.Errorf("edit release: invalid status: %s", res.Status)
 		}
 		return nil
 	})
@@ -186,11 +184,11 @@ func (c *GitHubClient) EditRelease(ctx context.Context, releaseID int64, req *gi
 func (c *GitHubClient) DeleteRelease(ctx context.Context, releaseID int64) error {
 	res, err := c.Repositories.DeleteRelease(context.TODO(), c.Owner, c.Repo, releaseID)
 	if err != nil {
-		return errors.Wrap(err, "failed to delete release")
+		return fmt.Errorf("failed to delete release: %w", err)
 	}
 
 	if res.StatusCode != http.StatusNoContent {
-		return errors.Errorf("delete release: invalid status: %s", res.Status)
+		return fmt.Errorf("delete release: invalid status: %s", res.Status)
 	}
 
 	return nil
@@ -201,11 +199,11 @@ func (c *GitHubClient) DeleteTag(ctx context.Context, tag string) error {
 	ref := fmt.Sprintf("tags/%s", tag)
 	res, err := c.Git.DeleteRef(context.TODO(), c.Owner, c.Repo, ref)
 	if err != nil {
-		return errors.Wrapf(err, "failed to delete tag: %s", ref)
+		return fmt.Errorf("failed to delete tag: %s %w", ref, err)
 	}
 
 	if res.StatusCode != http.StatusNoContent {
-		return errors.Errorf("delete tag: invalid status: %s", res.Status)
+		return fmt.Errorf("delete tag: invalid status: %s", res.Status)
 	}
 
 	return nil
@@ -216,7 +214,7 @@ func (c *GitHubClient) UploadAsset(ctx context.Context, releaseID int64, filenam
 
 	filename, err := filepath.Abs(filename)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get abs path")
+		return nil, fmt.Errorf("failed to get abs path: %w", err)
 	}
 
 	opts := &github.UploadOptions{
@@ -233,24 +231,24 @@ func (c *GitHubClient) UploadAsset(ctx context.Context, releaseID int64, filenam
 
 		f, err := os.Open(filename)
 		if err != nil {
-			return errors.Wrap(err, "failed to open file")
+			return fmt.Errorf("failed to open file: %w", err)
 		}
 		defer f.Close()
 
 		asset, res, err = c.Repositories.UploadReleaseAsset(context.TODO(), c.Owner, c.Repo, releaseID, opts, f)
 		if err != nil {
-			return errors.Wrapf(err, "failed to upload release asset: %s", filename)
+			return fmt.Errorf("failed to upload release asset: %s %w", filename, err)
 		}
 
 		switch res.StatusCode {
 		case http.StatusCreated:
 			return nil
 		case 422:
-			return errors.Errorf(
+			return fmt.Errorf(
 				"upload release asset: invalid status code: %s",
 				"422 (this is probably because the asset already uploaded)")
 		default:
-			return errors.Errorf(
+			return fmt.Errorf(
 				"upload release asset: invalid status code: %s", res.Status)
 		}
 	})
@@ -261,11 +259,11 @@ func (c *GitHubClient) UploadAsset(ctx context.Context, releaseID int64, filenam
 func (c *GitHubClient) DeleteAsset(ctx context.Context, assetID int64) error {
 	res, err := c.Repositories.DeleteReleaseAsset(context.TODO(), c.Owner, c.Repo, assetID)
 	if err != nil {
-		return errors.Wrap(err, "failed to delete release asset")
+		return fmt.Errorf("failed to delete release asset: %w", err)
 	}
 
 	if res.StatusCode != http.StatusNoContent {
-		return errors.Errorf("delete release assets: invalid status code: %s", res.Status)
+		return fmt.Errorf("delete release assets: invalid status code: %s", res.Status)
 	}
 
 	return nil
@@ -279,11 +277,11 @@ func (c *GitHubClient) ListAssets(ctx context.Context, releaseID int64) ([]*gith
 	for {
 		assets, res, err := c.Repositories.ListReleaseAssets(context.TODO(), c.Owner, c.Repo, releaseID, &github.ListOptions{Page: page})
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to list assets")
+			return nil, fmt.Errorf("failed to list assets: %w", err)
 		}
 
 		if res.StatusCode != http.StatusOK {
-			return nil, errors.Errorf("list release assets: invalid status code: %s", res.Status)
+			return nil, fmt.Errorf("list release assets: invalid status code: %s", res.Status)
 		}
 
 		result = append(result, assets...)

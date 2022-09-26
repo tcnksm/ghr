@@ -1,10 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 )
 
 // LocalAssets contains the local objects to be uploaded
@@ -15,12 +14,12 @@ func LocalAssets(path string) ([]string, error) {
 
 	path, err := filepath.Abs(path)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get abs path")
+		return nil, fmt.Errorf("failed to get abs path: %w", err)
 	}
 
 	fi, err := os.Stat(path)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get file stat")
+		return nil, fmt.Errorf("failed to get file stat: %w", err)
 	}
 
 	if !fi.IsDir() {
@@ -30,7 +29,7 @@ func LocalAssets(path string) ([]string, error) {
 	// Glob all files in the given path
 	files, err := filepath.Glob(filepath.Join(path, "*"))
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to glob files")
+		return nil, fmt.Errorf("failed to glob files: %w", err)
 	}
 
 	assets := make([]string, 0, len(files))
