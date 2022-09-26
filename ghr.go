@@ -38,7 +38,7 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 	// If release is not found, then create a new release.
 	release, err := g.GitHub.GetRelease(ctx, *req.TagName)
 	if err != nil {
-		if err != ErrReleaseNotFound {
+		if !errors.Is(err, ErrReleaseNotFound) {
 			return nil, errors.Wrap(err, "failed to get release")
 		}
 		Debugf("Release (with tag %s) not found: create a new one",

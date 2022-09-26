@@ -26,6 +26,7 @@ var (
 type GitHub interface {
 	CreateRelease(ctx context.Context, req *github.RepositoryRelease) (*github.RepositoryRelease, error)
 	GetRelease(ctx context.Context, tag string) (*github.RepositoryRelease, error)
+	GetDraftRelease(ctx context.Context, tag string) (*github.RepositoryRelease, error)
 	EditRelease(ctx context.Context, releaseID int64, req *github.RepositoryRelease) (*github.RepositoryRelease, error)
 	DeleteRelease(ctx context.Context, releaseID int64) error
 	DeleteTag(ctx context.Context, tag string) error
@@ -127,6 +128,36 @@ func (c *GitHubClient) GetRelease(ctx context.Context, tag string) (*github.Repo
 	}
 
 	return release, nil
+}
+
+func (c *GitHubClient) GetDraftRelease(ctx context.Context, tag string) (*github.RepositoryRelease, error) {
+	const perPage = 100
+	for page := 1; page <= 2; page++ {
+		releases, res, err := c.Repositories.ListReleases(ctx, c.Owner, c.Repo, &github.ListOptions{
+			PerPage: perPage,
+			Page:    page,
+		})
+		if err != nil {
+			if res == nil {
+				return nil, errors.Wrapf(err, "failed to get releases while getting draft release for: %s", tag)
+			}
+			// TODO(tcnksm): Handle invalid token
+			if res.StatusCode != http.StatusNotFound {
+				return nil, errors.Wrapf(err,
+					"get release tag: invalid status: %s", res.Status)
+			}
+			return nil, ErrReleaseNotFound
+		}
+		for _, rel := range releases {
+			if *rel.Draft && *rel.TagName == tag {
+				return rel, nil
+			}
+		}
+		if len(releases) < perPage {
+			break
+		}
+	}
+	return nil, nil
 }
 
 // EditRelease edit a release object within the GitHub API
