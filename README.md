@@ -2,13 +2,14 @@ ghr
 ====
 
 [![GitHub release](http://img.shields.io/github/release/tcnksm/ghr.svg?style=flat-square)][release]
-[![Travis](https://img.shields.io/travis/tcnksm/ghr.svg?style=flat-square)](https://travis-ci.org/tcnksm/ghr)
-[![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godocs]
+[![Test](https://github.com/tcnksm/ghr/actions/workflows/test.yml/badge.svg)][GitHub Actions]
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/tcnksm/ghr)][PkgGoDev]
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)][license]
 
 [release]: https://github.com/tcnksm/ghr/releases
+[GitHub Actions]: https://github.com/tcnksm/ghr/actions/workflows/test.yml
 [license]: https://github.com/tcnksm/ghr/blob/master/LICENSE
-[godocs]: http://godoc.org/github.com/tcnksm/ghr
+[PkgGoDev]: https://pkg.go.dev/github.com/tcnksm/ghr
 
 `ghr` creates GitHub Release and uploads artifacts in parallel.
 
