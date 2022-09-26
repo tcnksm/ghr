@@ -1,8 +1,8 @@
 name: Test
 on:
   push:
-  pull_request:
-
+    branches:
+    - "**"
 jobs:
   test:
     name: Test
@@ -14,18 +14,13 @@ jobs:
           - ubuntu-latest
           - macos-latest
           - windows-latest
-        go:
-          - "1.x"
-
     steps:
-      - name: Set up Go ${{ matrix.go }}
-        uses: actions/setup-go@v2
+      - name: Set up Go
+        uses: actions/setup-go@v3
         with:
-          go-version: ${{ matrix.go }}
-
+          go-version: 1.x
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
-
       - name: restore cache
         uses: actions/cache@v2
         with:
@@ -33,18 +28,16 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-
       - name: Test
         run: make cover
         env:
           GITHUB_TOKEN: ${{ secrets.GHTOOLS_GITHUB_TOKEN }}
-
       - name: Send coverage
         uses: shogo82148/actions-goveralls@v1
         with:
           path-to-profile: cover.out
           parallel: true
-          flag-name: OS-${{ matrix.os }}-Go-${{ matrix.go }}
+          flag-name: OS-${{ matrix.os }}-Go-1.x
 
   # notifies that all test jobs are finished.
   finish:
