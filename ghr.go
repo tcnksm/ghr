@@ -76,9 +76,9 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 
 // DeleteRelease removes an existing release, if it exists. If it does not exist,
 // DeleteRelease returns an error
-func (g *GHR) DeleteRelease(ctx context.Context, ID int64, tag string) error {
+func (g *GHR) DeleteRelease(ctx context.Context, releaseID int64, tag string) error {
 
-	err := g.GitHub.DeleteRelease(ctx, ID)
+	err := g.GitHub.DeleteRelease(ctx, releaseID)
 	if err != nil {
 		return err
 	}
