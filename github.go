@@ -129,6 +129,7 @@ func (c *GitHubClient) GetRelease(ctx context.Context, tag string) (*github.Repo
 	return release, nil
 }
 
+// GetDraftRelease queries the GitHub API for draft release with the specified tag
 func (c *GitHubClient) GetDraftRelease(ctx context.Context, tag string) (*github.RepositoryRelease, error) {
 	const perPage = 100
 	for page := 1; page <= 2; page++ {
@@ -158,7 +159,7 @@ func (c *GitHubClient) GetDraftRelease(ctx context.Context, tag string) (*github
 	return nil, nil
 }
 
-// EditRelease edit a release object within the GitHub API
+// EditRelease edits a release object within the GitHub API
 func (c *GitHubClient) EditRelease(ctx context.Context, releaseID int64, req *github.RepositoryRelease) (*github.RepositoryRelease, error) {
 	var release *github.RepositoryRelease
 
