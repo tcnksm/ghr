@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"testing"
 	"time"
 
@@ -15,7 +15,7 @@ func TestGHR_CreateRelease(t *testing.T) {
 	githubClient := testGithubClient(t)
 	GHR := &GHR{
 		GitHub:    githubClient,
-		outStream: ioutil.Discard,
+		outStream: io.Discard,
 	}
 
 	testTag := "create-release"
@@ -40,7 +40,7 @@ func TestGHR_CreateReleaseWithExistingRelease(t *testing.T) {
 	githubClient := testGithubClient(t)
 	GHR := &GHR{
 		GitHub:    githubClient,
-		outStream: ioutil.Discard,
+		outStream: io.Discard,
 	}
 
 	testTag := "create-with-existing"
@@ -151,7 +151,7 @@ func TestGHR_UploadAssets(t *testing.T) {
 	githubClient := testGithubClient(t)
 	GHR := &GHR{
 		GitHub:    githubClient,
-		outStream: ioutil.Discard,
+		outStream: io.Discard,
 	}
 
 	testTag := "ghr-upload-assets"
