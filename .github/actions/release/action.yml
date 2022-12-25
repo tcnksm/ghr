@@ -1,5 +1,5 @@
 name: release
-description: release maltmill
+description: release ghr
 inputs:
   token:
     description: GitHub token
