@@ -77,6 +77,9 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 
 func (g *GHR) GetLatestRelease(ctx context.Context) (*github.RepositoryRelease, error) {
 	release, err := g.GitHub.GetLatestRelease(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to fetch latest Github release: %w", err)
+	}
 	return release, err
 }
 
