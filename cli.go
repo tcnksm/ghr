@@ -145,7 +145,7 @@ func (cli *CLI) Run(args []string) int {
 	flags.BoolVar(&prerelease, "prerelease", false, "")
 
 	flags.Var(
-		enumflag.New(&latest, "auto", LatestIds, enumflag.EnumCaseInsensitive),
+		enumflag.New(&latest, "true", LatestIds, enumflag.EnumCaseInsensitive),
 		"latest",
 		"",
 	)
