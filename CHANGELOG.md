@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.16.1](https://github.com/tcnksm/ghr/compare/v0.16.0...v0.16.1) - 2023-10-12
+- drop pkg/errors dependency by @Songmu in https://github.com/tcnksm/ghr/pull/148
+- Miscellaneous fixes: coding convention fixes and some typo fixes by @itchyny in https://github.com/tcnksm/ghr/pull/149
+- Bump golang.org/x/net from 0.0.0-20220923203811-8be639271d50 to 0.7.0 by @dependabot in https://github.com/tcnksm/ghr/pull/150
+- Bump golang.org/x/net from 0.7.0 to 0.17.0 by @dependabot in https://github.com/tcnksm/ghr/pull/153
+
 ## [v0.16.0](https://github.com/tcnksm/ghr/compare/v0.15.0...v0.16.0) - 2022-09-26
 - introduce modern releng stack by @Songmu in https://github.com/tcnksm/ghr/pull/141
 - Go 1.19 and update deps by @Songmu in https://github.com/tcnksm/ghr/pull/143
