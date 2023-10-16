@@ -28,7 +28,7 @@ CREDITS: go.sum devel-deps
 
 .PHONY: crossbuild
 crossbuild: CREDITS
-	godzil crossbuild -pv=v${VERSION} -build-ldflags=$(BUILD_LDFLAGS) \
+	CGO_ENABLED=0 godzil crossbuild -pv=v${VERSION} -build-ldflags=$(BUILD_LDFLAGS) \
         -arch=amd64,arm64 -os=windows,darwin,linux,freebsd -d=./pkg/dist/v${VERSION}
 	cd pkg/dist/v${VERSION} && shasum -a 256 * > ./v${VERSION}_SHASUMS
 
