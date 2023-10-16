@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.16.2](https://github.com/tcnksm/ghr/compare/v0.16.1...v0.16.2) - 2023-10-16
+- disable cgo. fixes #154. by @shogo82148 in https://github.com/tcnksm/ghr/pull/155
+
 ## [v0.16.1](https://github.com/tcnksm/ghr/compare/v0.16.0...v0.16.1) - 2023-10-12
 - drop pkg/errors dependency by @Songmu in https://github.com/tcnksm/ghr/pull/148
 - Miscellaneous fixes: coding convention fixes and some typo fixes by @itchyny in https://github.com/tcnksm/ghr/pull/149
