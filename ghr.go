@@ -8,7 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/google/go-github/v47/github"
+	"github.com/google/go-github/v55/github"
+	"github.com/hashicorp/go-version"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -72,6 +73,30 @@ func (g *GHR) CreateRelease(ctx context.Context, req *github.RepositoryRelease, 
 	}
 
 	return g.GitHub.CreateRelease(ctx, req)
+}
+
+func (g *GHR) GetLatestRelease(ctx context.Context) (*github.RepositoryRelease, error) {
+	release, err := g.GitHub.GetLatestRelease(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to fetch latest Github release: %w", err)
+	}
+	return release, err
+}
+
+func (g *GHR) IsNewerSemverRelease(newRelease *github.RepositoryRelease, latestRelease *github.RepositoryRelease) (bool, error) {
+	newReleaseVer, error := version.NewVersion(*newRelease.TagName)
+	if error != nil {
+		return false, fmt.Errorf("Unable to parse new release version as semver%s: %w", *newRelease.TagName, error)
+	}
+	latestReleaseVer, error := version.NewVersion(*latestRelease.TagName)
+	if error != nil {
+		return false, fmt.Errorf("Unable to parse latest release version as semver %s: %w", *newRelease.TagName, error)
+	}
+
+	if latestReleaseVer.LessThan(newReleaseVer) {
+		return true, nil
+	}
+	return false, nil
 }
 
 // DeleteRelease removes an existing release, if it exists. If it does not exist,

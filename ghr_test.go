@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-github/v47/github"
+	"github.com/google/go-github/v55/github"
 )
 
 func TestGHR_CreateRelease(t *testing.T) {
@@ -32,6 +32,42 @@ func TestGHR_CreateRelease(t *testing.T) {
 	}
 
 	defer ghr.DeleteRelease(context.TODO(), *release.ID, testTag)
+}
+
+func TestGHR_GetLatestRelease(t *testing.T) {
+	t.Parallel()
+
+	githubClient := testGithubClient(t)
+	ghr := &GHR{
+		GitHub:    githubClient,
+		outStream: io.Discard,
+	}
+
+	testTag := "v1.2.3"
+
+	existingReq := &github.RepositoryRelease{
+		TagName:    github.String(testTag),
+		Draft:      github.Bool(false),
+		MakeLatest: github.String("true"),
+	}
+
+	newRelease, err := githubClient.CreateRelease(context.TODO(), existingReq)
+	if err != nil {
+		t.Fatalf("CreateRelease failed: %s", err)
+	}
+
+	// Create an existing release before
+	existing, err := ghr.GetLatestRelease(context.TODO())
+	if err != nil {
+		t.Fatalf("GetLatestRelease failed: %s", err)
+	}
+
+	if newRelease.Name != existing.Name {
+		t.Fatalf("GetLatestRelease got release %s instead of release %s", *existing.Name, *newRelease.Name)
+	}
+
+	defer ghr.DeleteRelease(context.TODO(), *existing.ID, testTag)
+
 }
 
 func TestGHR_CreateReleaseWithExistingRelease(t *testing.T) {
