@@ -461,9 +461,9 @@ Options:
 
 -latest
 	Set the release as the 'latest' release. Can be true, false, or auto.
-	Auto (the default) will set the release as 'latest' if the release
-	names are valid semver names, and the current release is the highest
-	semver version of recent releases.
+	Auto will set the release as 'latest' if the release names are valid
+	semver names and the current release is the highest version of recent
+	releases.
 
 -prerelease
 	Create prerelease
