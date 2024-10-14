@@ -14,7 +14,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v66/github"
 	"github.com/mitchellh/colorstring"
 	"github.com/tcnksm/go-gitconfig"
 	"github.com/thediveo/enumflag/v2"
