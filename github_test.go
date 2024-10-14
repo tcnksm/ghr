@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-github/v47/github"
+	"github.com/google/go-github/v55/github"
 )
 
 const (

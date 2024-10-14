@@ -14,9 +14,10 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/google/go-github/v47/github"
+	"github.com/google/go-github/v55/github"
 	"github.com/mitchellh/colorstring"
 	"github.com/tcnksm/go-gitconfig"
+	"github.com/thediveo/enumflag/v2"
 )
 
 const (
@@ -52,6 +53,20 @@ const (
 	defaultParallel     = -1
 )
 
+type SetLatest enumflag.Flag
+
+const (
+	setLatestFalse SetLatest = iota
+	setLatestTrue
+	setLatestAuto
+)
+
+var LatestIds = map[SetLatest][]string{
+	setLatestFalse: {"false"},
+	setLatestTrue:  {"true"},
+	setLatestAuto:  {"auto"},
+}
+
 // Debugf prints debug output when EnvDebug is set
 func Debugf(format string, args ...interface{}) {
 	if env := os.Getenv(EnvDebug); len(env) != 0 {
@@ -86,6 +101,7 @@ func (cli *CLI) Run(args []string) int {
 		body       string
 		draft      bool
 		prerelease bool
+		latest     SetLatest
 
 		parallel int
 
@@ -127,6 +143,12 @@ func (cli *CLI) Run(args []string) int {
 
 	flags.BoolVar(&draft, "draft", false, "")
 	flags.BoolVar(&prerelease, "prerelease", false, "")
+
+	flags.Var(
+		enumflag.New(&latest, "true", LatestIds, enumflag.EnumCaseInsensitive),
+		"latest",
+		"",
+	)
 
 	flags.IntVar(&parallel, "parallel", defaultParallel, "")
 	flags.IntVar(&parallel, "p", defaultParallel, "")
@@ -260,6 +282,8 @@ func (cli *CLI) Run(args []string) int {
 	}
 	Debugf("Number of file to upload: %d", len(localAssets))
 
+	Debugf("Set this release as latest: %s", latest)
+
 	// Create a GitHub client
 	gitHubClient, err := NewGitHubClient(owner, repo, token, baseURLStr)
 	if err != nil {
@@ -286,6 +310,31 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	ctx := context.TODO()
+
+	if latest == setLatestAuto {
+		latestRelease, err := ghr.GitHub.GetLatestRelease(ctx)
+		if err != nil {
+			fmt.Fprintf(cli.errStream, "Unable to fetch the latest release to compare versions: %s", err)
+			return ExitCodeError
+		}
+
+		isLatestRelease, err := ghr.IsNewerSemverRelease(req, latestRelease)
+		if err != nil {
+			fmt.Fprintf(cli.errStream, "Could not compare current and latest semver releases: %s", err)
+			return ExitCodeError
+		}
+		if isLatestRelease {
+			latest = setLatestTrue
+		} else {
+			latest = setLatestFalse
+		}
+
+		if latest == setLatestTrue {
+			req.MakeLatest = github.String("true")
+		} else {
+			req.MakeLatest = github.String("false")
+		}
+	}
 
 	if soft {
 		_, err := ghr.GitHub.GetRelease(ctx, *req.TagName)
@@ -409,6 +458,12 @@ Options:
 
 -draft
 	Release as draft (Unpublish)
+
+-latest
+	Set the release as the 'latest' release. Can be true, false, or auto.
+	Auto will set the release as 'latest' if the release names are valid
+	semver names and the current release is the highest version of recent
+	releases.
 
 -prerelease
 	Create prerelease

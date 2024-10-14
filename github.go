@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/Songmu/retry"
-	"github.com/google/go-github/v47/github"
+	"github.com/google/go-github/v55/github"
 	"golang.org/x/oauth2"
 )
 
@@ -26,6 +26,7 @@ var (
 type GitHub interface {
 	CreateRelease(ctx context.Context, req *github.RepositoryRelease) (*github.RepositoryRelease, error)
 	GetRelease(ctx context.Context, tag string) (*github.RepositoryRelease, error)
+	GetLatestRelease(ctx context.Context) (*github.RepositoryRelease, error)
 	GetDraftRelease(ctx context.Context, tag string) (*github.RepositoryRelease, error)
 	EditRelease(ctx context.Context, releaseID int64, req *github.RepositoryRelease) (*github.RepositoryRelease, error)
 	DeleteRelease(ctx context.Context, releaseID int64) error
@@ -113,9 +114,30 @@ func (c *GitHubClient) CreateRelease(ctx context.Context, req *github.Repository
 func (c *GitHubClient) GetRelease(ctx context.Context, tag string) (*github.RepositoryRelease, error) {
 	// Check Release whether already exists or not
 	release, res, err := c.Repositories.GetReleaseByTag(context.TODO(), c.Owner, c.Repo, tag)
+
 	if err != nil {
 		if res == nil {
 			return nil, fmt.Errorf("failed to get release tag: %s %w", tag, err)
+		}
+
+		// TODO(tcnksm): Handle invalid token
+		if res.StatusCode != http.StatusNotFound {
+			return nil, fmt.Errorf("get release tag: invalid status: %s %w", res.Status, err)
+		}
+
+		return nil, ErrReleaseNotFound
+	}
+
+	return release, nil
+}
+
+// GetRelease queries the GitHub API for a specified release object
+func (c *GitHubClient) GetLatestRelease(ctx context.Context) (*github.RepositoryRelease, error) {
+	// Check Release whether already exists or not
+	release, res, err := c.Repositories.GetLatestRelease(context.TODO(), c.Owner, c.Repo)
+	if err != nil {
+		if res == nil {
+			return nil, fmt.Errorf("failed to find latest release: %w", err)
 		}
 
 		// TODO(tcnksm): Handle invalid token
