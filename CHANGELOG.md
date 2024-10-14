@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.17.0](https://github.com/tcnksm/ghr/compare/v0.16.2...v0.17.0) - 2024-10-14
+- Add -latest flag to specify latest release or not by @danudey in https://github.com/tcnksm/ghr/pull/152
+- Bump google.golang.org/protobuf from 1.28.1 to 1.33.0 by @dependabot in https://github.com/tcnksm/ghr/pull/158
+- Bump golang.org/x/net from 0.17.0 to 0.23.0 by @dependabot in https://github.com/tcnksm/ghr/pull/160
+- Bump github.com/cloudflare/circl from 1.3.3 to 1.3.7 by @dependabot in https://github.com/tcnksm/ghr/pull/161
+- update deps and go version by @Songmu in https://github.com/tcnksm/ghr/pull/162
+
 ## [v0.16.2](https://github.com/tcnksm/ghr/compare/v0.16.1...v0.16.2) - 2023-10-16
 - disable cgo. fixes #154. by @shogo82148 in https://github.com/tcnksm/ghr/pull/155
 
