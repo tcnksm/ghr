@@ -1,6 +1,8 @@
 module github.com/tcnksm/ghr
 
-go 1.19
+go 1.23
+
+toolchain go1.23.1
 
 require (
 	github.com/Songmu/retry v0.1.0
