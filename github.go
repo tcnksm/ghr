@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/Songmu/retry"
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v66/github"
 	"golang.org/x/oauth2"
 )
 
