@@ -1,6 +1,6 @@
 module github.com/tcnksm/ghr
 
-go 1.25
+go 1.25.0
 
 require (
 	github.com/Songmu/retry v0.1.0
@@ -12,7 +12,7 @@ require (
 	github.com/tcnksm/go-latest v0.0.0-20170313132115-e3007ae9052e
 	github.com/thediveo/enumflag/v2 v2.1.0
 	golang.org/x/oauth2 v0.35.0
-	golang.org/x/sync v0.19.0
+	golang.org/x/sync v0.20.0
 )
 
 require (
