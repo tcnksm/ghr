@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.18.2](https://github.com/tcnksm/ghr/compare/v0.18.1...v0.18.2) - 2026-04-15
+- set toolchain by @Songmu in https://github.com/tcnksm/ghr/pull/189
+
 ## [v0.18.1](https://github.com/tcnksm/ghr/compare/v0.18.0...v0.18.1) - 2026-04-15
 - Bump Songmu/tagpr from 1.15.0 to 1.18.2 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/185
 - Bump actions/cache from 5.0.3 to 5.0.5 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/186
