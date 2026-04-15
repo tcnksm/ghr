@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.18.3](https://github.com/tcnksm/ghr/compare/v0.18.2...v0.18.3) - 2026-04-15
+- go 1.26 by @Songmu in https://github.com/tcnksm/ghr/pull/191
+
 ## [v0.18.2](https://github.com/tcnksm/ghr/compare/v0.18.1...v0.18.2) - 2026-04-15
 - set toolchain by @Songmu in https://github.com/tcnksm/ghr/pull/189
 
