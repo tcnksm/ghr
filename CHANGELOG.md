@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.18.1](https://github.com/tcnksm/ghr/compare/v0.18.0...v0.18.1) - 2026-04-15
+- Bump Songmu/tagpr from 1.15.0 to 1.18.2 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/185
+- Bump actions/cache from 5.0.3 to 5.0.5 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/186
+- Bump shogo82148/actions-goveralls from 1.10.0 to 1.11.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/183
+- Bump actions/setup-go from 6.2.0 to 6.4.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/182
+- Bump github.com/hashicorp/go-version from 1.8.0 to 1.9.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/181
+- Bump golang.org/x/oauth2 from 0.35.0 to 0.36.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/178
+- Fallback ACTION_REF to v0.18.0 when github.action_ref is empty by @Songmu in https://github.com/tcnksm/ghr/pull/188
+- Bump github.com/thediveo/enumflag/v2 from 2.1.0 to 2.2.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/180
+
 ## [v0.18.0](https://github.com/tcnksm/ghr/compare/v0.17.2...v0.18.0) - 2026-02-14
 - add custom GitHub Actions by @Songmu in https://github.com/tcnksm/ghr/pull/174
 
