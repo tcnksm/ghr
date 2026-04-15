@@ -5,7 +5,7 @@ go 1.25
 require (
 	github.com/Songmu/retry v0.1.0
 	github.com/google/go-github/v66 v66.0.0
-	github.com/hashicorp/go-version v1.8.0
+	github.com/hashicorp/go-version v1.9.0
 	github.com/mattn/go-colorable v0.1.14
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db
 	github.com/tcnksm/go-gitconfig v0.1.2
