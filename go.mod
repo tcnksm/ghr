@@ -10,7 +10,7 @@ require (
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db
 	github.com/tcnksm/go-gitconfig v0.1.2
 	github.com/tcnksm/go-latest v0.0.0-20170313132115-e3007ae9052e
-	github.com/thediveo/enumflag/v2 v2.2.0
+	github.com/thediveo/enumflag/v2 v2.2.1
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sync v0.20.0
 )
@@ -22,7 +22,6 @@ require (
 	github.com/mattn/go-isatty v0.0.21 // indirect
 	github.com/spf13/cobra v1.10.2 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
-	golang.org/x/net v0.53.0 // indirect
-	golang.org/x/sys v0.43.0 // indirect
-	golang.org/x/tools v0.42.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
 )
