@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.18.4](https://github.com/tcnksm/ghr/compare/v0.18.3...v0.18.4) - 2026-07-14
+
+- fix releng for action.yml by @Songmu in https://github.com/tcnksm/ghr/pull/193
+- Bump Songmu/tagpr from 1.18.2 to 1.20.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/197
+- Bump golang.org/x/net from 0.53.0 to 0.55.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/206
+
 ## [v0.18.3](https://github.com/tcnksm/ghr/compare/v0.18.2...v0.18.3) - 2026-04-15
 - go 1.26 by @Songmu in https://github.com/tcnksm/ghr/pull/191
 
