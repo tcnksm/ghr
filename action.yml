@@ -5,7 +5,7 @@ inputs:
   version:
     description: "Version of ghr to install"
     required: false
-    default: "v0.18.3"
+    default: "v0.18.4"
   tag:
     description: "Git tag for the release (required)"
     required: true
