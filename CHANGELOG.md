@@ -1,5 +1,20 @@
 # Changelog
 
+## [v0.18.4](https://github.com/tcnksm/ghr/compare/v0.18.3...v0.18.4) - 2026-09-20
+
+- fix releng for action.yml by @Songmu in https://github.com/tcnksm/ghr/pull/193
+- Bump Songmu/tagpr from 1.18.2 to 1.20.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/197
+- Bump golang.org/x/net from 0.53.0 to 0.55.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/206
+- Bump github.com/mattn/go-colorable from 0.1.14 to 0.1.15 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/199
+- Bump actions/cache from 5.0.5 to 6.1.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/205
+- Bump golang.org/x/oauth2 from 0.36.0 to 0.37.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/213
+- Bump actions/setup-go from 6.4.0 to 7.0.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/210
+- Bump shogo82148/actions-goveralls from 1.11.0 to 1.11.1 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/211
+- Bump actions/checkout from 6.0.2 to 7.0.1 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/209
+- Bump Songmu/tagpr from 1.20.0 to 1.20.1 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/208
+- Bump golang.org/x/sync from 0.20.0 to 0.23.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/212
+- Bump github.com/thediveo/enumflag/v2 from 2.2.0 to 2.2.1 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/200
+
 ## [v0.18.3](https://github.com/tcnksm/ghr/compare/v0.18.2...v0.18.3) - 2026-04-15
 - go 1.26 by @Songmu in https://github.com/tcnksm/ghr/pull/191
 
