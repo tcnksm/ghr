@@ -1,0 +1,54 @@
+name: release build
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      artifact-metadata: write
+      attestations: write
+      contents: read
+      id-token: write
+    steps:
+    - name: checkout
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - name: setup go
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      with:
+        go-version-file: go.mod
+    - name: prepare release build
+      id: build
+      run: |
+        echo "revision=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+    - name: build release archives
+      id: goxz
+      uses: Songmu/goxz@654f94b7e3bf7398ec4cffe54ebbb1af135fb0a9 # v0.12.0
+      with:
+        package-version: ${{ github.ref_name }}
+        os: linux,darwin,windows,freebsd
+        arch: amd64,arm64
+        packages: .
+        build-ldflags: -s -w -X main.GitCommit=${{ steps.build.outputs.revision }}
+        static: "true"
+    - name: generate checksums
+      env:
+        OUTPUT_DIR: ${{ steps.goxz.outputs.output-dir }}
+      run: |
+        cd "$OUTPUT_DIR"
+        shasum -a 256 -- * > "${GITHUB_REF_NAME}_SHASUMS"
+    - name: attest build provenance
+      uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+      with:
+        subject-path: "${{ steps.goxz.outputs.output-dir }}/*"
+    - name: upload release artifacts
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: release-${{ github.ref_name }}
+        path: "${{ steps.goxz.outputs.output-dir }}/*"
+        if-no-files-found: error
+        retention-days: 1
