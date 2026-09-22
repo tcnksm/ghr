@@ -1,9 +1,7 @@
 VERSION = $(shell godzil show-version)
 COMMIT = $(shell git rev-parse --short HEAD)
 BUILD_LDFLAGS = "-s -w -X main.GitCommit=$(COMMIT)"
-ifdef update
-  u=-u
-endif
+u := $(if $(update),-u)
 
 .PHONY: default
 default: test
@@ -17,6 +15,7 @@ deps:
 .PHONY: devel-deps
 devel-deps: deps
 	go install github.com/Songmu/godzil/cmd/godzil@latest
+	go install github.com/Songmu/gocredits/cmd/gocredits@v0.5.0
 
 # build generate binary on './bin' directory.
 .PHONY: build
@@ -24,13 +23,19 @@ build:
 	go build -ldflags=$(BUILD_LDFLAGS) -o bin/ghr
 
 CREDITS: go.sum devel-deps
-	godzil credits -w
+	gocredits . > CREDITS
+
+.PHONY: prepare-release
+prepare-release: devel-deps
+	go mod tidy
+	gocredits . > CREDITS
+	git update-index --add --remove -- go.mod go.sum CREDITS
 
 .PHONY: crossbuild
 crossbuild: CREDITS
 	CGO_ENABLED=0 godzil crossbuild -pv=v${VERSION} -build-ldflags=$(BUILD_LDFLAGS) \
-        -arch=amd64,arm64 -os=windows,darwin,linux,freebsd -d=./pkg/dist/v${VERSION}
-	cd pkg/dist/v${VERSION} && shasum -a 256 * > ./v${VERSION}_SHASUMS
+		-arch=amd64,arm64 -os=windows,darwin,linux,freebsd -d=./pkg/dist/v${VERSION}
+	cd pkg/dist/v${VERSION} && shasum -a 256 -- * > ./v${VERSION}_SHASUMS
 
 # install installs binary on $GOPATH/bin directory.
 .PHONY: install
