@@ -70,7 +70,7 @@ runs:
       ACTION_REF="${ACTION_REF:-v0.18.0}"
       TEMP_PATH="$(mktemp -d)"
       PATH="${TEMP_PATH}:$PATH"
-      curl -sfL "https://raw.githubusercontent.com/tcnksm/ghr/${ACTION_REF}/install.sh" | sh -s -- -b "$TEMP_PATH" "$GHR_VERSION" 2>&1
+      bash "$GITHUB_ACTION_PATH/install.sh" -b "$TEMP_PATH" "$GHR_VERSION"
 
       ARGS=()
       if [ "$INPUT_DRAFT" = "true" ]; then
