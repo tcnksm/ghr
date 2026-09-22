@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.18.5](https://github.com/tcnksm/ghr/compare/v0.18.4...v0.18.5) - 2026-09-22
+
+- Modernize release workflow by @Songmu in https://github.com/tcnksm/ghr/pull/214
+
 ## [v0.18.4](https://github.com/tcnksm/ghr/compare/v0.18.3...v0.18.4) - 2026-09-20
 
 - fix releng for action.yml by @Songmu in https://github.com/tcnksm/ghr/pull/193
