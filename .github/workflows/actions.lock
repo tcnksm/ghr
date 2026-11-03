@@ -22,7 +22,7 @@ workflows:
         - 'actions/cache@v6.1.0'
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-go@v7.0.0'
-        - 'shogo82148/actions-goveralls@v1.11.3'
+        - 'shogo82148/actions-goveralls@v1.11.5'
 dependencies:
     'actions/attest@v4.2.2':
         ref: 'v4.2.2'
@@ -59,9 +59,9 @@ dependencies:
         commit: 'sha1-7d2c558640ea49e798d46539536190aff8c18715'
         owner_id: 3797062
         repo_id: 225328382
-    'shogo82148/actions-goveralls@v1.11.3':
-        ref: 'v1.11.3'
-        commit: 'sha1-daabb2902148216a0b13c82107a6e67ed97f796e'
+    'shogo82148/actions-goveralls@v1.11.5':
+        ref: 'v1.11.5'
+        commit: 'sha1-548a2a7896df420c38df648845a5525a33f82585'
         owner_id: 1157344
         repo_id: 222089012
     'songmu/goxz@v0.13.0':
