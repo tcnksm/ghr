@@ -3,11 +3,78 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 )
+
+func TestRun_commitish(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		commitish string
+	}{
+		{name: "omitted"},
+		{name: "branch", commitish: "main"},
+		{name: "SHA", commitish: "0123456789abcdef0123456789abcdef01234567"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			requests := make(chan map[string]interface{}, 1)
+			mux := http.NewServeMux()
+			mux.HandleFunc("GET /repos/owner/repo/releases", func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprint(w, "[]")
+			})
+			mux.HandleFunc("GET /repos/owner/repo/releases/tags/run", func(w http.ResponseWriter, r *http.Request) {
+				http.NotFound(w, r)
+			})
+			mux.HandleFunc("POST /repos/owner/repo/releases", func(w http.ResponseWriter, r *http.Request) {
+				var req map[string]interface{}
+				if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+					t.Errorf("Decode release request: %s", err)
+					http.Error(w, "invalid JSON", http.StatusBadRequest)
+					return
+				}
+				requests <- req
+				w.WriteHeader(http.StatusCreated)
+				fmt.Fprintf(w, `{"id":1,"upload_url":"http://%s/repos/owner/repo/releases/1/assets"}`, r.Host)
+			})
+			mux.HandleFunc("PATCH /repos/owner/repo/releases/1", func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprint(w, `{"id":1}`)
+			})
+			server := httptest.NewServer(mux)
+			defer server.Close()
+			t.Setenv(EnvGitHubAPI, server.URL+"/")
+
+			outStream, errStream := new(bytes.Buffer), new(bytes.Buffer)
+			cli := &CLI{outStream: outStream, errStream: errStream}
+			args := []string{"ghr", "-username", "owner", "-repository", "repo", "-token", "test-token"}
+			if tc.commitish != "" {
+				args = append(args, "--commitish", tc.commitish)
+			}
+			args = append(args, "run")
+			if got := cli.Run(args); got != ExitCodeOK {
+				t.Fatalf("Run exits %d, want %d\n\n%s", got, ExitCodeOK, errStream.String())
+			}
+
+			select {
+			case req := <-requests:
+				got, present := req["target_commitish"]
+				if tc.commitish == "" {
+					if present {
+						t.Errorf("target_commitish = %v, want absent", got)
+					}
+				} else if !present || got != tc.commitish {
+					t.Errorf("target_commitish = %v, want %q", got, tc.commitish)
+				}
+			default:
+				t.Fatal("No release-creation request received")
+			}
+		})
+	}
+}
 
 func TestRun(t *testing.T) {
 	client := testGithubClient(t)

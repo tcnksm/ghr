@@ -304,9 +304,11 @@ func (cli *CLI) Run(args []string) int {
 		TagName:              github.String(tag),
 		Prerelease:           github.Bool(prerelease),
 		Draft:                github.Bool(draft),
-		TargetCommitish:      github.String(commitish),
 		Body:                 github.String(body),
 		GenerateReleaseNotes: github.Bool(generatenotes),
+	}
+	if commitish != "" {
+		req.TargetCommitish = github.String(commitish)
 	}
 
 	ctx := context.TODO()
