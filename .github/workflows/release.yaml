@@ -26,15 +26,15 @@ jobs:
       contents: write
     steps:
     - name: checkout
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      uses: actions/checkout@v7.0.1
       with:
         persist-credentials: false
     - name: setup go
-      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      uses: actions/setup-go@v7.0.0
       with:
         go-version-file: go.mod
     - name: download release artifacts
-      uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+      uses: actions/download-artifact@v8.0.2
       with:
         name: release-${{ github.ref_name }}
         path: pkg/dist/${{ github.ref_name }}
@@ -44,7 +44,7 @@ jobs:
         PACKAGE_VERSION: ${{ github.ref_name }}
       run: make upload VERSION="$PACKAGE_VERSION"
     - name: update major version tag
-      uses: haya14busa/action-update-semver@7d2c558640ea49e798d46539536190aff8c18715 # v1.5.1
+      uses: haya14busa/action-update-semver@v1.5.1
       with:
         github_token: ${{ github.token }}
         tag: ${{ github.ref_name }}

@@ -19,15 +19,15 @@ jobs:
           - windows-latest
     steps:
       - name: Check out code into the Go module directory
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - name: Set up Go
-        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        uses: actions/setup-go@v7.0.0
         with:
           go-version-file: go.mod
       - name: restore cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        uses: actions/cache@v6.1.0
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
@@ -38,7 +38,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GHTOOLS_GITHUB_TOKEN }}
       - name: Send coverage
-        uses: shogo82148/actions-goveralls@daabb2902148216a0b13c82107a6e67ed97f796e # v1.11.3
+        uses: shogo82148/actions-goveralls@v1.11.3
         with:
           path-to-profile: cover.out
           parallel: true
@@ -52,6 +52,6 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: shogo82148/actions-goveralls@daabb2902148216a0b13c82107a6e67ed97f796e # v1.11.3
+      - uses: shogo82148/actions-goveralls@v1.11.3
         with:
           parallel-finished: true
