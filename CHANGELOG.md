@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.18.6](https://github.com/tcnksm/ghr/compare/v0.18.5...v0.18.6) - 2026-11-03
+
+- Bump Songmu/goxz from 0.12.0 to 0.13.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/218
+- Bump github.com/mattn/go-colorable from 0.1.15 to 0.1.16 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/225
+- Bump shogo82148/actions-goveralls from 1.11.1 to 1.11.3 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/220
+- Bump golang.org/x/sync from 0.23.0 to 0.24.0 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/224
+- Bump actions/download-artifact from 8.0.1 to 8.0.2 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/222
+- Bump actions/upload-artifact from 7.0.1 to 7.0.2 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/221
+- Bump Songmu/tagpr from 1.20.3 to 1.21.2 by @dependabot[bot] in https://github.com/tcnksm/ghr/pull/223
+- Fix: omit target_commitish when --commitish is not specified by @Songmu in https://github.com/tcnksm/ghr/pull/226
+- Adopt Actions lockfile and group Dependabot updates by @Songmu in https://github.com/tcnksm/ghr/pull/228
+
 ## [v0.18.5](https://github.com/tcnksm/ghr/compare/v0.18.4...v0.18.5) - 2026-09-22
 
 - Modernize release workflow by @Songmu in https://github.com/tcnksm/ghr/pull/214
